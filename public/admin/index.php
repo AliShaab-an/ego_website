@@ -18,7 +18,7 @@
     $productController = new ProductController();
     $categoryController = new CategoryController();
 
-    $action = $_GET['action'] ?? 'dashboard';
+    $action = $_GET['action'] ?? 'login';
 ?>
     <!DOCTYPE html>
     <html lang="en">
@@ -30,10 +30,12 @@
         <script src="https://kit.fontawesome.com/7f6ab6587f.js" crossorigin="anonymous"></script>
         <title>Admin Panel - Ego Clothing</title>
     </head>
-    <body class="flex justify-center bg-white h-full">
-        <div class=" flex mt-6">
-            <?php include( BACKEND_VIEWS .'sidebar.php'); ?>
-            <main class="flex-1 ml-10 w-5xl ">
+    <body class="flex justify-center bg-white h-screen overflow-hidden">
+        <?php include(BACKEND_VIEWS . 'popup.php'); ?>
+        <div class="  h-9/10 flex mt-6">
+            <?php include( BACKEND_VIEWS .'sidebar.php');?>
+
+            <main class="flex-1 ml-10 w-5xl h-full overflow-y-auto">
                 <?php 
                     switch($action){
                         case 'login':
@@ -49,7 +51,7 @@
                             $productController->productsPage();
                             break;
                         case 'Categories':
-                            $categoryController->categoryPage();
+                            $adminController->categoryPage();
                             break;
                         case 'Customers':
                             $userController->customersPage();
@@ -66,7 +68,9 @@
                 ?>
             </main>
         </div>
+        <script src="<?= ADMIN_JS_PATH ?>jquery-3.7.1.min.js"></script>
         <script src="<?= ADMIN_JS_PATH ?>index.js"></script>
+        <script src="<?= ADMIN_JS_PATH ?>admin.js"></script>
     </body>
     </html>
 

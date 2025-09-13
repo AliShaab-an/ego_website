@@ -41,5 +41,7 @@
             include __DIR__ . '/../views/backend/dashboard.php';
         }
 
-        
+        public function categoryPage(){
+            include __DIR__ . '/../views/backend/category.php';
+        }
     }
