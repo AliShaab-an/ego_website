@@ -1,10 +1,3 @@
-<?php 
-    ini_set('display_errors', 1);
-    error_reporting(E_ALL);
-    ini_set('display_startup_errors', 1);
-    echo "REACHED"; exit;
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,9 +7,8 @@
     <title>Document</title>
 </head>
 <body class="bg-red-500 border border-black">
-    <div>
-    <?php echo "REACHED"; exit; ?>
+    <div class="flex justify-center items-center h-screen">
+
     </div>
-    <?php include __DIR__ . "/../app/views/frontend/footer.php" ?>
 </body>
 </html>

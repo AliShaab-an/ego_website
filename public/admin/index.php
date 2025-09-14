@@ -18,7 +18,11 @@
     $productController = new ProductController();
     $categoryController = new CategoryController();
 
-    $action = $_GET['action'] ?? 'login';
+    $action = $_GET['action'] ?? 'dashboard';
+
+    if (!in_array($action, ['login', 'logout'])) {
+        Auth::checkAdmin();   // will allow admin or super_admin
+    }
 ?>
     <!DOCTYPE html>
     <html lang="en">
@@ -31,7 +35,9 @@
         <title>Admin Panel - Ego Clothing</title>
     </head>
     <body class="flex justify-center bg-white h-screen overflow-hidden">
-        <?php include(BACKEND_VIEWS . 'popup.php'); ?>
+        <?php include(BACKEND_VIEWS . 'popup.php');
+            include(BACKEND_VIEWS . 'createAdminPopup.php');
+        ?>
         <div class="  h-9/10 flex mt-6">
             <?php include( BACKEND_VIEWS .'sidebar.php');?>
 
@@ -45,19 +51,21 @@
                             $adminController->dashboard();
                             break;
                         case 'orderManagement':
-                            $orderController->ordersPage();
+                            $adminController->ordersPage();
                             break;
                         case 'addProduct':
-                            $productController->productsPage();
+                            $adminController->productsPage();
                             break;
                         case 'Categories':
                             $adminController->categoryPage();
                             break;
                         case 'Customers':
-                            $userController->customersPage();
+                            $adminController->customersPage();
                             break;
                         case 'Admins':
-                            $userController->adminsPage();
+                            // only super_admin can access
+                            Auth::checkRoles(['super_admin']); 
+                            $adminController->adminsPage();
                             break;
                         case 'logout':
                             $adminController->logout();

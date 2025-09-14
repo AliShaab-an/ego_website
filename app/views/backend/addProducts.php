@@ -4,7 +4,7 @@
     
 </div>
 
-<div class="w-full h-dvh flex gap-4">
+<div class="w-full flex gap-4">
     <div class="w-3/5  bg-white flex flex-col items-start gap-2 py-4 px-4 shadow-[0_0_14.36px_-3.16px_rgba(0,0,0,0.25)]">
         <p class="text-3xl font-bold mb-4">Basic Details</p>
         <label for="" class="font-bold">Product Name</label>
@@ -32,7 +32,10 @@
             </div>
             <div>
                 <label for="" class="font-bold">Stock Status</label>
-                <input type="text" class="w-full p-2 border border-gray-500 rounded">
+                <select class="w-full p-2 border border-gray-500 rounded" name="" id="">
+                    <option value="in_stock">In Stock</option>
+                    <option value="out_of_stock">Out of Stock</option>
+                </select>
             </div>
         </div>
     </div>

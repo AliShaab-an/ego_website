@@ -14,9 +14,14 @@
             if($_SERVER['REQUEST_METHOD'] === 'POST'){
                 $email = $_POST['email'] ?? '';
                 $password = $_POST['password'] ?? '';
-
+                
+                if(User::emailExists($email) === false){
+                    $error = "Email already exists.";
+                    exit;
+                }
                 $user = User::verifyLogin($email,$password);
-                if($user && $user['role'] === 'admin'){
+
+                if($user && in_array($user['role'], ['admin','super_admin'])){
                     Session::set('user_id',$user['id']);
                     Session::set('user_name',$user['name']);
                     Session::set('user_email',$user['email']);
@@ -37,11 +42,26 @@
         }
 
         public function dashboard(){
-            Auth::checkAdmin();
             include __DIR__ . '/../views/backend/dashboard.php';
         }
 
         public function categoryPage(){
             include __DIR__ . '/../views/backend/category.php';
+        }
+
+        public function ordersPage() {
+            include __DIR__ . '/../views/backend/orders.php';
+        }
+
+        public function customersPage(){
+            include __DIR__ . '/../views/backend/customers.php';
+        }
+
+        public function adminsPage(){
+            include __DIR__ . '/../views/backend/admins.php';
+        }
+
+        public function productsPage(){
+            include __DIR__ . '/../views/backend/addProducts.php';
         }
     }

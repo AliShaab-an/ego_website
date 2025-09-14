@@ -3,9 +3,9 @@
 // require_once __DIR__ . '/config/database.php';
 
 // $name = "Ali Shaaban";
-// $email = "ali.shaaban2002@example.com";
+// $email = "ali.shaaban2002@gmail.com";
 // $password = password_hash("admin1", PASSWORD_BCRYPT);
-// $role = "admin";
+// $role = "super_admin";
 
 // $stmt = $pdo->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)");
 // $stmt->execute([$name, $email, $password, $role]);

@@ -14,10 +14,11 @@
 
 
         public static function createProduct($data){
-            DB::query("INSERT INTO products (name, description, price, category_id, created_at) VALUES (?, ?, ?, ?)", [
+            DB::query("INSERT INTO products (name, description, base_price,weight, category_id, created_at) VALUES (?, ?, ?, ?)", [
                 $data['name'],
                 $data['description'],
-                $data['price'],
+                $data['base_price'],
+                $data['weight'],
                 $data['category_id'],
             ]);
             return DB::getConnection()->lastInsertId();

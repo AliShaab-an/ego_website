@@ -7,10 +7,27 @@ function formatDate(isoDate) {
 }
 
 $(document).ready(function () {
+  loadCategories();
+  loadCustomers();
+  loadAdmins();
+});
+
+$(document).ready(function () {
   $("#openBtn").on("click", function () {
     $("#popup").removeClass("hidden");
   });
-  loadCategories();
+});
+
+$(document).ready(function () {
+  $("#openAdminBtn").on("click", function () {
+    $("#createAdmin").removeClass("hidden");
+  });
+});
+
+$(document).ready(function () {
+  $("#AdminCloseBtn").on("click", function () {
+    $("#createAdmin").addClass("hidden");
+  });
 });
 
 $(document).ready(function () {
@@ -158,3 +175,130 @@ $(document).on("click", ".deleteCategory", function () {
     },
   });
 });
+
+// Load customers
+function loadCustomers() {
+  $.ajax({
+    url: "/Ego_website/public/admin/api/customers_list.php",
+    type: "GET",
+    dataType: "json",
+    success: function (res) {
+      if (res.status === "success") {
+        let table = `
+          <table class="table-auto w-full md:table-fixed">
+            <thead class="bg-[rgba(240,215,186,0.2)]">
+              <tr>
+                <th class="pt-4 pb-4">No.</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>`;
+
+        let totalCustomers = `<p class='text-3xl font-bold text-black my-2'>0</p>`;
+        let customersLast7Days = `<p class='text-3xl font-bold text-black my-2'>0</p>`;
+
+        if (res.data.length) {
+          res.data.forEach((customer) => {
+            table += `
+              <tr class="text-center border-b border-gray-300">
+                <td class="py-4">${customer.id}</td>
+                <td class="py-4">${customer.name}</td>
+                <td class="py-4">${customer.email}</td>
+                <td class="py-4">
+                  <span class="flex justify-center gap-2">
+                    <i class="fa-solid fa-trash hover:text-red-500 deleteCustomer"
+                       data-id="${customer.id}"></i>
+                  </span>
+                </td>
+              </tr>`;
+          });
+
+          totalCustomers = `<p class='text-3xl font-bold text-black my-2'>${res.data.length}</p>`;
+          customersLast7Days = `<p class='text-3xl font-bold text-black my-2'>${res.last7Days}</p>`;
+        } else {
+          table += `<tr><td colspan="4" class="text-center p-4">No customers found</td></tr>`;
+        }
+        table += `</tbody></table>`;
+        $("#customersList").html(table);
+        $("#totalCustomers").html(totalCustomers);
+        $("#customersLast7Days").html(customersLast7Days);
+      } else {
+        $("#customersList").html(
+          "<p class='text-red-500'>Error loading customers</p>"
+        );
+        $("#totalCustomers").html(totalCustomers);
+        $("#customersLast7Days").html(customersLast7Days);
+      }
+    },
+    error: function () {
+      $("#customersList").html(
+        "<p class='text-red-500'>Server error while loading customers.</p>"
+      );
+      $("#totalCustomers").html(
+        `<p class='text-3xl font-bold text-black my-2'>0</p>`
+      );
+      $("#customersLast7Days").html(
+        `<p class='text-3xl font-bold text-black my-2'>0</p>`
+      );
+    },
+  });
+}
+
+function loadAdmins() {
+  $.ajax({
+    url: "/Ego_website/public/admin/api/admins_list.php",
+    type: "GET",
+    dataType: "json",
+    success: function (res) {
+      if (res.status === "success") {
+        let table = `
+                <table class="table-auto w-full  md:table-fixed ">
+                    <thead class="bg-[rgba(240,215,186,0.2)] ">
+                        <tr>
+                            <th class="py-4">No.</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                `;
+
+        if (res.data.length) {
+          res.data.forEach((admin) => {
+            table += `
+                            <tr class="text-center border-b border-gray-300 ">
+                                <td class="py-4">${admin.id}</td>
+                                <td class="py-4">${admin.name}</td>
+                                <td class="py-4">${admin.email}</td>
+                                <td class="py-4">${admin.role}</td>
+                                <td class="py-4">
+                                    <span class="flex justify-center gap-2">
+                                        <i class="fa-solid fa-trash hover:text-red-500 deleteAdmin"
+                                        data-id="${admin.id}"></i>
+                                    </span>
+                                </td>
+                            </tr>
+                        `;
+          });
+        } else {
+          table += `<tr><td colspan="4" class="text-center p-4">No admins found</td></tr>`;
+        }
+        table += `</tbody></table>`;
+        $("#adminsList").html(table);
+      } else {
+        $("#adminsList").html(
+          "<p class='text-red-500'>Error loading admins</p>"
+        );
+      }
+    },
+    error: function () {
+      $("#adminsList").html(
+        "<p class='text-red-500'>Server error while loading admins.</p>"
+      );
+    },
+  });
+}
