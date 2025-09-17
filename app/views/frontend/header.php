@@ -32,7 +32,7 @@
                 </button>
                 <button id="menuBtn" aria-controls="mobileNav" aria-expanded="false"
                         class="inline-flex items-center justify-center w-8 h-10 rounded-md" aria-label="Menu">
-                    <i class="fi fi-br-menu-burger"></i>
+                    <i class="fi fi-rr-menu-burger"></i>
                 </button>
             </div>
             

@@ -111,3 +111,48 @@ toggleBtn.addEventListener("click", () => {
     toggleIcon.classList.add("fa-eye");
   }
 });
+
+let variantIndex = 1;
+
+document.getElementById("addInventory").addEventListener("click", function (e) {
+  e.preventDefault();
+
+  const container = document.getElementById("variantContainer");
+
+  const newRow = document.createElement("div");
+  newRow.classList.add("flex", "flex-row", "gap-2", "mt-2", "variant-row");
+
+  newRow.innerHTML = `
+        <div>
+            <label class="font-bold">Stock Quantity</label>
+            <input type="number" name="variants[${variantIndex}][quantity]" 
+                   class="w-40 text-center h-10 p-2 border border-gray-500 rounded" min="0">
+        </div>
+        <div>
+            <label class="font-bold">Color</label>
+            <select name="variants[${variantIndex}][color_id]" class="w-40 h-10 text-center text-sm p-2 border border-gray-500 rounded">
+                <option value="">Color</option>
+            </select>
+        </div>
+        <div>
+            <label class="font-bold">Size</label>
+            <select name="variants[${variantIndex}][size_id]" class="w-40 h-10 text-center text-sm p-2 border border-gray-500 rounded">
+                <option value="">Size</option>
+            </select>
+        </div>
+        
+        <div class="text-center">
+            <label class="font-bold">Remove</label>
+            <button type="button" class="removeVariant h-10 px-4 border border-red-500 text-red-600 rounded"><i class="fi fi-rr-cross-circle"></i></button>
+        </div>
+  `;
+
+  container.appendChild(newRow);
+  variantIndex++;
+
+  document.addEventListener("click", function (e) {
+    if (e.target.classList.contains("removeVariant")) {
+      e.target.closest(".variant-row").remove();
+    }
+  });
+});

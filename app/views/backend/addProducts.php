@@ -7,35 +7,51 @@
 <div class="w-full flex gap-4">
     <div class="w-3/5  bg-white flex flex-col items-start gap-2 py-4 px-4 shadow-[0_0_14.36px_-3.16px_rgba(0,0,0,0.25)]">
         <p class="text-3xl font-bold mb-4">Basic Details</p>
+        <form action="">
+
+        </form>
         <label for="" class="font-bold">Product Name</label>
-        <input type="text" class="w-full p-2 border border-gray-500 rounded">
+        <input type="text" class="w-full p-2 border border-gray-500 rounded" required>
         <label for="" class="font-bold">Product description</label>
         <input type="text" class="w-full h-16 px-2  border border-gray-500 rounded">
         <p class="font-bold text-xl">Pricing</p>
         <label for="" class="font-bold">Product price</label>
-        <input type="text" class="w-full p-2 border border-gray-500 rounded">
+        <input type="number" class="w-full p-2 border border-gray-500 rounded" placeholder="$00.00" min="0.00" required>
         <div class="flex flex-row  gap-2">
             <div class="">
                 <label for="" class="font-bold">Discounted Price(Optional)</label>
-                <input type="text" class="w-full p-2 border border-gray-500 rounded">
+                <input type="number" class="w-full p-2 border border-gray-500 rounded">
             </div>
             <div>
                 <label for="" class="font-bold">Weight</label>
-                <input type="text" class="w-full p-2 border border-gray-500 rounded">
+                <input type="number" class="w-full p-2 border border-gray-500 rounded">
             </div>
         </div>
+
         <p class="font-bold text-xl">Inventory</p>
-        <div class="flex flex-row  gap-2">
-            <div class="">
-                <label for="" class="font-bold">Stock Quantity</label>
-                <input type="text" class="w-full p-2 border border-gray-500 rounded">
-            </div>
-            <div>
-                <label for="" class="font-bold">Stock Status</label>
-                <select class="w-full p-2 border border-gray-500 rounded" name="" id="">
-                    <option value="in_stock">In Stock</option>
-                    <option value="out_of_stock">Out of Stock</option>
-                </select>
+        <div id="variantContainer">
+            <!-- First variant row -->
+            <div  class="flex flex-row gap-2">
+                <div>
+                    <label for="" class="font-bold">Stock Quantity</label>
+                    <input type="number" class="w-40 text-center h-10 p-2 border border-gray-500 rounded">
+                </div>
+                <div>
+                    <label for="" class="font-bold">Colors</label>
+                    <select class="w-40 h-10 text-center text-sm p-2 border border-gray-500 rounded">
+                        <option value="">Color</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="" class="font-bold">Size</label>
+                    <select class="w-40 h-10 text-center text-sm p-2 border border-gray-500 rounded">
+                        <option value="">Size</option>
+                    </select>
+                </div>
+                <div class="text-center">
+                    <label for="" class="font-bold">Add</label>
+                    <button id="addInventory" class="h-10 text-sm px-4 border border-gray-500 rounded"><i class="fi fi-rr-plus"></i></button>
+                </div>
             </div>
         </div>
     </div>
@@ -66,11 +82,17 @@
         <select name="" id="" class="w-full border border-gray-500 rounded my-2 p-2">
             <option value="">Select Your Category</option>
         </select>
-        <p class="font-bold">Select colors</p>
-        <div>
-
+        <p class="font-bold">Add Color</p>
+        <div class="flex items-center gap-2 mt-2">
+            <div class="flex flex-col">
+                <input type="text" id="colorName" name="name" placeholder="Choose Color" 
+                class="p-2 border border-gray-400 rounded w-40">
+            </div>
+            <div class="flex flex-col">   
+                <input type="color" id="colorPicker" name="hex_code" value="#f01105ff"
+                class="w-16 h-10 p-1 border border-gray-400 rounded shadow cursor-pointer">
+            </div>
         </div>
     </div>
-
 </div>
 

@@ -14,7 +14,7 @@
 
 
         public static function createProduct($data){
-            DB::query("INSERT INTO products (name, description, base_price,weight, category_id, created_at) VALUES (?, ?, ?, ?)", [
+            DB::query("INSERT INTO products (name, description, base_price,weight, category_id) VALUES (?, ?, ?, ?, ?)", [
                 $data['name'],
                 $data['description'],
                 $data['base_price'],
