@@ -10,6 +10,7 @@ $(document).ready(function () {
   loadCategories();
   loadCustomers();
   loadAdmins();
+  loadColors();
 });
 
 $(document).ready(function () {
@@ -56,6 +57,7 @@ function loadCategories() {
             <tbody>`;
 
         let grid = "";
+        let dropdown = `<option value="">Select Your Category</option>`;
         if (res.data.length) {
           res.data.forEach((cat) => {
             table += `
@@ -84,6 +86,7 @@ function loadCategories() {
                     </p>
                 </div> 
             `;
+            dropdown += `<option value="${cat.id}">${cat.name}</option>`;
           });
         } else {
           table += `<tr><td colspan="3" class="text-center p-4">No categories found</td></tr>`;
@@ -93,11 +96,13 @@ function loadCategories() {
 
         $("#categoryList").html(table);
         $("#categoryGrid").html(grid);
+        $("#categoryDropdown").html(dropdown);
       } else {
         $("#categoryList").html(
           "<p class='text-red-500'>Error loading categories</p>"
         );
         $("#categoryGrid").html("");
+        $("#categoryDropdown").html(`<option value="">Error loading</option>`);
       }
     },
     error: function () {
@@ -105,6 +110,7 @@ function loadCategories() {
         "<p class='text-red-500'>Server error while loading categories.</p>"
       );
       $("#categoryGrid").html("");
+      $("#categoryDropdown").html(`<option value="">Server error</option>`);
     },
   });
 }
@@ -298,6 +304,76 @@ function loadAdmins() {
     error: function () {
       $("#adminsList").html(
         "<p class='text-red-500'>Server error while loading admins.</p>"
+      );
+    },
+  });
+}
+
+$(document).ready(function () {
+  $("#colorForm").on("submit", function (e) {
+    e.preventDefault();
+
+    $.ajax({
+      url: "/Ego_website/public/admin/api/add-color.php",
+      type: "POST",
+      data: $(this).serialize(),
+      dataType: "json",
+      success: function (res) {
+        if (res.status === "success") {
+          alert("Color added successfully!");
+          $("#colorForm")[0].reset();
+
+          if (typeof loadColors === "function") {
+            loadColors();
+          }
+        } else {
+          alert(res.message || "Error adding color");
+        }
+      },
+      error: function () {
+        alert("Server error while adding color");
+      },
+    });
+  });
+});
+
+let colorOptions = '<option value="">Color</option>';
+
+function loadColors() {
+  $.ajax({
+    url: "/Ego_website/public/admin/api/list-colors.php",
+    type: "GET",
+    dataType: "json",
+    success: function (res) {
+      if (res.status === "success") {
+        let dropdown = `<option value="">Color</option>`;
+        colorOptions = '<option value="">Color</option>';
+
+        if (Array.isArray(res.data) && res.data.length) {
+          res.data.forEach((color) => {
+            const option = `<option value="${color.id}" style="background:${color.hex_code}; color:#fff;">
+               ${color.name}
+             </option>`;
+            colorOptions += option;
+            dropdown += option;
+          });
+        } else {
+          dropdown += `<option value="">No Colors</option>`;
+          colorOptions = '<option value="">No Colors</option>';
+        }
+        $("#colorsDropdown").html(dropdown);
+        $("#variantContainer select[name*='[color_id]']").html(colorOptions);
+      } else {
+        $("#colorsDropdown").html(`<option value="">Error loading</option>`);
+        $("#variantContainer select[name*='[color_id]']").html(
+          '<option value="">Error loading</option>'
+        );
+      }
+    },
+    error: function () {
+      $("#colorsDropdown").html(`<option value="">Server error</option>`);
+      $("#variantContainer select[name*='[color_id]']").html(
+        '<option value="">Server error</option>'
       );
     },
   });

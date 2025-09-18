@@ -38,7 +38,7 @@
                 </div>
                 <div>
                     <label for="" class="font-bold">Colors</label>
-                    <select class="w-40 h-10 text-center text-sm p-2 border border-gray-500 rounded">
+                    <select id="colorsDropdown" class="w-40 h-10 text-center text-sm p-2 border border-gray-500 rounded">
                         <option value="">Color</option>
                     </select>
                 </div>
@@ -79,20 +79,39 @@
         </div>
         <p class="text-lg font-bold my-2">Categories</p>
         <p class="font-semibold">Product Categories</p>
-        <select name="" id="" class="w-full border border-gray-500 rounded my-2 p-2">
-            <option value="">Select Your Category</option>
+
+        <select name="" id="categoryDropdown" class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 pr-10 text-gray-700 shadow-sm
+            focus:border-[rgba(183,146,103,1)] focus:ring-2 focus:ring-[rgba(183,146,103,0.3)] focus:outline-none
+            transition duration-200 ease-in-out cursor-pointer">
+            <option class="bg-white text-gray-700 font-medium hover:bg-gray-100" value="">Select Your Category</option>
         </select>
-        <p class="font-bold">Add Color</p>
-        <div class="flex items-center gap-2 mt-2">
+            
+        
+        
+        <p class="font-semibold mt-2">Add Color</p>
+        <form id="colorForm" class="flex items-center gap-2 ">
             <div class="flex flex-col">
-                <input type="text" id="colorName" name="name" placeholder="Choose Color" 
+                <input type="text" id="colorName" name="name" placeholder="Color Name" 
                 class="p-2 border border-gray-400 rounded w-40">
             </div>
             <div class="flex flex-col">   
                 <input type="color" id="colorPicker" name="hex_code" value="#f01105ff"
-                class="w-16 h-10 p-1 border border-gray-400 rounded shadow cursor-pointer">
+                class="w-28 h-10 p-1 border border-gray-400 rounded shadow cursor-pointer">
             </div>
-        </div>
+            <button type="submit" class="h-10 text-sm px-4 border border-gray-500 rounded"><i class="fi fi-rr-plus"></i></button>
+        </form>
+        <p class="font-semibold mt-2">Add Size</p>
+        <form id="SizeForm" class="flex items-center gap-2 mt-2 ">
+            <div class="flex flex-col">
+                <input type="text" id="colorName" name="name" placeholder="Size name" 
+                class="p-2 border border-gray-400 rounded w-40">
+            </div>
+            <div class="flex flex-col">   
+                <input type="text" id="sizeType" name="type" placeholder="Type"
+                class="w-28 h-10 p-1 border border-gray-400 rounded shadow cursor-pointer">
+            </div>
+            <button type="submit" class="h-10 text-sm px-4 border border-gray-500 rounded"><i class="fi fi-rr-plus"></i></button>
+        </form>
     </div>
 </div>
 

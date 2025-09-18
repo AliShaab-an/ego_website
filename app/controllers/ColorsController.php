@@ -5,7 +5,7 @@
 
         public function addColor(){
             $name = $_POST["name"] ?? '';
-            $hex = $_POST['hex_name'] ?? null;
+            $hex = $_POST['hex_code'] ?? null;
             
             if($name == ''){
                 return ['status' => 'error', 'message' => 'Color name required'];
