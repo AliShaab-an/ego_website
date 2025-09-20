@@ -9,6 +9,8 @@
             return ['status' => 'success', 'data' => $categories];
         }
 
+        
+
         public function addCategory(){
             $name = trim($_POST['name'] ?? '');
 
@@ -57,6 +59,11 @@
 
             Category::deleteCategory($id);
             return ['status' => 'success', 'message' => 'Category deleted successfully'];
+        }
+
+        // Frontend Functions
+        public function getCategories(){
+            return  Category::getAllCategories();
         }
 
     }

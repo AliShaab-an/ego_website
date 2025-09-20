@@ -5,7 +5,7 @@
 
     class Category{
         public static function getAllCategories(){
-            return DB::query("SELECT * FROM categories ORDER BY name DESC") -> fetchAll();
+            return DB::query("SELECT * FROM categories ORDER BY name DESC") -> fetchAll(PDO::FETCH_ASSOC);
         }
 
         public static function createCategory($name,$image = null){
