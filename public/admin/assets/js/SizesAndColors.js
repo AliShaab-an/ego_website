@@ -1,5 +1,5 @@
 $(document).ready(function () {
-  $("#colorForm").on("submit", function (e) {
+  $("#sizeForm").on("submit", function (e) {
     e.preventDefault();
 
     $.ajax({
@@ -10,7 +10,7 @@ $(document).ready(function () {
       success: function (res) {
         if (res.status === "success") {
           alert("Size added successfully!");
-          $("#SizerForm")[0].reset();
+          $("#sizeForm")[0].reset();
 
           if (typeof loadSizes === "function") {
             loadSizes();
@@ -40,8 +40,8 @@ function loadSizes() {
 
         if (Array.isArray(res.data) && res.data.length) {
           res.data.forEach((size) => {
-            const option = `<option value="${size.id}" style="background:${size.type}">
-               ${color.name}
+            const option = `<option value="${size.id}">
+               ${size.name} (${size.type})
              </option>`;
             sizeOptions += option;
             dropdown += option;
@@ -62,6 +62,76 @@ function loadSizes() {
     error: function () {
       $("#sizesDropdown").html(`<option value="">Server error</option>`);
       $("#variantContainer select[name*='[size_id]']").html(
+        '<option value="">Server error</option>'
+      );
+    },
+  });
+}
+
+$(document).ready(function () {
+  $("#colorForm").on("submit", function (e) {
+    e.preventDefault();
+
+    $.ajax({
+      url: "/Ego_website/public/admin/api/add-color.php",
+      type: "POST",
+      data: $(this).serialize(),
+      dataType: "json",
+      success: function (res) {
+        if (res.status === "success") {
+          alert("Color added successfully!");
+          $("#colorForm")[0].reset();
+
+          if (typeof loadColors === "function") {
+            loadColors();
+          }
+        } else {
+          alert(res.message || "Error adding color");
+        }
+      },
+      error: function () {
+        alert("Server error while adding color");
+      },
+    });
+  });
+});
+
+let colorOptions = '<option value="">Color</option>';
+
+function loadColors() {
+  $.ajax({
+    url: "/Ego_website/public/admin/api/list-colors.php",
+    type: "GET",
+    dataType: "json",
+    success: function (res) {
+      if (res.status === "success") {
+        let dropdown = `<option value="">Color</option>`;
+        colorOptions = '<option value="">Color</option>';
+
+        if (Array.isArray(res.data) && res.data.length) {
+          res.data.forEach((color) => {
+            const option = `<option value="${color.id}">
+               ${color.name}
+             </option>`;
+            colorOptions += option;
+            dropdown += option;
+          });
+        } else {
+          dropdown += `<option value="">No Colors</option>`;
+          colorOptions = '<option value="">No Colors</option>';
+        }
+        $("#colorsDropdown").html(dropdown);
+        $("#variantContainer select[name*='[color_id]']").html(colorOptions);
+      } else {
+        $("#colorsDropdown").html(`<option value="">Error loading</option>`);
+        $("#variantContainer select[name*='[color_id]']").html(
+          '<option value="">Error loading</option>'
+        );
+      }
+    },
+    error: function () {
+      $("#colorsDropdown").html(`<option value="">Server error</option>`);
+      $("#variantContainer select[name*='[color_id]']").html(
         '<option value="">Server error</option>'
       );
     },

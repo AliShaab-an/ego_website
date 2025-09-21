@@ -7,4 +7,4 @@
 
     $controller = new  SizesController();
 
-    echo json_encode($controller->listSizes());
+    echo json_encode($controller->addSize());

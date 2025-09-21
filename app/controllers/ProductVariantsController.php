@@ -1,22 +1,29 @@
 <?php 
 
-    require_once __DIR__ . '/../models/ProductVariant.php.php';
+    require_once __DIR__ . '/../models/ProductVariant.php';
     class ProductVariantsController{
 
         public function addVariant($productId, $variantData){
+            $color_id = intval($variantData['color_id'] ?? 0);
+            $size_id = intval($variantData['size_id'] ?? 0);
+            $quantity = intval($variantData['quantity'] ?? 0);
 
-            if(empty($variantData['color_id']) || empty($variantData['size_id'])){
+            if ($color_id <= 0 || $size_id <= 0) {
                 return ['status' => 'error', 'message' => "Invalid variant data"];
             }
 
-            ProductVariant::createProductVariant($productId,[
-                'color_id' => $variantData['color_id'],
-                'size_id' => $variantData['size_id'],
-                'price' => $variantData['price'],
-                'quantity' => $variantData['quantity'],
-            ]);
+            if ($quantity < 0) {
+                return ['status' => 'error', 'message' => "Quantity cannot be negative"];
+            }
 
-            return ['status' => 'success', 'message' => 'Variant added'];
+            $variantId = ProductVariant::createProductVariant($productId, [
+                'color_id' => $color_id,
+                'size_id' => $size_id,
+                'quantity' => $quantity,
+                
+                ]);
+
+            return ['status' => 'success','id' => $variantId, 'message' => 'Variant added'];
             
         }
     }

@@ -25,16 +25,16 @@
     <form class="space-y-4">
       <div class="text-start">
         <label class="block mb-1 text-sm font-medium text-gray-700">Name</label>
-        <input type="text" class="w-full border border-gray-300 px-3 py-2 outline-none " placeholder="John">
+        <input type="text" class="w-full border border-gray-300 px-3 py-2 outline-none focus:border-brand focus:ring-1 focus:ring-brand" placeholder="Name">
       </div>
       
       <div class="text-start">
         <label class="block text-sm font-medium text-gray-700">Email</label>
-        <input type="email" class="w-full border border-gray-300 px-3 py-2 outline-none placeholder:text-gray-400" placeholder="Enter your email">
+        <input type="email" class="w-full border border-gray-300 px-3 py-2 outline-none focus:border-brand placeholder:text-gray-400" placeholder="Enter your email">
       </div>
       <div class="text-start">
         <label class="block text-sm font-medium text-gray-700">How can we help?</label>
-        <textarea class="w-full border border-gray-300 px-3 py-2 outline-none placeholder:text-gray-400" rows="5" placeholder="Your message..."></textarea>
+        <textarea class="w-full border border-gray-300 px-3 py-2 outline-none focus:border-brand placeholder:text-gray-400" rows="5" placeholder="Your message..."></textarea>
       </div>
       <div class="flex items-start">
         <button type="submit" class="w-1/3  bg-brand text-white px-4 py-2">Submit</button>
