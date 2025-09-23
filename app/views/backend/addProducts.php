@@ -44,12 +44,17 @@
                 <!-- Main Image -->
                 <div class="mb-4 w-full">
                     <p class="font-bold mb-2">Main Image</p>
-                    <label class="flex flex-col w-full h-48 items-center justify-center gap-2 border border-black rounded cursor-pointer">
-                    <i class="fa-solid fa-circle-plus text-brand"></i>
-                    <p class="text-lg text-brand">Click to upload main image</p>
-                    <input type="file" name="images[]" id="mainImage" accept="image/*" class="hidden">
+                    <label id="mainImageLabel"
+                        class="flex flex-col w-full h-48 items-center justify-center gap-2 border border-black rounded cursor-pointer relative overflow-hidden">
+                        <i class="fa-solid fa-circle-plus text-brand"></i>
+                        <p class="text-lg text-brand">Click to upload main image</p>
+                        <input type="file" name="images[]" id="mainImage" accept="image/*" class="sr-only">
+                        <div id="mainImagePreview" class="absolute inset-0 w-full h-full hidden">
+                            <img id="mainImagePreviewImg" class="w-full h-full object-cover" />
+                            <button id="replaceMainImage" type="button"
+                            class="absolute top-2 right-2 bg-white rounded p-2 text-xs">Replace</button>
+                        </div>
                     </label>
-                    <div id="mainImagePreview" class="mt-2"></div>
                 </div>
 
                 <!-- Extra Images -->

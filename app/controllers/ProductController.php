@@ -8,6 +8,10 @@
     class ProductController{
 
         public function addProduct(){
+            
+            file_put_contents(__DIR__ . '/../../logs/debug.log', "POST:\n" . print_r($_POST, true), FILE_APPEND);
+            file_put_contents(__DIR__ . '/../../logs/debug.log', "FILES:\n" . print_r($_FILES, true), FILE_APPEND);
+
             $name = $_POST['name'] ?? '';
             $description = $_POST['description'] ?? '';
             $base_price = floatval($_POST['base_price'] ?? 0);
@@ -15,6 +19,7 @@
             $category_id = intval($_POST['category_id'] ?? 0);
             $is_top = isset($_POST['is_top']) ? 1 : 0;
 
+            file_put_contents(__DIR__ . '/../../logs/debug.log', print_r($_POST, true), FILE_APPEND);
             // Validate and process the data
             if($name === '' || $base_price <= 0 || $category_id <= 0){
                 return ['status' => 'error', 'message' => 'Invalid product data'];

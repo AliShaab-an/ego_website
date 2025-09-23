@@ -12,7 +12,7 @@
             </div>
             <label for="categoryName" class="text-lg font-bold">Category Name</label>
             <input id="categoryName" name="name" type="text" class="w-full p-2 border border-gray-500 rounded my-4">
-            <button id="okBtn" class="px-4 py-2 bg-white border border-black text-black rounded hover:bg-[rgba(183,146,103,1)] hover:text-white hover:border-none transition">Submit</button> 
+            <button id="okBtn" class="px-4 py-2 bg-white border border-black text-black rounded hover:bg-brand hover:text-white hover:border-none transition">Submit</button> 
         </form>             
     </div>
 </div>

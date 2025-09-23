@@ -9,7 +9,7 @@
     require_once __DIR__ . '/../../app/core/Helper.php';
     
     
-
+    Session::configure(900,'/Ego_website/public/admin/login.php');
     Session::startSession();
 
     $adminController = new AdminController();

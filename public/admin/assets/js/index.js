@@ -183,58 +183,76 @@ document.addEventListener("click", function (e) {
   }
 });
 
-// Preview JS for Main Image
-$("#mainImage").on("change", function () {
-  let preview = $("#mainImagePreview");
-  preview.html(""); // clear old
-  if (this.files && this.files[0]) {
-    let reader = new FileReader();
-    reader.onload = (e) => {
-      preview.html(
-        `<img src="${e.target.result}" class="h-32 w-32 object-cover rounded border">`
-      );
-    };
-    reader.readAsDataURL(this.files[0]);
-  }
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const mainImageInput = document.getElementById("mainImage");
+  const previewContainer = document.getElementById("mainImagePreview");
+  const previewImg = document.getElementById("mainImagePreviewImg");
+  const replaceBtn = document.getElementById("replaceMainImage");
+
+  mainImageInput.addEventListener("change", function () {
+    if (this.files && this.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        previewImg.src = e.target.result;
+        previewContainer.classList.remove("hidden");
+      };
+      reader.readAsDataURL(this.files[0]);
+    }
+  });
+
+  replaceBtn.addEventListener("click", function (e) {
+    e.preventDefault();
+    mainImageInput.click(); // open file dialog again
+  });
 });
+let addExtraImageBtn = document.getElementById("addExtraImage");
+// --- Handle extra images ---
+addExtraImageBtn.addEventListener("click", function () {
+  // Create wrapper for both input + preview
+  const wrapper = document.createElement("div");
+  wrapper.className = "relative";
 
-let extraIndex = 0;
+  // Hidden file input
+  const fileInput = document.createElement("input");
+  fileInput.type = "file";
+  fileInput.name = "images[]";
+  fileInput.accept = "image/*";
+  fileInput.classList.add("hidden");
 
-$("#addExtraImage").on("click", function () {
-  extraIndex++;
-  let slot = $(`
-    <div class="relative flex flex-col items-center justify-center gap-2 w-28 h-28 border border-gray-300 rounded cursor-pointer group">
-      <input type="file" name="images[]" accept="image/*" class="hidden extraImageInput" id="extraImage${extraIndex}">
-      <label for="extraImage${extraIndex}" class="flex flex-col items-center justify-center w-full h-full cursor-pointer">
-        <i class="fa-solid fa-circle-plus text-gray-500 group-hover:text-brand"></i>
-        <p class="text-xs text-gray-600">Upload</p>
-      </label>
-      <i class="fa-solid fa-circle-xmark absolute top-1 right-1 text-gray-400 hover:text-red-500 cursor-pointer removeExtra"></i>
-    </div>
-  `);
+  wrapper.appendChild(fileInput);
+  extraImagesContainer.appendChild(wrapper);
 
-  $("#extraImagesContainer").append(slot);
-});
+  // Trigger file selection
+  fileInput.click();
 
-// Preview for extra images
-$(document).on("change", ".extraImageInput", function () {
-  let fileInput = this;
-  let parent = $(this).closest("div");
+  fileInput.addEventListener("change", function () {
+    if (this.files && this.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        // Create preview
+        const preview = document.createElement("div");
+        preview.className =
+          "relative flex flex-col items-center justify-center w-24 h-24 border border-gray-400 rounded overflow-hidden";
 
-  if (fileInput.files && fileInput.files[0]) {
-    let reader = new FileReader();
-    reader.onload = (e) => {
-      parent
-        .find("label")
-        .html(
-          `<img src="${e.target.result}" class="h-full w-full object-cover rounded">`
-        );
-    };
-    reader.readAsDataURL(fileInput.files[0]);
-  }
-});
+        preview.innerHTML = `
+          <img src="${e.target.result}" class="w-full h-full object-cover" />
+          <button type="button" class="absolute top-1 right-1 bg-white text-red-500 border rounded px-1 text-xs removeExtra">✕</button>
+        `;
 
-// Remove extra image slot
-$(document).on("click", ".removeExtra", function () {
-  $(this).parent().remove();
+        // Add remove event
+        preview.querySelector(".removeExtra").addEventListener("click", () => {
+          wrapper.remove(); // removes both input and preview
+        });
+
+        // If there’s already a preview in wrapper, replace it
+        const oldPreview = wrapper.querySelector(".preview");
+        if (oldPreview) oldPreview.remove();
+
+        wrapper.appendChild(preview);
+      };
+      reader.readAsDataURL(this.files[0]);
+    }
+  });
 });

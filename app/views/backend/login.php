@@ -27,13 +27,13 @@
             <div class="mb-5">
                 <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
                 <input type="email" id="email" name="email" required
-                    class="w-full rounded-lg border border-[rgba(183,146,103,1)]   focus:border-[rgba(183,146,103,1)] focus:ring focus:ring-[rgba(183,146,103,0.3)] p-2">
+                    class="w-full rounded border border-gray-300 outline-none focus:border-brand focus:ring-1 focus:ring-brand p-2">
             </div>
 
             <div class="mb-6">
                 <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
                 <input type="password" id="password" name="password" required
-                    class="w-full rounded-lg border border-[rgba(183,146,103,1)] focus:border-[rgba(183,146,103,1)] focus:ring focus:ring-[rgba(183,146,103,0.3)] p-2">
+                    class="w-full rounded border border-gray-300 focus:border-brand outline-none focus:ring-1 focus:ring-brand p-2">
             </div>
 
             <button type="submit"

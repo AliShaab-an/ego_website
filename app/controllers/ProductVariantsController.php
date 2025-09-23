@@ -6,6 +6,7 @@
         public function addVariant($productId, $variantData){
             $color_id = intval($variantData['color_id'] ?? 0);
             $size_id = intval($variantData['size_id'] ?? 0);
+            $price = intval($variantData['price'] ?? 0);
             $quantity = intval($variantData['quantity'] ?? 0);
 
             if ($color_id <= 0 || $size_id <= 0) {
@@ -19,6 +20,7 @@
             $variantId = ProductVariant::createProductVariant($productId, [
                 'color_id' => $color_id,
                 'size_id' => $size_id,
+                'price' => $price,
                 'quantity' => $quantity,
                 
                 ]);

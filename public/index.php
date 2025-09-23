@@ -1,10 +1,8 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-$header_bg = "assets/images/header2.png";
-$header_title = "EGO Luxury";
-$header_subtitle = "Modern Chick &amp; Timeless Elegance";
+    require_once __DIR__ . '/../app/config/path.php';
+    $header_bg = "assets/images/header2.png";
+    $header_title = "EGO Luxury";
+    $header_subtitle = "Modern Chick &amp; Timeless Elegance";
 ?>
 
 <!DOCTYPE html>
@@ -23,17 +21,22 @@ $header_subtitle = "Modern Chick &amp; Timeless Elegance";
         $categoriesController = new CategoryController();
         $categories = $categoriesController->getCategories();
 
-        include __DIR__ . '/../app/views/frontend/header.php'; 
+        include __DIR__ . '/../app/views/frontend/header.php';
+        include __DIR__ . '/../app/views/frontend/login.php'; 
+        include __DIR__ . '/../app/views/frontend/signup.php';
+        include __DIR__ . '/../app/views/frontend/partials/sidebar.php';
         
         include __DIR__ . '/../app/views/frontend/partials/collections.php';
+
+        include __DIR__ . '/../app/views/frontend/partials/homeContact.php';
     
     ?>
 
     
 
     
-
     
+    <script src="<?= JS_PATH ?>main.js"></script>
 </body>
 </html>
 

@@ -34,18 +34,18 @@
              <!-- Right side (icons) -->
             <div class="flex-1 flex justify-end items-center gap-3 text-white">
                 <!-- Desktop icons -->
-                <button class="hidden md:inline-flex items-center justify-center w-8 h-10" aria-label="Account">
+                <button id="openLogin" class="hidden md:inline-flex items-center justify-center w-8 h-10 cursor-pointer" aria-label="Account">
                 <i class="fi fi-rr-user text-xl"></i>
                 </button>
-                <button class="hidden md:inline-flex items-center justify-center w-8 h-10" aria-label="Cart">
+                <button class="hidden md:inline-flex items-center justify-center w-8 h-10 cursor-pointer" aria-label="Cart">
                 <i class="fi fi-rr-shopping-bag text-xl"></i>
                 </button>
 
                 <!-- Mobile icons + hamburger -->
                 <div class="md:hidden flex items-center gap-2">
-                    <button aria-label="Account"><i class="fi fi-rr-user text-xl"></i></button>
+                    <button id="openLoginPhone" aria-label="Account"><i class="fi fi-rr-user text-xl"></i></button>
                     <button aria-label="Cart"><i class="fi fi-rr-shopping-bag text-xl"></i></button>
-                    <button id="menuBtn" aria-controls="mobileNav" aria-expanded="false" aria-label="Menu">
+                    <button id="openSidebar" aria-controls="mobileNav" aria-expanded="false" aria-label="Menu">
                         <i class="fa-solid fa-bars text-xl"></i>
                     </button>
                 </div>
