@@ -6,30 +6,60 @@
       <h2 class="text-5xl font-cor">Collections</h2>
     </div>
 
-    <!-- Collections Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 border border-black">
-     
-      <?php if (!empty($categories)): ?>
-        <?php foreach ($categories as $category): ?>
-          <a href="category.php?id=<?= $category['id'] ?>" 
-             class="group block overflow-hidden rounded-lg shadow hover:shadow-lg transition-shadow duration-300">
-            
-            <div class="relative w-full h-72">
-              <img src="/Ego_website/public/admin/uploads/<?= htmlspecialchars($category['image'] ?? 'placeholder.jpg') ?>" 
-                   alt="<?= htmlspecialchars($category['name']) ?>" 
-                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+    <!-- Swiper container -->
+    <div class="swiper myCategories">
+      <div class="swiper-wrapper">
+      
+      <!-- Category Slide -->
+        <div class="swiper-slide">
+          <div class="grid md:grid-cols-2 gap-6 items-center">
+          
+            <!-- Left: Big category image -->
+            <div>
+              <img src="assets/images/category-dresses.jpg" alt="Dresses" 
+                  class="w-full h-[400px] object-cover rounded">
+              <p class="mt-2 text-lg font-semibold">Dresses</p>
             </div>
-            
-            <div class="p-4 bg-white">
-              <h3 class="text-lg font-semibold text-gray-800 group-hover:text-[rgba(183,146,103,1)]">
-                <?= htmlspecialchars($category['name']) ?>
-              </h3>
+
+            <!-- Right: Products grid -->
+            <div class="grid grid-cols-2 gap-4">
+              <div class="space-y-2">
+                <img src="assets/images/product-1.jpg" class="w-full h-40 object-cover rounded">
+                <p class="text-sm">Jersey midi dress with cut</p>
+                <span class="text-brand font-medium">$300</span>
+              </div>
+              <div class="space-y-2">
+                <img src="assets/images/product-2.jpg" class="w-full h-40 object-cover rounded">
+                <p class="text-sm">Blazer with two slits</p>
+                <span class="text-brand font-medium">$85</span>
+              </div>
+              <div class="space-y-2">
+                <img src="assets/images/product-3.jpg" class="w-full h-40 object-cover rounded">
+                <p class="text-sm">Modern cream palazzo pants</p>
+                <span class="text-brand font-medium">$100</span>
+              </div>
+              <div class="space-y-2">
+                <img src="assets/images/product-4.jpg" class="w-full h-40 object-cover rounded">
+                <p class="text-sm">Faux leather shorts</p>
+                <span class="text-brand font-medium">$55</span>
+              </div>
             </div>
-          </a>
-        <?php endforeach; ?>
-      <?php else: ?>
-        <p class="col-span-full text-center text-gray-500">No collections available</p>
-      <?php endif; ?>
+          </div>
+        </div>
+
+        <!-- Repeat swiper-slide for other categories -->
+        <div class="swiper-slide">
+          <!-- Another category + its 4 products -->
+        </div>
+      </div>
+
+      <!-- Navigation buttons -->
+      <div class="flex justify-center mt-6 gap-4">
+        <div class="swiper-button-prev !static !text-black"></div>
+        <div class="swiper-button-next !static !text-black"></div>
+      </div>
+
+      <!-- Pagination dots -->
+      <div class="swiper-pagination mt-4"></div>
     </div>
-  </div>
 </section>

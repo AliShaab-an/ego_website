@@ -7,15 +7,15 @@
 
     <div class="flex flex-col items-start text-black mb-4">
       <p><span class="text-2xl">Address</span></p>
-      <p class="mb-4">Beirut, Downtown</p>
+      <p class="mb-4 text-lg text-gray-500">Beirut - Aresco center ground floor</p>
       <p><span class="text-2xl">Phone</span></p>
-      <p class="mb-4">123 456 789</p>
+      <p class="mb-4 text-lg text-gray-500">00961-81971653</p>
       <p><span class="text-2xl font-outfit">Email</span></p>
-      <p><a href="#">Egoclothing.com</a></p>
+      <p class="text-lg text-gray-500 cursor-pointer">Eclothingleb@gmail.com</p>
     </div>
 
-    <div class="space-y-2  w-1/2 flex flex-col items-start ">
-      <button class="w-full border border-brand px-4 py-2 text-brand"><a href="#">Find Us</a></button>
+    <div class="space-y-2 w-full md:w-1/2 flex flex-col items-start ">
+      <button class="w-full border border-brand px-4 py-2 text-brand"><a href="https://www.google.com/maps/place/33%C2%B053'43.9%22N+35%C2%B029'27.6%22E/@33.8955154,35.488411,17z/data=!3m1!4b1!4m4!3m3!8m2!3d33.8955154!4d35.4909859?entry=ttu&g_ep=EgoyMDI1MDkyMi4wIKXMDSoASAFQAw%3D%3D">Find Us</a></button>
       <button class="w-full bg-brand text-white px-4 py-2">Contact Us</button>
     </div>
   </div>
@@ -34,7 +34,7 @@
       </div>
       <div class="text-start">
         <label class="block text-sm font-medium text-gray-700">How can we help?</label>
-        <textarea class="w-full border border-gray-300 px-3 py-2 outline-none focus:border-brand placeholder:text-gray-400" rows="5" placeholder="Your message..."></textarea>
+        <textarea class="w-full border border-gray-300 px-3 py-2 outline-none focus:border-brand placeholder:text-gray-400" rows="6" placeholder="Your message..."></textarea>
       </div>
       <div class="flex items-start">
         <button type="submit" class="w-1/3  bg-brand text-white px-4 py-2">Submit</button>

@@ -1,8 +1,6 @@
 <?php
 
     require_once __DIR__ . '/../core/DB.php';
-
-
     class Category{
         public static function getAllCategories(){
             return DB::query("SELECT * FROM categories ORDER BY name DESC") -> fetchAll(PDO::FETCH_ASSOC);
@@ -21,9 +19,12 @@
             DB::query("UPDATE categories SET name = ? WHERE id = ?", [$name, $id]);
         }
         
+        // Frontend functions
         public static function getCategoryById($id){
             DB::query("SELECT * FROM categories WHERE id = ?", [$id]);
         }
+
+        
 
 
     }

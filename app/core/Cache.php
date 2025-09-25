@@ -20,6 +20,8 @@
                 $content = unserialize(file_get_contents($filename));
                 if ($content['expire'] > time()) {
                     return $content['data'];
+                }else{
+                    unlink($filename);
                 }
             }
             return false;
@@ -30,5 +32,14 @@
             if (file_exists($filename)) {
                 unlink($filename);
             }
+        }
+
+        public static function remember($key,$ttl,$callback){
+            $data = self::get($key);
+            if($data === false){
+                $data = $callback();
+                self::set($key,$data,$ttl);
+            }
+            return $data;
         }
     }
