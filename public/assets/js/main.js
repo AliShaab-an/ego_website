@@ -86,3 +86,87 @@ toggleBtn.addEventListener("click", () => {
   categoriesMenu.classList.toggle("hidden");
   arrow.textContent = categoriesMenu.classList.contains("hidden") ? "▼" : "▲";
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  new Swiper(".topProductsSwiper", {
+    slidesPerView: 1,
+    spaceBetween: 16,
+    centeredSlides: true,
+    loop: "true",
+    pagination: {
+      el: ".swiper-pagination",
+      clickable: true,
+    },
+    breakpoints: {
+      768: {
+        slidesPerView: 3.3, // show 3 full slides + peek of the next
+        centeredSlides: true,
+        pagination: false,
+      },
+    },
+  });
+});
+
+// Shop Sidebar
+
+document.addEventListener("DOMContentLoaded", () => {
+  const sidebar = document.getElementById("filterSidebar");
+  const openBtn = document.getElementById("openFilter");
+  const closeBtn = document.getElementById("closeFilter");
+
+  openBtn.addEventListener("click", () => {
+    sidebar.classList.remove("-translate-x-full");
+    document.body.classList.add("overflow-hidden");
+  });
+
+  closeBtn.addEventListener("click", () => {
+    sidebar.classList.add("-translate-x-full");
+    document.body.classList.remove("overflow-hidden");
+  });
+});
+
+//progress bar
+
+const minSlider = document.getElementById("minSlider");
+const maxSlider = document.getElementById("maxSlider");
+const minPrice = document.getElementById("minPrice");
+const maxPrice = document.getElementById("maxPrice");
+const rangeHighlight = document.getElementById("rangeHighlight");
+
+function updateRange() {
+  const minVal = parseInt(minSlider.value);
+  const maxVal = parseInt(maxSlider.value);
+
+  if (minVal > maxVal) {
+    minSlider.value = maxVal;
+  }
+
+  minPrice.textContent = `$${minSlider.value}`;
+  maxPrice.textContent = `$${maxSlider.value}`;
+
+  const percentMin = ((minSlider.value - 5) / (1000 - 5)) * 100;
+  const percentMax = ((maxSlider.value - 5) / (1000 - 5)) * 100;
+
+  rangeHighlight.style.left = `${percentMin}%`;
+  rangeHighlight.style.width = `${percentMax - percentMin}%`;
+}
+
+minSlider.addEventListener("input", updateRange);
+maxSlider.addEventListener("input", updateRange);
+
+updateRange();
+
+//checkout page
+
+document.addEventListener("DOMContentLoaded", function () {
+  const phoneInput = document.querySelector("#phone");
+  if (phoneInput) {
+    window.intlTelInput(phoneInput, {
+      initialCountry: "lb", // default Lebanon 🇱🇧
+      preferredCountries: ["lb", "ae", "sa", "us"],
+      separateDialCode: true,
+      utilsScript:
+        "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.min.js",
+    });
+  }
+});

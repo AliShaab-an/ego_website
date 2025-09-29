@@ -66,4 +66,9 @@
             return  Category::getAllCategories();
         }
 
+        public function listCategoriesWithProducts() {
+            $data = Category::getCategoriesWithProducts(4);
+            return ['status' => 'success', 'data' => $data];
+        }
+
     }

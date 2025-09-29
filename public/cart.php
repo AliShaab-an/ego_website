@@ -1,31 +1,29 @@
-<?php
+<?php 
     require_once __DIR__ . '/../app/config/path.php';
-    $header_bg = "assets/images/contactus.png";
-    $header_title = "Contact us";
-    $nav_logo = "assets/images/egologo2.png";
-    
+    $nav_logo = "assets/images/egologo3.png";
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="assets/css/style.css">
     <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css'>
     <script src="https://kit.fontawesome.com/7f6ab6587f.js" crossorigin="anonymous"></script>
-    <title>EGO Luxury-Contact us</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <title>Ego Clothing</title>
 </head>
-<body class="text-center">
-    <?php
-    
-        include __DIR__ . '/../app/views/frontend/header.php';
+<body>
+    <div class="h-28 shadow-[0px_-7px_22.5px_0px_rgba(0,0,0,0.25)] py-4">
+        <?php include __DIR__ . '/../app/views/frontend/partials/nav.php'; ?>
+    </div>
+    <?php 
         include __DIR__ . '/../app/views/frontend/login.php'; 
         include __DIR__ . '/../app/views/frontend/signup.php';
         include __DIR__ . '/../app/views/frontend/partials/sidebar.php';
-        include __DIR__ . '/../app/views/frontend/partials/contactSection.php';
+        include __DIR__ . '/../app/views/frontend/cartSection.php';
         include __DIR__ . '/../app/views/frontend/footer.php';
     ?>
-
     <script src="<?= JS_PATH ?>main.js"></script>
-</body> 
+</body>
 </html>

@@ -2,7 +2,7 @@
         require_once  CORE . 'Helper.php';
 ?>
 
-        <aside class="w-64 h-full bg-white text-black flex flex-col p-4 shadow-[0_0_18px_-4px_rgba(0,0,0,0.25)] ">
+        <aside class="w-64 h-full bg-white text-black flex flex-col p-4 shadow-[0_0_18px_-4px_rgba(0,0,0,0.25)]">
             <div class="flex flex-col flex-grow">
                 <nav class="flex flex-col gap-2">
                     <?php

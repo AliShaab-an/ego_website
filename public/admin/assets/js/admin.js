@@ -48,7 +48,7 @@ function loadCategories() {
         let table = `
         <table class="table-auto w-full  md:table-fixed ">
             <thead class="bg-[rgba(240,215,186,0.2)]">
-              <tr">
+              <tr>
                 <th class="py-4">ID</th>
                 <th class="py-4">Name</th>
                 <th class="py-4">Created At</th>

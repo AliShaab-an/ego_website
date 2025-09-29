@@ -24,7 +24,24 @@
             DB::query("SELECT * FROM categories WHERE id = ?", [$id]);
         }
 
-        
+        public static function getCategoriesWithProducts($limit = 4) {
+            $categories = DB::query("SELECT * FROM categories ORDER BY name ASC")
+                    ->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach ($categories as &$category) {
+                $category['products'] = DB::query("
+                    SELECT p.id, p.name, p.base_price, pi.image_path
+                    FROM products p
+                    LEFT JOIN product_images pi 
+                        ON p.id = pi.product_id AND pi.is_main = 1
+                    WHERE p.category_id = ?
+                    ORDER BY p.id DESC
+                    LIMIT $limit
+                ", [$category['id']])->fetchAll(PDO::FETCH_ASSOC) ?? [];
+            }
+
+            return $categories;
+        }
 
 
     }

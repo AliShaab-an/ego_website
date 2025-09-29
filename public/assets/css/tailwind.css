@@ -24,3 +24,35 @@
   /* custom color */
   --color-brand: rgb(183, 146, 103);
 }
+
+@layer components {
+  .swiper-pagination-bullet {
+    @apply w-3 h-3 bg-gray-300 opacity-100 rounded-full transition-all duration-300;
+  }
+  .swiper-pagination-bullet-active {
+    @apply bg-brand scale-125 shadow-md;
+  }
+  .swiper-slide a:hover img {
+    @apply scale-110;
+  }
+}
+
+@layer components {
+  /* Default nav styles */
+  .nav-links a {
+    @apply text-gray-800 hover:underline hover:font-bold;
+  }
+
+  .nav-icons i {
+    @apply text-gray-800;
+  }
+
+  /* When inside .hero */
+  .hero .nav-links a {
+    @apply text-white/90 hover:text-white;
+  }
+
+  .hero .nav-icons i {
+    @apply text-white;
+  }
+}

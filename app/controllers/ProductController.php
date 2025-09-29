@@ -62,4 +62,21 @@
                 return ['status' => 'error', 'message' => $e->getMessage()];
             }
         }
+
+
+        public function getTopProducts(){
+            return Product::getTopProducts(8);
+        }
+
+        public function getNewProducts(){
+            return Product::getNewProducts(8);
+        }
+
+        public function listAllProducts($page = 1, $perPage = 12) {
+            return Product::getAllProducts($page, $perPage);
+        }
+
+        public function getProductsCount(){
+            return Product::getProductsCount();
+        }
     }
