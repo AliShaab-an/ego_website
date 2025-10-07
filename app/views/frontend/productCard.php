@@ -1,84 +1,107 @@
-<section class="container mx-auto px-8 py-10">
+<section class="max-w-7xl mx-auto px-4 py-10">
   <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-
+    
     <!-- Left: Image Gallery -->
-    <div class="flex flex-col md:flex-row gap-6 px-4">
-      <!-- Thumbnails (desktop only) -->
-      <div class="hidden md:flex flex-col gap-4 w-28">
-        <img src="assets/images/placeholder.png" class="cursor-pointer"/>
-        <img src="assets/images/placeholder.png" class="cursor-pointer"/>
-        <img src="assets/images/placeholder.png" class="cursor-pointer"/>
+    <div class="flex flex-col md:flex-row gap-6">
+      
+      <!-- Thumbnails (desktop: vertical, mobile: horizontal under main image) -->
+      <div class="hidden md:flex flex-col gap-4 w-24 order-1">
+        <?php foreach($product['images'] as $img): ?>
+          <img 
+            onclick="changeImage(this)"
+            src="/Ego_website/public/<?= $img ?>" 
+            class="cursor-pointer border hover:border-brand"/>
+        <?php endforeach; ?>
       </div>
 
       <!-- Main Image -->
-      <div class="flex-1 w-[384px] h-[540px]">
-        <img id="mainImage" src="assets/images/placeholder.png" class="w-full h-full object-cover"/>
+      <div class="flex-1 w-full h-[400px] md:h-[540px] order-2">
+        <img id="mainImage" 
+            src="/Ego_website/public/<?= $product['images'][0] ?>" 
+            alt="<?= htmlspecialchars($product['name']) ?>"
+            class="w-full h-full object-cover"/>
       </div>
+    </div>
+
+    <!-- Thumbnails on mobile (horizontal row under main image) -->
+    <div class="flex md:hidden gap-4 mt-4 justify-center">
+      <?php foreach($product['images'] as $img): ?>
+          <img 
+            src="/Ego_website/public/<?= $img ?>" 
+            class="cursor-pointer border hover:border-brand"/>
+        <?php endforeach; ?>
     </div>
 
     <!-- Right: Product Details -->
     <div class="flex flex-col gap-6">
-      <h1 class="text-3xl font-light font-outfit">Linen oversized trenchcoat</h1>
-      <p class="text-3xl font-outfit">$320</p>
+      <h1 class="text-3xl font-light font-outfit"><?= htmlspecialchars($product['name']) ?></h1>
+      <p class="text-2xl font-semibold text-brand">$<?= number_format($product['base_price'], 2) ?></p>
 
       <!-- Sizes -->
-      <div class="flex justify-start items-center gap-2">
-          <h3 class="text-2xl ">Size:</h3>
-          <div class="text-xl flex justify-start items-center">
-            <button class="px-3 py-1 hover:rounded-full hover:border hover:border-brand hover:text-brand">XS</button>
-            <button class="px-3 py-1 hover:rounded-full hover:border hover:border-brand hover:text-brand">S</button>
-            <button class="px-3 py-1 hover:rounded-full hover:border hover:border-brand hover:text-brand">M</button>
-            <button class="px-3 py-1 hover:rounded-full hover:border hover:border-brand hover:text-brand">L</button>
-          </div>
+      <div class="flex gap-4">
+        <h3 class="text-xl">Size:</h3>
+        <div class="flex gap-2">
+          <?php foreach($product['variants'] as $variant): ?>
+            <?php if(!empty($variant['size'])): ?>
+              <button class="px-3 py-1 border rounded-full hover:border-brand"><?= htmlspecialchars($variant['size']) ?></button>
+            <?php endif; ?>
+          <?php endforeach; ?>
+        </div>
       </div>
+
       <!-- Colors -->
-      <div class="flex justify-start items-center gap-2">
-        <h3 class="text-2xl 
-        ">Colors:</h3>
-        <div class="w-5 h-5 bg-red-500 rounded-full"></div>
-        
+      <div class="flex gap-4">
+        <h3 class="text-xl">Colors:</h3>
+        <div class="flex gap-2">
+          <?php foreach ($product['variants'] as $variant): ?>
+            <?php if (!empty($variant['color'])): ?>
+              <div class="w-6 h-6 rounded-full cursor-pointer border relative" 
+                style="background-color: <?= $variant['color_hex'] ?: 'gray' ?>;"
+                title="<?= htmlspecialchars($variant['color']) ?>">
+                <i class="fi fi-rr-check absolute inset-0 top-0.5 text-center m-auto hidden text-white"></i>
+              </div>
+            <?php endif; ?>
+          <?php endforeach; ?>
+        </div>
       </div>
 
       <!-- Quantity + Add to Cart -->
       <div class="flex gap-4 items-center">
-        <div class="flex justify-center items-center gap-4 border text-xl px-4 py-2 text-brand">
-          <button class="">-</button>
-          <div class="">1</div>
-          <button class="">+</button>
+        <div class="flex items-center gap-4 border px-4 py-2 text-lg text-brand rounded">
+          <button class="cursor-pointer" type="button" id="qty-minus">-</button>
+          <span id="qty-value">1</span>
+          <button class="cursor-pointer" type="button" id="qty-plus">+</button>
         </div>
-        <button class="bg-brand font-outfit text-xl text-white px-8 py-2">Add to Cart</button>
+        <button 
+        class="bg-brand text-white px-8 py-2 rounded cursor-pointer"
+        id="add-to-cart"
+        data-product-id="<?= $product['id'] ?>">
+        
+        Add to Cart
+        </button>
       </div>
+
+      <input type="hidden" id="selected-size" value="">
+      <input type="hidden" id="selected-color" value="">
 
       <!-- Accordion -->
-      <div class="border-b border-t border-brand w-64">
-        <div class="flex justify-between items-center p-2 text-xl text-brand">
-          <p>Description</p>
-          <i class="fi fi-rr-arrow-small-right"></i>
+      <div class="border-t border-b border-brand divide-y text-brand">
+        <button class="accordion-btn w-full flex justify-between items-center p-3 text-lg font-medium text-left cursor-pointer">
+          Description
+          <i class="fi fi-rr-arrow-small-right text-xl"></i>
+        </button>
+        <div class="accordion-content hidden p-4">
+          <?= $product['description'] ?>
         </div>
+        <button class="w-full flex justify-between items-center p-3 text-lg font-medium text-left cursor-pointer">
+          Shipping & Returns
+          <i class="fi fi-rr-arrow-small-right text-xl"></i>
+        </button>
+        <button class="w-full flex justify-between items-center p-3 text-lg font-medium text-left cursor-pointer">
+          Product Care
+          <i class="fi fi-rr-arrow-small-right text-xl"></i>
+        </button>
       </div>
     </div>
-  </div>
-</section>
-
-<!-- Similar Products -->
-<section class="py-12">
-  <h2 class="text-6xl font-normal mb-8 text-center font-cor">Similar Products</h2>
-  <div class="swiper similarProductsSwiper px-6">
-    <div class="swiper-wrapper">
-      <div class="swiper-slide">
-        <img src="assets/images/placeholder.png" class="w-full h-64 object-cover rounded">
-        <p class="mt-2">Modena cream palazzo pants</p>
-        <span class="text-brand">$100</span>
-      </div>
-      <div class="swiper-slide">
-        <img src="assets/images/placeholder.png" class="w-full h-64 object-cover rounded">
-        <p class="mt-2">Blazer with two slits</p>
-        <span class="text-brand">$85</span>
-      </div>
-      <!-- Repeat -->
-    </div>
-    <div class="swiper-button-prev hidden md:block"></div>
-    <div class="swiper-button-next hidden md:block"></div>
-    <div class="swiper-pagination block md:hidden"></div>
   </div>
 </section>

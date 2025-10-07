@@ -1,5 +1,10 @@
 <?php
     require_once __DIR__ . '/../app/config/path.php';
+    require_once CORE . 'Session.php';
+    Session::configure(1800,'/Ego_website/public/index.php');
+    Session::startSession();
+    $userId = Session::getCurrentUser();
+    $sessionId = session_id();
     $header_bg = "assets/images/header2.png";
     $header_title = "EGO Luxury";
     $header_subtitle = "Modern Chick &amp; Timeless Elegance";
@@ -49,8 +54,10 @@
     
 
 
+    <script src="<?= JS_PATH ?>jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
     <script src="<?= JS_PATH ?>main.js"></script>
+    <script src="<?= JS_PATH ?>app.js"></script>
 </body>
 </html>
 

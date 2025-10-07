@@ -77,7 +77,7 @@
                 ?>
             </main>
         </div>
-        <script src="<?= ADMIN_JS_PATH ?>jquery-3.7.1.min.js"></script>
+        <script src="<?= JS_PATH ?>jquery-3.7.1.min.js"></script>
         <script src="<?= ADMIN_JS_PATH ?>index.js"></script>
         <script src="<?= ADMIN_JS_PATH ?>admin.js"></script>
         <script src="<?= ADMIN_JS_PATH ?>SizesAndColors.js"></script>

@@ -112,147 +112,122 @@ toggleBtn.addEventListener("click", () => {
   }
 });
 
-let variantIndex = 1;
-
-function createVariantRow(index) {
-  return `
-    <div class="flex flex-row gap-2 mt-2 items-end variant-row">
-      
-      <!-- Quantity -->
-      <div class="flex flex-col">
-        <label class="font-bold mb-2">Quantity</label>
-        <input type="number" name="variants[${index}][quantity]" 
-               class="w-40 text-center h-10 p-2 border border-gray-300 outline-none rounded" min="0" placeholder="0">
-      </div>
-
-      <!-- Color -->
-      <div class="flex flex-col">
-        <label class="font-bold mb-2">Color</label>
-        <select name="variants[${index}][color_id]" 
-                class="colorDropdown w-40 h-10 text-center text-sm p-2 border border-gray-300 rounded outline-none">
-          ${colorOptions}
-        </select>
-      </div>
-
-      <!-- Size -->
-      <div class="flex flex-col">
-        <label class="font-bold mb-2">Size</label>
-        <select name="variants[${index}][size_id]" 
-                class="sizeDropdown w-40 h-10 text-center text-sm p-2 border border-gray-300 rounded outline-none">
-          ${sizeOptions}
-        </select>
-      </div>
-
-      <!-- Price (optional) -->
-      <div class="flex flex-col">
-        <label class="font-bold mb-2">Price (Optional)</label>
-        <input type="number" name="variants[${index}][price]" 
-               class="w-32 text-center h-10 p-2 border border-gray-300 rounded outline-none" min="0" step="0.01">
-      </div>
-
-      <!-- Actions -->
-      <div class="flex flex-col">
-        <button type="button" class="removeVariant h-10 px-4 border border-red-500 text-red-600 rounded">
-          <i class="fi fi-rr-cross-circle"></i>
-        </button>
-      </div>
-    </div>
-  `;
-}
-
-// Handle initial "Add Inventory" button
-document.getElementById("addInventory").addEventListener("click", function (e) {
-  e.preventDefault();
-  const container = document.getElementById("variantContainer");
-  container.insertAdjacentHTML("beforeend", createVariantRow(variantIndex));
-  variantIndex++;
-});
-
-// Delegate events for dynamically added buttons
-document.addEventListener("click", function (e) {
-  // Add new row
-  if (e.target.closest(".addVariant")) {
-    const container = document.getElementById("variantContainer");
-    container.insertAdjacentHTML("beforeend", createVariantRow(variantIndex));
-    variantIndex++;
-  }
-
-  // Remove row
-  if (e.target.closest(".removeVariant")) {
-    e.target.closest(".variant-row").remove();
-  }
-});
-
-
-
 document.addEventListener("DOMContentLoaded", () => {
-  const mainImageInput = document.getElementById("mainImage");
-  const previewContainer = document.getElementById("mainImagePreview");
-  const previewImg = document.getElementById("mainImagePreviewImg");
-  const replaceBtn = document.getElementById("replaceMainImage");
+  const addColorBtn = document.getElementById("addColorBtn");
+  const colorContainer = document.getElementById("colorContainer");
+  const colorTemplate = document.getElementById("colorTemplate");
+  const sizeTemplate = document.getElementById("sizeTemplate");
 
-  mainImageInput.addEventListener("change", function () {
-    if (this.files && this.files[0]) {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        previewImg.src = e.target.result;
-        previewContainer.classList.remove("hidden");
-      };
-      reader.readAsDataURL(this.files[0]);
+  loadColors();
+  loadSizes();
+
+  // --- Add a new color variant block ---
+  addColorBtn.addEventListener("click", () => {
+    const colorClone = colorTemplate.content.cloneNode(true);
+    const colorDropdown = colorClone.querySelector(".colorDropdown");
+
+    // Get variant index (how many variants exist already)
+    const colorIndex = colorContainer.querySelectorAll(".color-block").length;
+
+    // Assign unique data-index
+    const colorBlock = colorClone.querySelector(".color-block");
+    colorBlock.dataset.index = colorIndex;
+
+    // Update name attributes dynamically
+    colorDropdown.setAttribute("name", `variants[${colorIndex}][color_id]`);
+
+    // Populate color dropdown
+    colorDropdown.innerHTML = colorOptions;
+
+    // Append to container
+    colorContainer.appendChild(colorClone);
+  });
+
+  // --- Event delegation for all dynamic actions ---
+  document.addEventListener("click", (e) => {
+    // Remove a size row
+    if (e.target.classList.contains("removeSizeBtn")) {
+      e.target.closest(".size-row").remove();
     }
-  });
 
-  replaceBtn.addEventListener("click", function (e) {
-    e.preventDefault();
-    mainImageInput.click(); // open file dialog again
-  });
-});
-let addExtraImageBtn = document.getElementById("addExtraImage");
-// --- Handle extra images ---
-addExtraImageBtn.addEventListener("click", function () {
-  // Create wrapper for both input + preview
-  const wrapper = document.createElement("div");
-  wrapper.className = "relative";
+    // Remove a color block
+    if (e.target.classList.contains("removeColorBtn")) {
+      e.target.closest(".color-block").remove();
+    }
 
-  // Hidden file input
-  const fileInput = document.createElement("input");
-  fileInput.type = "file";
-  fileInput.name = "images[]";
-  fileInput.accept = "image/*";
-  fileInput.classList.add("hidden");
+    // Add a size row inside a color block
+    if (e.target.classList.contains("addSizeBtn")) {
+      const colorBlock = e.target.closest(".color-block");
+      const colorIndex = colorBlock.dataset.index;
+      const sizesContainer = colorBlock.querySelector(".sizesContainer");
+      const sizeClone = sizeTemplate.content.cloneNode(true);
 
-  wrapper.appendChild(fileInput);
-  extraImagesContainer.appendChild(wrapper);
+      // Replace variant index in all size input names
+      sizeClone.querySelectorAll("select, input").forEach((el) => {
+        const baseName = el.getAttribute("name");
+        if (baseName) {
+          el.setAttribute(
+            "name",
+            baseName.replace("variants[0]", `variants[${colorIndex}]`)
+          );
+        }
+      });
 
-  // Trigger file selection
-  fileInput.click();
+      // Populate size dropdown
+      const sizeDropdown = sizeClone.querySelector(".sizesDropdown");
+      sizeDropdown.innerHTML = sizeOptions;
 
-  fileInput.addEventListener("change", function () {
-    if (this.files && this.files[0]) {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        // Create preview
-        const preview = document.createElement("div");
-        preview.className =
-          "relative flex flex-col items-center justify-center w-24 h-24 border border-gray-400 rounded overflow-hidden";
+      sizesContainer.appendChild(sizeClone);
+    }
 
-        preview.innerHTML = `
-          <img src="${e.target.result}" class="w-full h-full object-cover" />
-          <button type="button" class="absolute top-1 right-1 bg-white text-red-500 border rounded px-1 text-xs removeExtra">✕</button>
-        `;
+    // Add extra image for a color variant
+    if (e.target.classList.contains("addExtraImage")) {
+      const colorBlock = e.target.closest(".color-block");
+      const extraImagesContainer = colorBlock.querySelector(
+        ".extraImagesContainer"
+      );
+      const colorIndex = colorBlock.dataset.index;
 
-        // Add remove event
-        preview.querySelector(".removeExtra").addEventListener("click", () => {
-          wrapper.remove(); // removes both input and preview
-        });
+      // Create a hidden file input for the new image
+      const fileInput = document.createElement("input");
+      fileInput.type = "file";
+      fileInput.name = `variants[${colorIndex}][images][]`; // ✅ associate with variant
+      fileInput.accept = "image/*";
+      fileInput.classList.add("hidden");
 
-        // If there’s already a preview in wrapper, replace it
-        const oldPreview = wrapper.querySelector(".preview");
-        if (oldPreview) oldPreview.remove();
+      extraImagesContainer.appendChild(fileInput);
+      fileInput.click();
 
-        wrapper.appendChild(preview);
-      };
-      reader.readAsDataURL(this.files[0]);
+      fileInput.addEventListener("change", function () {
+        if (this.files && this.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const wrapper = document.createElement("div");
+            wrapper.className =
+              "relative flex flex-col items-center justify-center w-24 h-36 border border-gray-300 rounded overflow-hidden";
+
+            wrapper.innerHTML = `
+              <img src="${e.target.result}" class="w-full h-24 object-cover" />
+              <input type="text" 
+                name="variants[${colorIndex}][images_alt_text][]" 
+                placeholder="Alt text" 
+                class="mt-1 p-1 text-xs border border-gray-300 rounded w-full" />
+                <input type="number" name="variants[0][images_display_order][]" placeholder="Display Order" class="mt-1 p-1 text-xs border border-gray-300 rounded w-full" value="0" />
+              <button type="button" 
+                class="absolute top-1 right-1 bg-white text-red-500 border rounded px-1 cursor-pointer text-xs removeExtra">✕</button>
+            `;
+
+            extraImagesContainer.appendChild(wrapper);
+          };
+          reader.readAsDataURL(this.files[0]);
+        }
+      });
+    }
+
+    // Remove an extra image
+    if (e.target.classList.contains("removeExtra")) {
+      const wrapper = e.target.closest("div.relative");
+      if (wrapper) wrapper.remove();
     }
   });
 });

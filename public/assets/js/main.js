@@ -127,34 +127,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
 //progress bar
 
-const minSlider = document.getElementById("minSlider");
-const maxSlider = document.getElementById("maxSlider");
-const minPrice = document.getElementById("minPrice");
-const maxPrice = document.getElementById("maxPrice");
-const rangeHighlight = document.getElementById("rangeHighlight");
+// const minSlider = document.getElementById("minSlider");
+// const maxSlider = document.getElementById("maxSlider");
+// const minPrice = document.getElementById("minPrice");
+// const maxPrice = document.getElementById("maxPrice");
+// const rangeHighlight = document.getElementById("rangeHighlight");
 
-function updateRange() {
-  const minVal = parseInt(minSlider.value);
-  const maxVal = parseInt(maxSlider.value);
+// function updateRange() {
+//   const minVal = parseInt(minSlider.value);
+//   const maxVal = parseInt(maxSlider.value);
 
-  if (minVal > maxVal) {
-    minSlider.value = maxVal;
-  }
+//   if (minVal > maxVal) {
+//     minSlider.value = maxVal;
+//   }
 
-  minPrice.textContent = `$${minSlider.value}`;
-  maxPrice.textContent = `$${maxSlider.value}`;
+//   minPrice.textContent = `$${minSlider.value}`;
+//   maxPrice.textContent = `$${maxSlider.value}`;
 
-  const percentMin = ((minSlider.value - 5) / (1000 - 5)) * 100;
-  const percentMax = ((maxSlider.value - 5) / (1000 - 5)) * 100;
+//   const percentMin = ((minSlider.value - 5) / (1000 - 5)) * 100;
+//   const percentMax = ((maxSlider.value - 5) / (1000 - 5)) * 100;
 
-  rangeHighlight.style.left = `${percentMin}%`;
-  rangeHighlight.style.width = `${percentMax - percentMin}%`;
-}
+//   rangeHighlight.style.left = `${percentMin}%`;
+//   rangeHighlight.style.width = `${percentMax - percentMin}%`;
+// }
 
-minSlider.addEventListener("input", updateRange);
-maxSlider.addEventListener("input", updateRange);
+// minSlider.addEventListener("input", updateRange);
+// maxSlider.addEventListener("input", updateRange);
 
-updateRange();
+// updateRange();
 
 //checkout page
 
@@ -169,4 +169,50 @@ document.addEventListener("DOMContentLoaded", function () {
         "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.min.js",
     });
   }
+});
+
+//Product Change Image
+
+function changeImage(thumbnail) {
+  const mainImg = document.getElementById("mainImage");
+  console.log("clicked");
+  mainImg.src = thumbnail.src;
+}
+
+$(document).ready(function () {
+  // Size selection
+  $(".flex.gap-2 > button").click(function () {
+    // Remove active class from all buttons
+    $(this).siblings().removeClass("bg-brand text-white border-brand");
+    // Add active class to clicked button
+    $(this).addClass("bg-brand text-white border-brand");
+
+    // Update hidden input
+    $("#selected-size").val($(this).text());
+  });
+});
+
+$(".flex.gap-2 > div").click(function () {
+  // Remove border highlight and hide check from siblings
+  $(this)
+    .siblings()
+    .removeClass("border-4 border-brand")
+    .find("i")
+    .addClass("hidden");
+
+  // Highlight selected
+  $(this).addClass("border-4 border-brand");
+
+  // Show checkmark in this circle
+  $(this).find("i").removeClass("hidden");
+
+  // Update hidden input
+  $("#selected-color").val($(this).attr("title"));
+});
+
+$(".accordion-btn").click(function () {
+  // Toggle content
+  $(this).next(".accordion-content").slideToggle();
+  // Rotate icon
+  $(this).find("i").toggleClass("rotate-90");
 });

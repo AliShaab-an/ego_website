@@ -34,3 +34,11 @@ if (!defined('CONFIG')) {
 if (!defined('BACKEND_VIEWS')) {
     define('BACKEND_VIEWS', ROOT_PATH . 'app/views/backend/');
 }
+
+if (!defined('CONT')) {
+    define('CONT', ROOT_PATH . 'app/controllers/');
+}
+
+if (!defined('MODELS')) {
+    define('MODELS', ROOT_PATH . 'app/models/');
+}

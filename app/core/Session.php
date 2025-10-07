@@ -20,6 +20,10 @@
             }
         }
 
+        public static function getCurrentUser(){
+            return $_SESSION['user_id'] ?? null;
+        }
+
         public static function set($key,$value){
             $_SESSION[$key] = $value;
         }

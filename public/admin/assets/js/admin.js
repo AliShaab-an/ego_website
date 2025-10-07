@@ -10,8 +10,6 @@ $(document).ready(function () {
   loadCategories();
   loadCustomers();
   loadAdmins();
-  loadColors();
-  loadSizes();
 });
 
 $(document).ready(function () {

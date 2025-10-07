@@ -1,17 +1,12 @@
 <?php 
-
+    require_once __DIR__ . '/../config/path.php';
+    require_once CORE . 'Logger.php';
     require_once __DIR__ . '/../models/Product.php';
-    require_once __DIR__ . '/ProductImagesController.php';
-    require_once __DIR__ . '/ProductVariantsController.php';
-    
 
     class ProductController{
 
         public function addProduct(){
             
-            file_put_contents(__DIR__ . '/../../logs/debug.log', "POST:\n" . print_r($_POST, true), FILE_APPEND);
-            file_put_contents(__DIR__ . '/../../logs/debug.log', "FILES:\n" . print_r($_FILES, true), FILE_APPEND);
-
             $name = $_POST['name'] ?? '';
             $description = $_POST['description'] ?? '';
             $base_price = floatval($_POST['base_price'] ?? 0);
@@ -19,7 +14,7 @@
             $category_id = intval($_POST['category_id'] ?? 0);
             $is_top = isset($_POST['is_top']) ? 1 : 0;
 
-            file_put_contents(__DIR__ . '/../../logs/debug.log', print_r($_POST, true), FILE_APPEND);
+            
             // Validate and process the data
             if($name === '' || $base_price <= 0 || $category_id <= 0){
                 return ['status' => 'error', 'message' => 'Invalid product data'];
@@ -34,32 +29,15 @@
                 'is_top' => $is_top
                 ]);
 
-                $errors = [];
-
-                if (!empty($_POST['variants']) && is_array($_POST['variants'])){
-                $variantsController = new ProductVariantsController();
-                foreach($_POST['variants'] as  $variant){
-                    $res = $variantsController->addVariant($productId,$variant);
-                        if($res['status'] !== 'success'){
-                        $errors[] = $res['message'];
-                        }
-                    }
-                }
-
-                if(!empty($_FILES['images']['name'][0])){
-                    $imageController = new ProductImagesController();
-                    $imageController->uploadImages($productId, $_FILES['images']);
-                }
-
                 return [
-                'status'  => empty($errors) ? 'success' : 'partial_success',
-                'id'      => $productId,
-                'message' => empty($errors) ? 'Product added successfully' : 'Product added but some variants failed',
-                'errors'  => $errors
+                    "status" => 'success',
+                    'id' => $productId,
+                    'message' => 'Product basic info added successfully'
                 ];
 
             }catch(Exception $e){
-                return ['status' => 'error', 'message' => $e->getMessage()];
+                Logger::error("ProductController::addProduct", $e->getMessage());
+                return ['status'=> 'error', 'message' => $e->getMessage()];
             }
         }
 
@@ -78,5 +56,40 @@
 
         public function getProductsCount(){
             return Product::getProductsCount();
+        }
+
+        public function getProductById($id){
+            $productData = Product::getProductById($id);
+
+            if(!$productData){
+                header("Location: /Ego_website/public/404.php");
+                exit;
+            }
+
+            $product = [
+                'id' => $productData[0]['product_id'],
+                'name' => $productData[0]['name'],
+                'description' => $productData[0]['description'],
+                'base_price' => $productData[0]['base_price'],
+                'images' => [],
+                'variants' => []
+            ];
+
+            foreach ($productData as $row) {
+                if ($row['image_path'] && !in_array($row['image_path'], $product['images'])) {
+                $product['images'][] = $row['image_path'];
+                }
+                if ($row['variant_id']) {
+                    $product['variants'][] = [
+                        'id' => $row['variant_id'],
+                        'size' => $row['size_name'],
+                        'color' => $row['color_name'],
+                        'color_hex' => $row['color_hex'] ?? null,
+                        'price' => $row['variant_price'] ?? $product['base_price'],
+                        'quantity' => $row['quantity']
+                    ];
+                }
+            }
+            return $product;
         }
     }

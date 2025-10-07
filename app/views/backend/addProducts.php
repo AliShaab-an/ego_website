@@ -2,7 +2,7 @@
     <form id="productForm" enctype="multipart/form-data">
         <div class="flex justify-between p-2 mb-2">
             <p class="text-3xl font-semibold">Add New Product</p>
-            <button type="submit" class="bg-brand text-sm text-white px-4 py-2 rounded font-bold">Publish Product</button>
+            <button type="submit" class="bg-brand text-sm text-white px-4 py-2 rounded font-bold cursor-pointer">Publish Product</button>
         </div>
 
         <div class="w-full flex gap-4">
@@ -40,67 +40,17 @@
                 </div>
             </div>
             <div class="w-2/5 bg-white flex flex-col items-start py-4 px-4 shadow-[0_0_14.36px_-3.16px_rgba(0,0,0,0.25)]">
-                <p class="text-2xl font-bold mb-4">Upload Product Image</p>
-                <!-- Main Image -->
-                <div class="mb-4 w-full">
-                    <p class="font-bold mb-2">Main Image</p>
-                    <label id="mainImageLabel"
-                        class="flex flex-col w-full h-48 items-center justify-center gap-2 border border-black rounded cursor-pointer relative overflow-hidden">
-                        <i class="fa-solid fa-circle-plus text-brand"></i>
-                        <p class="text-lg text-brand">Click to upload main image</p>
-                        <input type="file" name="images[]" id="mainImage" accept="image/*" class="sr-only">
-                        <div id="mainImagePreview" class="absolute inset-0 w-full h-full hidden">
-                            <img id="mainImagePreviewImg" class="w-full h-full object-cover" />
-                            <button id="replaceMainImage" type="button"
-                            class="absolute top-2 right-2 bg-white rounded p-2 text-xs">Replace</button>
-                        </div>
-                    </label>
-                </div>
-
-                <!-- Extra Images -->
-                <div class="w-full">
-                    <p class="font-bold mb-2">Other Images</p>
-                    <div id="extraImagesContainer" class="grid grid-cols-3 gap-2">
-                    <!-- Extra image slots will appear here -->
-                    </div>
-                    <button type="button" id="addExtraImage" class="mt-3 px-4 py-2 text-sm border border-gray-400 rounded hover:bg-gray-100">
-                    <i class="fa-solid fa-circle-plus mr-1"></i> Add More Images
-                    </button>
-                </div>
             </div>
+
         </div>
+
         <p class="font-bold text-xl my-2">Inventory</p>
         <div class="w-full bg-white flex flex-col items-start py-4 px-4 shadow-[0_0_14.36px_-3.16px_rgba(0,0,0,0.25)] mt-4">
-            
-            <div id="variantContainer">
-                <!-- First variant row -->
-                <div class="flex flex-row gap-2 items-end">
-                    <div class="flex flex-col">
-                        <label for="" class="font-bold mb-2">Quantity</label>
-                        <input name="variants[0][quantity]" type="number" placeholder="0" class="w-40 text-center h-10 p-2 border border-gray-300 outline-none rounded" min="0">
-                    </div>
-                    <div class="flex flex-col">
-                        <label for="" class="font-bold mb-2">Colors</label>
-                        <select id="colorsDropdown" name="variants[0][color_id]" class="w-40 h-10 text-center text-sm p-2 border border-gray-300 outline-none rounded">
-                            <option value="">Color</option>
-                        </select>
-                    </div>
-                    <div class="flex flex-col">
-                        <label for="" class="font-bold mb-2">Size</label>
-                        <select id="sizesDropdown" name="variants[0][size_id]" class="w-40 h-10 text-center text-sm p-2 border border-gray-300 outline-none rounded">
-                            <option value="">Size</option>
-                        </select>
-                    </div>
-                    <div class="flex flex-col">
-                        <label class="font-bold mb-2">Price (Optional)</label>
-                        <input type="number" name="variants[0][price]" 
-                        class="w-32 text-center h-10 p-2 border border-gray-300 rounded outline-none" min="0" step="0.01">
-                    </div>
-                    <div class="flex flex-col">
-                        <button type="button" id="addInventory" class="h-10 text-sm px-4 border border-gray-500 rounded"><i class="fi fi-rr-plus"></i></button>
-                    </div>
-                </div>
-            </div>
+
+            <div id="colorContainer" class="w-full"></div>
+            <button type="button" id="addColorBtn" class="mt-4 px-4 py-2 border rounded hover:bg-gray-100 cursor-pointer">
+            <i class="fi fi-rr-plus mr-1"></i> Add Variant
+            </button>
         </div>
     </form>
     <p class="font-bold text-xl my-2 font-outfit">Colors & Sizes</p>
@@ -112,7 +62,7 @@
                 class="p-2 border border-gray-300 rounded w-40 outline-none">
             </div>
             <div class="flex flex-col">   
-                <input type="color" id="colorPicker" name="hex_code" value="#000000ff"
+                <input type="color" id="colorPicker" name="hex_code" value="#000000"
                 class="w-28 h-10 p-1 border border-gray-300 rounded cursor-pointer">
             </div>
             <button type="submit" class="h-10 text-sm px-4 border border-gray-500 rounded"><i class="fi fi-rr-plus"></i></button>
@@ -131,6 +81,63 @@
         </form>
     </div>
 </div>
+
+
+<template id="colorTemplate">
+  <div class="color-block border border-gray-300 rounded p-4 mt-4 space-y-3">
+    <div class="flex justify-between items-center mb-2">
+      <p class="font-bold text-lg">Add Variant</p>
+      <button type="button" class="removeColorBtn text-red-500 cursor-pointer">Remove</button>
+    </div>
+
+    <!-- Color Selection -->
+    <div>
+      <select name="variants[0][color_id]" class="colorDropdown w-44 h-10 text-center text-sm p-2 border border-gray-300 outline-none rounded">
+        <option value="">Select Color</option>
+      </select>
+    </div>
+
+    <!-- Variant Images -->
+    <div class="variant-images-section">
+      <p class="font-bold mb-2">Variant Images</p>
+      <div class="extraImagesContainer flex gap-2"></div>
+      <button type="button" class="addExtraImage mt-2 px-3 py-1 border border-gray-400 rounded hover:bg-gray-100 text-sm">
+        <i class="fa-solid fa-circle-plus mr-1"></i> Add Image
+      </button>
+    </div>
+
+    <!-- Sizes -->
+    <div class="sizesContainer"></div>
+    <button type="button" class="addSizeBtn mt-2 px-3 py-1 border rounded hover:bg-gray-100 cursor-pointer">
+      <i class="fa-solid fa-plus mr-1"></i> Add Info
+    </button>
+  </div>
+</template>
+
+<!-- Template for size row -->
+<template id="sizeTemplate">
+  <div class="size-row flex gap-2 items-end mt-2">
+    <div class="flex flex-col">
+        <label for="" class="font-bold mb-2">Size</label>
+        <select name="variants[0][size_id]" class="sizesDropdown w-40 h-10 text-center text-sm p-2 border border-gray-300 outline-none rounded">
+            <option value="">Size</option>
+        </select>
+    </div>
+    <div class="flex flex-col">
+        <label for="" class="font-bold mb-2">Quantity</label>
+        <input name="variants[0][quantity]" type="number" placeholder="0" class="w-40 text-center h-10 p-2 border border-gray-300 outline-none rounded" min="0">
+    </div>
+    <div class="flex flex-col">
+        <label class="font-bold mb-2">Price (Optional)</label>
+        <input type="number" name="variants[0][price]" 
+        class="w-32 text-center h-10 p-2 border border-gray-300 rounded outline-none" min="0" step="0.01" required>
+    </div>
+    <button type="button" class="removeSizeBtn h-10 px-2 py-1 border rounded text-red-500 cursor-pointer">Remove</button>
+  </div>
+</template>
+
+
+
 
 
 

@@ -14,8 +14,15 @@
     </div>
 
     <div class="flex flex-col space-y-4 ">
-      <button class="w-full md:w-full md:h-14 md:text-xl border border-brand px-4 py-2 text-brand"><a href="https://www.google.com/maps/place/33%C2%B053'43.9%22N+35%C2%B029'27.6%22E/@33.8955154,35.488411,17z/data=!3m1!4b1!4m4!3m3!8m2!3d33.8955154!4d35.4909859?entry=ttu&g_ep=EgoyMDI1MDkyMi4wIKXMDSoASAFQAw%3D%3D">Find Us</a></button>
-      <button class="w-full md:w-full md:h-14 md:text-xl bg-brand text-white px-4 py-2"><a href="contact.php">Contact Us</a></button>
+      <a href="https://www.google.com/maps/place/33%C2%B053'43.9%22N+35%C2%B029'27.6%22E/@33.8955154,35.488411,17z"
+      target="_blank"
+      class="inline-block w-full md:w-auto text-center md:h-14 md:text-xl border border-brand px-6 py-3 bg-white text-brand hover:bg-brand hover:text-white transition">
+      Find Us
+      </a>
+        <a href="contact.php" 
+        class="block w-full md:w-full md:h-14 md:text-xl bg-brand text-white px-6 py-3 text-center transition">
+            Contact Us
+        </a>
     </div>
   </div>
 

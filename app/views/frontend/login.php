@@ -11,17 +11,18 @@
             <h2 class="text-2xl md:text-3xl font-bold mb-2">Welcome Back</h2>
             <p class="text-gray-500 mb-6">Please enter your details</p>
       
-            <form class="space-y-4">
+            <form id="customerLogin" class="space-y-4">
+                <div id="loginMessage" class="hidden text-sm p-2 rounded"></div>
                 <div class="text-start space-y-2">
                     <label class="block text-sm font-medium">Email</label>
-                    <input type="email" placeholder="Enter your email" 
+                    <input type="email" name="email" placeholder="Enter your email" 
                     class="w-full border border-gray-300 px-3 py-2 outline-none 
                         focus:border-brand focus:ring-1 focus:ring-brand">
                 </div>
         
                 <div class="text-start space-y-2">
                     <label class="block text-sm font-medium">Password</label>
-                    <input type="password" placeholder="Enter your password" 
+                    <input type="password" name="password" placeholder="Enter your password" 
                             class="w-full border border-gray-300 px-3 py-2 outline-none 
                                     focus:border-brand focus:ring-1 focus:ring-brand">
                 </div>

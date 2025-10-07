@@ -51,15 +51,19 @@
 
 
         public static function createProduct($data){
-            DB::query("INSERT INTO products (name, description, base_price,weight, category_id,is_top) VALUES (?, ?, ?, ?, ?,?)", [
-                $data['name'],
-                $data['description'],
-                $data['base_price'],
-                $data['weight'],
-                $data['category_id'],
-                $data['is_top'] ?? 0
-            ]);
-            return DB::getConnection()->lastInsertId();
+            try{
+                DB::query("INSERT INTO products (name, description, base_price,weight, category_id,is_top) VALUES (?, ?, ?, ?, ?,?)", [
+                    $data['name'],
+                    $data['description'],
+                    $data['base_price'],
+                    $data['weight'],
+                    $data['category_id'],
+                    $data['is_top'] ?? 0
+                ]);
+                return DB::getConnection()->lastInsertId();
+            }catch(Exception $e){
+                
+            }
         }
 
         public static function updateProduct($id,$data){
@@ -105,6 +109,37 @@
                 return $newProducts;
             }catch(Exception $e){
                 error_log("getNewProducts Error:" . $e);
+                return false;
+            }
+        }
+
+
+        public static function getProductById($id){
+            try{
+                $sql = "SELECT 
+                    p.id AS product_id,
+                    p.name,
+                    p.description,
+                    p.base_price,
+                    pi.image_path,
+                    v.id AS variant_id,
+                    v.quantity,
+                    v.price AS variant_price,
+                    c.name AS color_name,
+                    c.hex_code AS color_hex,
+                    s.name AS size_name
+                    FROM products p
+                    LEFT JOIN product_images pi ON p.id = pi.product_id
+                    LEFT JOIN product_variants v ON p.id = v.product_id
+                    LEFT JOIN colors c ON v.color_id = c.id
+                    LEFT JOIN sizes s ON v.size_id = s.id
+                    WHERE p.id = ? 
+                    AND (v.quantity IS NULL OR v.quantity > 0)";
+
+                $product = DB::query($sql, [$id])->fetchAll(PDO::FETCH_ASSOC);
+                return $product;
+            }catch(Exception $e){
+                error_log("Error fetching product: " . $e->getMessage());
                 return false;
             }
         }

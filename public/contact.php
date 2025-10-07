@@ -1,5 +1,9 @@
 <?php
     require_once __DIR__ . '/../app/config/path.php';
+    Session::configure(1800,'/Ego_website/public/index.php');
+    Session::startSession();
+    $userId = Session::getCurrentUser();
+    $sessionId = session_id();
     $header_bg = "assets/images/contactus.png";
     $header_title = "Contact us";
     $nav_logo = "assets/images/egologo2.png";
@@ -26,6 +30,8 @@
         include __DIR__ . '/../app/views/frontend/footer.php';
     ?>
 
+    <script src="<?= JS_PATH ?>jquery-3.7.1.min.js"></script>
     <script src="<?= JS_PATH ?>main.js"></script>
+    <script src="<?= JS_PATH ?>app.js"></script>
 </body> 
 </html>

@@ -35,35 +35,15 @@ function loadSizes() {
     dataType: "json",
     success: function (res) {
       if (res.status === "success") {
-        let dropdown = `<option value="">Size</option>`;
         sizeOptions = '<option value="">Size</option>';
-
         if (Array.isArray(res.data) && res.data.length) {
           res.data.forEach((size) => {
-            const option = `<option value="${size.id}">
-               ${size.name} (${size.type})
-             </option>`;
-            sizeOptions += option;
-            dropdown += option;
+            sizeOptions += `<option value="${size.id}">${size.name} (${size.type})</option>`;
           });
         } else {
-          dropdown += `<option value="">No Sizes</option>`;
           sizeOptions = '<option value="">No Sizes</option>';
         }
-        $("#sizesDropdown").html(dropdown);
-        $("#variantContainer select[name*='[size_id]']").html(sizeOptions);
-      } else {
-        $("#sizesDropdown").html(`<option value="">Error loading</option>`);
-        $("#variantContainer select[name*='[size_id]']").html(
-          '<option value="">Error loading</option>'
-        );
       }
-    },
-    error: function () {
-      $("#sizesDropdown").html(`<option value="">Server error</option>`);
-      $("#variantContainer select[name*='[size_id]']").html(
-        '<option value="">Server error</option>'
-      );
     },
   });
 }
@@ -105,35 +85,17 @@ function loadColors() {
     dataType: "json",
     success: function (res) {
       if (res.status === "success") {
-        let dropdown = `<option value="">Color</option>`;
         colorOptions = '<option value="">Color</option>';
-
         if (Array.isArray(res.data) && res.data.length) {
           res.data.forEach((color) => {
-            const option = `<option value="${color.id}">
-               ${color.name}
-             </option>`;
-            colorOptions += option;
-            dropdown += option;
+            colorOptions += `<option value="${color.id}" data-hex="${color.hex_code}">
+              ${color.name}
+            </option>`;
           });
         } else {
-          dropdown += `<option value="">No Colors</option>`;
           colorOptions = '<option value="">No Colors</option>';
         }
-        $("#colorsDropdown").html(dropdown);
-        $("#variantContainer select[name*='[color_id]']").html(colorOptions);
-      } else {
-        $("#colorsDropdown").html(`<option value="">Error loading</option>`);
-        $("#variantContainer select[name*='[color_id]']").html(
-          '<option value="">Error loading</option>'
-        );
       }
-    },
-    error: function () {
-      $("#colorsDropdown").html(`<option value="">Server error</option>`);
-      $("#variantContainer select[name*='[color_id]']").html(
-        '<option value="">Server error</option>'
-      );
     },
   });
 }

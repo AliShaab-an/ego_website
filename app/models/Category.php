@@ -2,6 +2,7 @@
 
     require_once __DIR__ . '/../core/DB.php';
     class Category{
+        
         public static function getAllCategories(){
             return DB::query("SELECT * FROM categories ORDER BY name DESC") -> fetchAll(PDO::FETCH_ASSOC);
         }

@@ -35,7 +35,8 @@
 
       <!-- Mobile cards -->
       <div class="space-y-4 md:hidden">
-        <div class="border rounded-lg p-4 shadow-sm">
+        <p class="text-xl font-outfit">Products</p>
+        <div class="border-t border-b  p-4 shadow-sm">
           <div class="flex items-center gap-3 mb-3">
             <img src="assets/images/placeholder.png" alt="" class="w-20 h-24 object-cover rounded">
             <div class="flex-1">
@@ -45,12 +46,12 @@
             <button class="text-red-500"><i class="fi fi-rr-cross-small"></i></button>
           </div>
           <div class="flex items-center justify-between text-sm">
-            <div class="flex items-center border rounded">
-              <button class="px-3 py-1">-</button>
-              <input type="number" value="1" class="w-12 text-center border-x outline-none">
-              <button class="px-3 py-1">+</button>
+            <div class="flex items-center gap-4 border px-4 py-2 text-lg text-brand rounded">
+              <button>-</button>
+              <span>1</span>
+              <button>+</button>
             </div>
-            <p class="font-semibold">$320</p>
+            <p class="text-xl font-semibold">$320</p>
           </div>
         </div>
       </div>

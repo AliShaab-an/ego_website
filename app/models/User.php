@@ -17,15 +17,24 @@
             return $stmt->fetch() !== false;
         }
 
+        public static function getByEmail($email) {
+            return DB::query("SELECT * FROM users WHERE email = ?", [$email])->fetch(PDO::FETCH_ASSOC);
+        }
+
         public static function createUser($data){
             $hashedPassword = password_hash($data['password'],PASSWORD_BCRYPT);
-            DB::query("INSERT INTO users (name,email,password,role) VALUES (?,?,?,?)", [
-                $data['name'],
-                $data['email'],
-                $hashedPassword,
-                $data['role'] ?? 'customer'
-            ]);
+            try{
+                DB::query("INSERT INTO users (name,email,password,role) VALUES (?,?,?,?)", [
+                    $data['name'],
+                    $data['email'],
+                    $hashedPassword,
+                    $data['role'] ?? 'customer'
+                ]);
             return DB::getConnection()->lastInsertId();
+            }catch(Exception $e){
+                error_log("User register error: " . $e->getMessage());
+            }
+            
         }
 
         public static function verifyLogin($email, $password){
