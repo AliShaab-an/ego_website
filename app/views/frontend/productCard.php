@@ -2,7 +2,7 @@
   <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
     
     <!-- Left: Image Gallery -->
-    <div class="flex flex-col md:flex-row gap-6">
+    <div class="flex flex-col md:flex-row gap-4">
       
       <!-- Thumbnails (desktop: vertical, mobile: horizontal under main image) -->
       <div class="hidden md:flex flex-col gap-4 w-24 order-1">
@@ -10,13 +10,16 @@
           <img 
             onclick="changeImage(this)"
             src="/Ego_website/public/<?= $img ?>" 
-            class="cursor-pointer border hover:border-brand"/>
+            loading="lazy"
+            class="cursor-pointer"/>
         <?php endforeach; ?>
       </div>
 
       <!-- Main Image -->
       <div class="flex-1 w-full h-[400px] md:h-[540px] order-2">
-        <img id="mainImage" 
+        <img 
+            id="mainImage" 
+            loading="lazy"
             src="/Ego_website/public/<?= $product['images'][0] ?>" 
             alt="<?= htmlspecialchars($product['name']) ?>"
             class="w-full h-full object-cover"/>
@@ -24,11 +27,12 @@
     </div>
 
     <!-- Thumbnails on mobile (horizontal row under main image) -->
-    <div class="flex md:hidden gap-4 mt-4 justify-center">
+    <div class="flex w-24 md:hidden gap-4 mt-4 justify-center">
       <?php foreach($product['images'] as $img): ?>
           <img 
+            loading="lazy"
             src="/Ego_website/public/<?= $img ?>" 
-            class="cursor-pointer border hover:border-brand"/>
+            class="cursor-pointer"/>
         <?php endforeach; ?>
     </div>
 
@@ -38,27 +42,35 @@
       <p class="text-2xl font-semibold text-brand">$<?= number_format($product['base_price'], 2) ?></p>
 
       <!-- Sizes -->
-      <div class="flex gap-4">
+      <div class="flex flex-col gap-2">
         <h3 class="text-xl">Size:</h3>
-        <div class="flex gap-2">
+        <div id="sizeContainer" class="flex gap-2">
           <?php foreach($product['variants'] as $variant): ?>
             <?php if(!empty($variant['size'])): ?>
-              <button class="px-3 py-1 border rounded-full hover:border-brand"><?= htmlspecialchars($variant['size']) ?></button>
-            <?php endif; ?>
-          <?php endforeach; ?>
+              <button
+                class="px-6 py-2 border-2 border-gray-300 text-xl rounded-full cursor-pointer"
+                >
+                  <?= htmlspecialchars($variant['size']) ?>
+              </button>
+            <?php endif;?>
+          <?php endforeach;?>
         </div>
       </div>
 
       <!-- Colors -->
-      <div class="flex gap-4">
+      <div class="flex flex-col gap-2">
         <h3 class="text-xl">Colors:</h3>
-        <div class="flex gap-2">
+        <div id="colorContainer" class="flex gap-2">
           <?php foreach ($product['variants'] as $variant): ?>
             <?php if (!empty($variant['color'])): ?>
-              <div class="w-6 h-6 rounded-full cursor-pointer border relative" 
-                style="background-color: <?= $variant['color_hex'] ?: 'gray' ?>;"
-                title="<?= htmlspecialchars($variant['color']) ?>">
-                <i class="fi fi-rr-check absolute inset-0 top-0.5 text-center m-auto hidden text-white"></i>
+              <div 
+                class="color-option flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-full cursor-pointer"
+                >
+                <div class="w-8 h-8 border-2 border-gray-300 rounded-full cursor-pointer" 
+                  style="background-color: <?= $variant['color_hex'] ?: 'gray' ?>;"
+                  title="<?= htmlspecialchars($variant['color']) ?>">
+                </div>
+                <p class="text-xl"><?= htmlspecialchars($variant['color']) ?></p>
               </div>
             <?php endif; ?>
           <?php endforeach; ?>
@@ -76,7 +88,6 @@
         class="bg-brand text-white px-8 py-2 rounded cursor-pointer"
         id="add-to-cart"
         data-product-id="<?= $product['id'] ?>">
-        
         Add to Cart
         </button>
       </div>
@@ -85,7 +96,7 @@
       <input type="hidden" id="selected-color" value="">
 
       <!-- Accordion -->
-      <div class="border-t border-b border-brand divide-y text-brand">
+      <div class="border-t border-b w-full border-brand divide-y text-brand">
         <button class="accordion-btn w-full flex justify-between items-center p-3 text-lg font-medium text-left cursor-pointer">
           Description
           <i class="fi fi-rr-arrow-small-right text-xl"></i>

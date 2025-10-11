@@ -13,11 +13,69 @@
         }
 
         public static function createColor($name,$hex=null){
-            DB::query("INSERT INTO colors (name, hex_code) VALUES (?, ?)", [$name, $hex]);
+            try{
+                DB::query("INSERT INTO colors (name, hex_code) VALUES (?, ?)", [$name, $hex]);
             return DB::getConnection()->lastInsertId();
+            }catch(PDOException $e){
+                throw new Exception("Failed to create color: " . $e->getMessage());
+            }
+            
         }
 
         public static function deleteColor($id){
-            DB::query("DELETE FROM colors WHERE id = ?", [$id]);
+            try {
+                if (!is_numeric($id) || $id <= 0) {
+                    throw new Exception("Invalid color ID.");
+                }
+
+                $deleted = DB::query("DELETE FROM colors WHERE id = ?", [$id]);
+
+                if ($deleted === 0) {
+                    throw new Exception("Color not found or already deleted.");
+                }
+                return true;
+
+            } catch (PDOException $e) {
+                throw new Exception("Failed to delete color: " . $e->getMessage());
+            }
+        }
+
+        public static function updateColor($id, $name, $hex){
+            try {
+                $id   = intval($id);
+                $name = strtoupper(trim($name));
+                $hex  = strtoupper(trim($hex));
+
+                if ($id <= 0 || $name === '' || $hex === '') {
+                    throw new Exception("Invalid color data.");
+                }
+
+                // Optional: validate hex format
+                if (!preg_match('/^#([A-F0-9]{6})$/', $hex)) {
+                    throw new Exception("Invalid hex color format.");
+                }
+
+                // Update record
+                DB::query(
+                    "UPDATE colors SET name = ?, hex_code = ? WHERE id = ?",
+                    [$name, $hex, $id]
+                );
+
+                return true;
+
+            } catch (PDOException $e) {
+                throw new Exception("Failed to update color: " . $e->getMessage());
+            }
+        }
+
+        public static function findByName($name){
+            $name = ucfirst(strtolower(trim($name)));
+            try {
+                $stmt = DB::query("SELECT * FROM colors WHERE name = ? LIMIT 1", [$name]);
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                return $result ?: null;
+            } catch (PDOException $e) {
+                throw new Exception("Failed to check color name: " . $e->getMessage());
+            }
         }
     }

@@ -5,28 +5,40 @@
 
     class ProductVariant{
 
-        public static function createProductVariant($product_id,$data){
+        public static function createProductVariant($productId,$data){
             try{
-                $color_id = isset($data['color_id']) ? intval($data['color_id'])  :  null;
+                $color_id = isset($data['color_id']) ? intval($data['color_id']) : null;
                 $size_id  = isset($data['size_id']) ? intval($data['size_id']) : null;
-                $price = isset($data['price']) && $data['price'] !== '' ? $data['price'] : null;
+                $price    = isset($data['price']) && $data['price'] !== '' ? floatval($data['price']) : 0;
                 $quantity = isset($data['quantity']) ? intval($data['quantity']) : 0;
 
-                if (!$color_id || !$size_id) {
-                    throw new Exception("Color or Size ID missing");
+                if (empty($color_id) || empty($size_id)) {
+                    throw new Exception("Color or Size ID missing when creating variant.");
                 }
 
-                DB::query("INSERT INTO product_variants (product_id,color_id,size_id,price,quantity) VALUES (?,?,?,?,?)", [
-                    $product_id,
+                $sql = "INSERT INTO product_variants 
+                (product_id, color_id, size_id, price, quantity) 
+                VALUES (?, ?, ?, ?, ?)";
+        
+                DB::query($sql, [
+                    $productId,
                     $color_id,
                     $size_id,
                     $price,
-                    $quantity,
+                    $quantity
                 ]);
+
+                file_put_contents(__DIR__ . '/../../logs/error.log',
+                    "Inserted Variant: Product #$productId | Color $color_id | Size $size_id | Price $price | Qty $quantity\n",
+                    FILE_APPEND
+                );
                 return DB::getConnection()->lastInsertId();
             }catch(Exception $e){
-                error_log("Variant insert failed: " . $e->getMessage());
-                return false;
+                file_put_contents(__DIR__ . '/../../logs/error.log',
+                    "Variant insert failed: " . $e->getMessage() . "\n",
+                    FILE_APPEND
+                );
+                throw $e; 
             } 
         }
     }

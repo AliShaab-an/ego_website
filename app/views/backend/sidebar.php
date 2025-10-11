@@ -25,6 +25,12 @@
                         Helper::sidebarLink("Customers", $action, "Customers","fa-circle-user");
                     ?>
                 </nav>
+                <P class="mt-4 mb-2">Colors & Sizes</P>
+                <nav class="flex flex-col gap-2">
+                    <?php
+                        Helper::sidebarLink("ColorsAndSizes", $action, "Colors & Sizes","fa-palette");
+                    ?>
+                </nav>
             </div>
             <!-- Logout button at bottom -->
             <div class="mt-auto pt-4">

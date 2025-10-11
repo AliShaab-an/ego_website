@@ -45,8 +45,13 @@
         }
 
 
-        public static function findProduct($id){
+        public static function findProductById($id){
+            try{
             return DB::query("SELECT * FROM products WHERE id = ?", [$id]) -> fetch();
+            }catch(Exception $e){
+                file_put_contents(__DIR__ . '/../../logs/model.log', $e->getMessage() . "\n", FILE_APPEND);
+                throw $e;
+            }
         }
 
 
@@ -61,8 +66,11 @@
                     $data['is_top'] ?? 0
                 ]);
                 return DB::getConnection()->lastInsertId();
+
+        
             }catch(Exception $e){
-                
+                file_put_contents(__DIR__ . '/../../logs/model.log', $e->getMessage() . "\n", FILE_APPEND);
+                throw new Exception("DB Insert Error: " . $e->getMessage());
             }
         }
 

@@ -10,7 +10,7 @@
                 <p class="text-3xl font-bold mb-2">Basic Details</p>
                 <div class="w-full flex flex-col gap-2">
                     <label for="" class="font-bold">Product Name</label>
-                    <input type="text" name="name" class="w-full p-2 border border-gray-300 rounded outline-none" required>
+                    <input type="text" id="name" name="name" class="w-full p-2 border border-gray-300 rounded outline-none" required>
                 </div>
                 <div class="w-full flex flex-col gap-2">
                     <label for="" class="font-bold">Product description</label>
@@ -53,33 +53,6 @@
             </button>
         </div>
     </form>
-    <p class="font-bold text-xl my-2 font-outfit">Colors & Sizes</p>
-    <div class="w-full bg-white flex flex-col items-start py-4 px-4 shadow-[0_0_14.36px_-3.16px_rgba(0,0,0,0.25)] mt-4">
-        <p class="font-semibold mt-2">Add Color</p>
-        <form id="colorForm" class="flex gap-2 mt-2 w-full">
-            <div class="flex flex-col">
-                <input type="text" id="colorName" name="name" placeholder="Color Name" 
-                class="p-2 border border-gray-300 rounded w-40 outline-none">
-            </div>
-            <div class="flex flex-col">   
-                <input type="color" id="colorPicker" name="hex_code" value="#000000"
-                class="w-28 h-10 p-1 border border-gray-300 rounded cursor-pointer">
-            </div>
-            <button type="submit" class="h-10 text-sm px-4 border border-gray-500 rounded"><i class="fi fi-rr-plus"></i></button>
-        </form>
-        <p class="font-semibold">Add Size</p>
-        <form id="sizeForm" class="flex items-center gap-2 mt-2 ">
-            <div class="flex flex-col gap-2">
-                <input type="text" id="sizeName" name="name" placeholder="Size Name" 
-                class="p-2 border border-gray-300 rounded w-40 outline-none" required>
-            </div>
-            <div class="flex flex-col">   
-                <input type="text" id="sizeType" name="type" placeholder="Type"
-                class="w-28 h-10 p-2 border border-gray-300 rounded shadow cursor-pointer outline-none" required>
-            </div>
-            <button type="submit" class="h-10 text-sm px-4 border border-gray-500 rounded"><i class="fi fi-rr-plus"></i></button>
-        </form>
-    </div>
 </div>
 
 
@@ -130,7 +103,7 @@
     <div class="flex flex-col">
         <label class="font-bold mb-2">Price (Optional)</label>
         <input type="number" name="variants[0][price]" 
-        class="w-32 text-center h-10 p-2 border border-gray-300 rounded outline-none" min="0" step="0.01" required>
+        class="w-32 text-center h-10 p-2 border border-gray-300 rounded outline-none" min="0" step="0.01">
     </div>
     <button type="button" class="removeSizeBtn h-10 px-2 py-1 border rounded text-red-500 cursor-pointer">Remove</button>
   </div>

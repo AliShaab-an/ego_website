@@ -32,7 +32,7 @@
                 <input class="border w-full h-12 p-2 outline-none" type="email" name="email" placeholder="Enter your email">
 
                 <label class="text-lg" for="phone">Phone Number</label>
-                <input class="border w-full h-12 p-2 outline-none" type="tel" id="phone" name="phone" placeholder="+961...">
+                <input class="border w-full h-12 p-2 outline-none"  id="phone" name="phone" placeholder="+961...">
 
                 <label class="text-lg" for="country">Country</label>
                 <input class="border w-full h-12 p-2 outline-none" type="text" placeholder="Enter your country">

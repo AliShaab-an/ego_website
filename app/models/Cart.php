@@ -16,7 +16,7 @@
                 return $cart ?: null;
 
             }catch(Exception $e){
-                error_log($e->getMessage());
+                file_put_contents(__DIR__ . '/../../logs/model.log', $e->getMessage() . "\n", FILE_APPEND);
                 return null;
             }
         }
@@ -27,7 +27,7 @@
                 return DB::getConnection()->lastInsertId();
 
             }catch(Exception $e){
-                error_log($e->getMessage());
+                file_put_contents(__DIR__ . '/../../logs/model.log', $e->getMessage() . "\n", FILE_APPEND);
             }
         }
 
@@ -50,7 +50,7 @@
                 }
 
             }catch(Exception $e){
-                error_log("CartModel addItem error: " . $e->getMessage(), 3, __DIR__ . "/logs/debug.log");
+                file_put_contents(__DIR__ . '/../../logs/model.log', $e->getMessage() . "\n", FILE_APPEND);
             }
         }
 
@@ -59,7 +59,7 @@
                 $items = DB::query("SELECT * FROM cart_item WHERE cart_id = ?", [$cartId]);
                 return $items->fetchAll(PDO::FETCH_ASSOC);
             } catch(Exception $e){
-                error_log($e->getMessage());
+                file_put_contents(__DIR__ . '/../../logs/model.log', $e->getMessage() . "\n", FILE_APPEND);
                 return [];
             }
         }
@@ -68,7 +68,7 @@
             try {
                 return DB::query("UPDATE cart_item SET quantity = ?, updated_at = NOW() WHERE item_id = ?", [$quantity, $itemId]);
             } catch(Exception $e){
-                error_log($e->getMessage());
+                file_put_contents(__DIR__ . '/../../logs/model.log', $e->getMessage() . "\n", FILE_APPEND);
                 return false;
             }
         }
@@ -77,7 +77,7 @@
             try {
                 return DB::query("DELETE FROM cart_item WHERE item_id = ?", [$itemId]);
             }catch(Exception $e){
-                error_log($e->getMessage());
+                file_put_contents(__DIR__ . '/../../logs/model.log', $e->getMessage() . "\n", FILE_APPEND);
                 return false;
             }
         }
@@ -87,7 +87,7 @@
                 DB::query("DELETE FROM cart_item WHERE cart_id = ?", [$cartId]);
                 DB::query("DELETE FROM cart WHERE cart_id = ?", [$cartId]);
             }catch(Exception $e){
-                error_log($e->getMessage());
+                file_put_contents(__DIR__ . '/../../logs/model.log', $e->getMessage() . "\n", FILE_APPEND);
             }
         }
 
@@ -125,7 +125,7 @@
             ]);
                 }
             } catch (Exception $e) {
-                    error_log("addOrUpdateItem error: " . $e->getMessage(), 3, __DIR__ . "/logs/debug.log");
+                    file_put_contents(__DIR__ . '/../../logs/model.log', $e->getMessage() . "\n", FILE_APPEND);
                     throw $e;
             }
         }
@@ -136,8 +136,8 @@
                 $result = $sql->fetch(PDO::FETCH_ASSOC);
                 return $result['total'] ?? 0;
             }catch(Exception $e) {
-                error_log("Cart getCartCount error: " . $e->getMessage(), 3, __DIR__ . "/../../logs.debug.log");
-                return 0;
+                file_put_contents(__DIR__ . '/../../logs/model.log', $e->getMessage() . "\n", FILE_APPEND);
+                throw $e;
             }
         }
     }

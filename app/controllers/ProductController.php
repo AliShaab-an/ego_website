@@ -2,6 +2,8 @@
     require_once __DIR__ . '/../config/path.php';
     require_once CORE . 'Logger.php';
     require_once __DIR__ . '/../models/Product.php';
+    require_once __DIR__ . '/../models/ProductVariant.php';
+    require_once __DIR__ . '/../models/ProductImages.php';
 
     class ProductController{
 
@@ -14,7 +16,7 @@
             $category_id = intval($_POST['category_id'] ?? 0);
             $is_top = isset($_POST['is_top']) ? 1 : 0;
 
-            
+            file_put_contents(__DIR__ . '/../../logs/product_post.log', print_r($_POST, true), FILE_APPEND);
             // Validate and process the data
             if($name === '' || $base_price <= 0 || $category_id <= 0){
                 return ['status' => 'error', 'message' => 'Invalid product data'];
@@ -29,10 +31,58 @@
                 'is_top' => $is_top
                 ]);
 
+                $check = DB::query("SELECT * FROM products WHERE id = ?", [$productId])->fetch(PDO::FETCH_ASSOC);
+                file_put_contents(__DIR__ . '/../../logs/controller.log',
+                    "After insert, fetched product #$productId:\n" . print_r($check, true) . "\n",
+                    FILE_APPEND
+                );
+
+
+                $variants = json_decode($_POST['variants'] ?? [], true);
+                if(!$variants){
+                    Logger::error("ProductController::addProduct", 'No variants');
+                    return [
+                        'status' => 'error', 'message' => "No Variants"
+                    ];
+                }
+
+                    foreach ($variants as $variant) {
+                        foreach ($variant['sizes'] as $sizeData) {
+                            ProductVariant::createProductVariant($productId,[
+                                'color_id' => $variant['color_id'],
+                                'size_id'  => $sizeData['size_id'],
+                                'price'    => $sizeData['price'],
+                                'quantity' => $sizeData['quantity'],
+                            ]);
+
+                            
+                        }
+                }
+
+                foreach ($_FILES['variant_images']['name'] as $variantIndex => $files) {
+                    foreach ($files as $key => $filename) {
+                        $tmpName = $_FILES['variant_images']['tmp_name'][$variantIndex][$key];
+
+                        $fileData = [
+                            'name' => $filename,
+                            'tmp_name' => $tmpName
+                        ];
+
+                        ProductImages::addImage([
+                            'product_id' => $productId,
+                            'variant_id' => null,
+                            'color_id' => $variants[$variantIndex]['color_id'],
+                            'file' => $fileData,
+                            'alt_text' => $variants[$variantIndex]['sizes'][0]['images_alt_text'][0] ?? '',
+                            'display_order' => $key + 1,
+                            'is_main' => $key === 0 ? 1 : 0
+                        ]);
+                    }
+                }
                 return [
-                    "status" => 'success',
-                    'id' => $productId,
-                    'message' => 'Product basic info added successfully'
+                    'status' => 'success',
+                    'product_id' => $productId,
+                    'message' => 'Product with variants and images added successfully'
                 ];
 
             }catch(Exception $e){

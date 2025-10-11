@@ -13,8 +13,8 @@
         public static function sidebarLink($action,$currentAction,$label,$icon){
             $isActive = $currentAction === $action;
             $classes = $isActive
-                ? "bg-[rgba(183,146,103,1)] text-white"
-                : "hover:bg-[rgba(183,146,103,1)] hover:text-white text-gray-700";
+                ? "bg-brand text-white"
+                : "hover:bg-brand hover:text-white text-gray-700";
 
             echo '<a href="index.php?action=' . $action . '" 
             class="flex items-center gap-2 px-3 py-2 rounded ' . $classes . '">

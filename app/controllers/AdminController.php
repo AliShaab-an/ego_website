@@ -64,4 +64,8 @@
         public function productsPage(){
             include __DIR__ . '/../views/backend/addProducts.php';
         }
+        
+        public function colorsAndSizesPage(){
+            include __DIR__ . '/../views/backend/colorsAndSizes.php';
+        }
     }

@@ -1,0 +1,121 @@
+Inserted Variant: Product #40 | Color 3 | Size 2 | Price 100 | Qty 10
+[2025-10-08 14:08:59] [ProductController::addProduct] ERROR: Missing product_id or file in addImage()
+Response: Array
+(
+    [status] => error
+    [message] => Missing product_id or file in addImage()
+)
+
+Inserted Variant: Product #41 | Color 3 | Size 2 | Price 100 | Qty 10
+[2025-10-08 14:12:30] [ProductController::addProduct] ERROR: Missing product_id or file in addImage()
+Response: Array
+(
+    [status] => error
+    [message] => Missing product_id or file in addImage()
+)
+
+Inserted Variant: Product #42 | Color 3 | Size 2 | Price 100 | Qty 100
+[2025-10-08 14:13:17] [ProductController::addProduct] ERROR: Missing product_id or file in addImage()
+Response: Array
+(
+    [status] => error
+    [message] => Missing product_id or file in addImage()
+)
+
+Inserted Variant: Product #43 | Color 5 | Size 2 | Price 100 | Qty 100
+Response: Array
+(
+    [status] => success
+    [product_id] => 43
+    [message] => Product with variants and images added successfully
+)
+
+Inserted Variant: Product #44 | Color 3 | Size 2 | Price 100 | Qty 100
+Response: Array
+(
+    [status] => success
+    [product_id] => 44
+    [message] => Product with variants and images added successfully
+)
+
+Inserted Variant: Product #45 | Color 5 | Size 2 | Price 100 | Qty 10
+Response: Array
+(
+    [status] => success
+    [product_id] => 45
+    [message] => Product with variants and images added successfully
+)
+
+API file reached
+Controller instantiated
+DEBUG: userId=, sessionId=1cmbjvuucv1r543j5u6i7mnsouDEBUG: productId=45, sizeId=XS, colorId=red, qty=1
+DEBUG: created new cartId=4
+[2025-10-10 09:59:36] [cartController::addProduct] ERROR: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`ego`.`cart_item`, CONSTRAINT `cart_item_ibfk_3` FOREIGN KEY (`variant_id`) REFERENCES `product_variants` (`id`) ON DELETE SET NULL)
+[2025-10-10 09:59:36] [add-to-cart.php] ERROR: Call to a member function getMessage() on null
+API file reached
+Controller instantiated
+DEBUG: userId=, sessionId=1cmbjvuucv1r543j5u6i7mnsouDEBUG: productId=45, sizeId=XS, colorId=red, qty=1
+DEBUG: existing cartId=4
+[2025-10-10 10:14:54] [cartController::addProduct] ERROR: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`ego`.`cart_item`, CONSTRAINT `cart_item_ibfk_3` FOREIGN KEY (`variant_id`) REFERENCES `product_variants` (`id`) ON DELETE SET NULL)
+[2025-10-10 10:14:54] [add-to-cart.php] ERROR: Call to a member function getMessage() on null
+API file reached
+Controller instantiated
+DEBUG: userId=, sessionId=1cmbjvuucv1r543j5u6i7mnsouDEBUG: productId=45, sizeId=, colorId=, qty=1
+DEBUG: existing cartId=4
+[2025-10-10 10:17:51] [cartController::addProduct] ERROR: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`ego`.`cart_item`, CONSTRAINT `cart_item_ibfk_3` FOREIGN KEY (`variant_id`) REFERENCES `product_variants` (`id`) ON DELETE SET NULL)
+[2025-10-10 10:17:51] [add-to-cart.php] ERROR: Call to a member function getMessage() on null
+API file reached
+Response: 
+DEBUG: userId=, sessionId=1cmbjvuucv1r543j5u6i7mnsouDEBUG: productId=45, sizeId=XS, colorId=red, qty=1
+DEBUG: existing cartId=4
+[2025-10-10 10:20:13] [cartController::addProduct] ERROR: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`ego`.`cart_item`, CONSTRAINT `cart_item_ibfk_3` FOREIGN KEY (`variant_id`) REFERENCES `product_variants` (`id`) ON DELETE SET NULL)
+[2025-10-10 10:20:13] [add-to-cart.php] ERROR: Call to a member function getMessage() on null
+API file reached
+DEBUG: userId=, sessionId=1cmbjvuucv1r543j5u6i7mnsouDEBUG: productId=45, sizeId=XS, colorId=red, qty=1
+DEBUG: existing cartId=4
+[2025-10-10 10:21:14] [cartController::addProduct] ERROR: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`ego`.`cart_item`, CONSTRAINT `cart_item_ibfk_3` FOREIGN KEY (`variant_id`) REFERENCES `product_variants` (`id`) ON DELETE SET NULL)
+Response: Array
+(
+    [success] => 
+    [message] => Server error
+)
+
+[2025-10-10 10:21:14] [add-to-cart.php] ERROR: Call to a member function getMessage() on null
+API file reached
+DEBUG: userId=, sessionId=1cmbjvuucv1r543j5u6i7mnsouDEBUG: productId=45, sizeId=XS, colorId=red, qty=1
+DEBUG: existing cartId=4
+[2025-10-10 10:22:45] [cartController::addProduct] ERROR: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`ego`.`cart_item`, CONSTRAINT `cart_item_ibfk_3` FOREIGN KEY (`variant_id`) REFERENCES `product_variants` (`id`) ON DELETE SET NULL)
+Response: Array
+(
+    [success] => 
+    [message] => Server error
+)
+
+API file reached
+DEBUG: userId=, sessionId=su9bs8ag2dg5vb7foj1id30q48DEBUG: productId=45, sizeId=, colorId=, qty=1
+DEBUG: created new cartId=5
+[2025-10-10 13:14:25] [cartController::addProduct] ERROR: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`ego`.`cart_item`, CONSTRAINT `cart_item_ibfk_3` FOREIGN KEY (`variant_id`) REFERENCES `product_variants` (`id`) ON DELETE SET NULL)
+Response: Array
+(
+    [success] => 
+    [message] => Server error
+)
+
+API file reached
+DEBUG: userId=, sessionId=su9bs8ag2dg5vb7foj1id30q48DEBUG: productId=45, sizeId=, colorId=, qty=1
+DEBUG: existing cartId=5
+[2025-10-10 13:14:32] [cartController::addProduct] ERROR: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`ego`.`cart_item`, CONSTRAINT `cart_item_ibfk_3` FOREIGN KEY (`variant_id`) REFERENCES `product_variants` (`id`) ON DELETE SET NULL)
+Response: Array
+(
+    [success] => 
+    [message] => Server error
+)
+
+Inserted Variant: Product #46 | Color 6 | Size 2 | Price 100 | Qty 10
+Response: Array
+(
+    [status] => success
+    [product_id] => 46
+    [message] => Product with variants and images added successfully
+)
+

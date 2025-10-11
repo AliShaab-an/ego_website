@@ -36,7 +36,8 @@
         <title>Admin Panel - Ego Clothing</title>
     </head>
     <body class="flex justify-center bg-white h-screen overflow-hidden">
-        <?php include(BACKEND_VIEWS . 'popup.php');
+        <?php 
+            include(BACKEND_VIEWS . 'popup.php');
             include(BACKEND_VIEWS . 'createAdminPopup.php');
         ?>
         <div class="  h-9/10 flex mt-6">
@@ -67,6 +68,9 @@
                             // only super_admin can access
                             Auth::checkRoles(['super_admin']); 
                             $adminController->adminsPage();
+                            break;
+                        case 'ColorsAndSizes':
+                            $adminController->colorsAndSizesPage();
                             break;
                         case 'logout':
                             $adminController->logout();

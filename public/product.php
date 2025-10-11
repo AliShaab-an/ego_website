@@ -1,7 +1,4 @@
 <?php 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
     require_once __DIR__ . '/../app/config/path.php';
     require_once CORE . 'Session.php';
     Session::configure(1800,'/Ego_website/public/index.php');

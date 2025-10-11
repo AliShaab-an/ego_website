@@ -1,0 +1,39 @@
+Array
+(
+    [name] => Jersey midi dress with cut
+    [description] => test
+    [base_price] => 100
+    [weight] => 
+    [category_id] => 3
+    [is_top] => 1
+    [variants] => [{"color_id":"5","sizes":[{"size_id":"2","quantity":"100","price":"100","images_alt_text":[],"images_display_order":[]}]}]
+)
+Array
+(
+    [name] => Jersey midi dress with cut
+    [description] => test
+    [base_price] => 100
+    [weight] => 
+    [category_id] => 5
+    [is_top] => 1
+    [variants] => [{"color_id":"3","sizes":[{"size_id":"2","quantity":"100","price":"100","images_alt_text":[],"images_display_order":[]}]}]
+)
+Array
+(
+    [name] => Jersey midi dress with cut
+    [description] => test
+    [base_price] => 100
+    [weight] => 
+    [category_id] => 2
+    [is_top] => 1
+    [variants] => [{"color_id":"5","sizes":[{"size_id":"2","quantity":"10","price":"100","images_alt_text":[],"images_display_order":[]}]}]
+)
+Array
+(
+    [name] => Jersey midi dress with cut
+    [description] => gjglkhk
+    [base_price] => 100
+    [weight] => 
+    [category_id] => 5
+    [variants] => [{"color_id":"6","sizes":[{"size_id":"2","quantity":"10","price":"100","images_alt_text":[],"images_display_order":[]}]}]
+)

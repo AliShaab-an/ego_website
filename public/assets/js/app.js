@@ -86,6 +86,41 @@ $(document).ready(function () {
   });
 });
 
+//=====================================================================================
+$(document).ready(function () {
+  // Size selection
+  $("#sizeContainer").on("click", "button", function () {
+    // Remove active style from all buttons
+    $("#sizeContainer button")
+      .removeClass("border-brand text-brand")
+      .addClass("border-gray-300 text-black");
+    // Add active style to the clicked one
+    $(this)
+      .removeClass("border-gray-300 text-black")
+      .addClass("border-brand text-brand");
+
+    // Update hidden input
+    $("#selected-size").val($(this).text().trim());
+  });
+});
+
+$(document).ready(function () {
+  // Color selection
+  $("#colorContainer").on("click", ".color-option", function () {
+    // Reset all
+    $("#colorContainer .color-option")
+      .removeClass("border-brand")
+      .addClass("border-gray-300");
+
+    // Activate clicked one
+    $(this).removeClass("border-gray-300").addClass("border-brand");
+
+    // Store selected color
+    const selectedColor = $(this).find("p").text().trim();
+    $("#selected-color").val(selectedColor);
+  });
+});
+
 $(document).on("click", "#add-to-cart", function () {
   let productId = $(this).data("product-id");
   let size = $("#selected-size").val();
@@ -96,9 +131,9 @@ $(document).on("click", "#add-to-cart", function () {
       productId +
       " Size: " +
       size +
-      " color " +
+      " Color: " +
       color +
-      " quantity " +
+      " Quantity: " +
       quantity
   );
   $.ajax({
@@ -114,7 +149,8 @@ $(document).on("click", "#add-to-cart", function () {
         alert("❌ " + res.message);
       }
     },
-    error: function () {
+    error: function (xhr) {
+      console.error("❌ AJAX error:", xhr.responseText);
       alert("❌ Server error. Try again.");
     },
   });

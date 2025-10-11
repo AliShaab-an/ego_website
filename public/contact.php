@@ -1,5 +1,6 @@
 <?php
     require_once __DIR__ . '/../app/config/path.php';
+    require_once __DIR__ . '/../app/core/Session.php';
     Session::configure(1800,'/Ego_website/public/index.php');
     Session::startSession();
     $userId = Session::getCurrentUser();

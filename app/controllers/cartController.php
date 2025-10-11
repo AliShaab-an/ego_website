@@ -4,6 +4,8 @@
     require_once __DIR__ . '/../models/ProductImages.php';
     require_once __DIR__ . '/../core/Session.php';
     require_once __DIR__ . '/../models/Cart.php';
+    require_once CORE . 'Logger.php';
+
 
     class cartController{
 
@@ -22,49 +24,56 @@
 
         public function addToCart() {
             list($userId, $sessionId) = $this->getIdentifiers();
-            error_log("DEBUG: userId=$userId, sessionId=$sessionId");
+
+            if (!$userId && !$sessionId) {
+                $sessionId = session_id() ?: bin2hex(random_bytes(10));
+                session_start();
+                $_SESSION['session_id'] = $sessionId;
+            }
+            file_put_contents(__DIR__ . '/../../logs/error.log', "DEBUG: userId=$userId, sessionId=$sessionId", FILE_APPEND);
 
             $productId = $_POST['productId'] ?? null;
             $size      = $_POST['size'] ?? null;
             $color     = $_POST['color'] ?? null;
             $quantity  = intval($_POST['quantity'] ?? 1);
 
-            error_log("DEBUG: productId=$productId, size=$size, color=$color, qty=$quantity");
+            file_put_contents(__DIR__ . '/../../logs/error.log',
+            "DEBUG: productId=$productId, sizeId=$size, colorId=$color, qty=$quantity\n",
+                FILE_APPEND
+            );
 
             if (!$productId) {
                 return ['success' => false, 'message' => 'Product ID missing'];
             }
 
             try {
-                // ✅ Fetch product from DB (secure, trusted data)
-                $product = Product::findProduct($productId); 
+                //  Fetch product from DB (secure, trusted data)
+                $product = Product::findProductById($productId); 
                 if (!$product) {
                     return ['success' => false, 'message' => 'Product not found'];
                 }
-                
                 $productName = $product['name'];
                 $price = $product['base_price'];
-                $mainImage = ProductImages::getMainByProduct($productId);
                 
-
-                // ✅ Get or create cart
+                
+                //  Get or create cart
                 $cart = Cart::getCart($userId, $sessionId);
                 error_log("DEBUG: getCart result = " . print_r($cart, true));
                 if (!$cart) {
                     $cartId = Cart::createCart($userId, $sessionId);
-                    error_log("DEBUG: created cartId=$cartId");
+                    file_put_contents(__DIR__ . '/../../logs/error.log', "DEBUG: created new cartId=$cartId\n", FILE_APPEND);
                 } else {
                     $cartId = $cart['cart_id'];
-                    error_log("DEBUG: existing cartId=$cartId");
+                    file_put_contents(__DIR__ . '/../../logs/error.log', "DEBUG: existing cartId=$cartId\n", FILE_APPEND);
                 }
 
-                // ✅ Add or update item
-                Cart::addOrUpdateItem($cartId, $productId, $quantity, $price, $size, $color, $image);
-                error_log("DEBUG: item added/updated");
+            
+                Cart::addOrUpdateItem($cartId, $productId, $quantity, $price, $size, $color, $mainImage);
+                file_put_contents(__DIR__ . '/../../logs/error.log', "DEBUG: item added/updated\n", FILE_APPEND);
 
-                // ✅ Update cart count
+                //  Update cart count
                 $cartCount = Cart::getCartCount($cartId);
-                error_log("DEBUG: cartCount=$cartCount");
+                file_put_contents(__DIR__ . '/../../logs/error.log', "DEBUG: cartCount=$cartCount\n", FILE_APPEND);
                 return [
                     'success' => true,
                     'message' => "$productName added to cart",
@@ -72,7 +81,7 @@
                 ];
 
             } catch (Exception $e) {
-                error_log("CartController error: " . $e->getMessage(), 3, __DIR__ . "/../../logs/debug.log");
+                Logger::error("cartController::addProduct", $e->getMessage());
                 return ['success' => false, 'message' => 'Server error'];
             }
         }

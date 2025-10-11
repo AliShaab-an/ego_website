@@ -6,54 +6,68 @@
 
         public static function addImage($data){
             try {
-                $product_id    = $data['product_id'] ?? null;
+                $productId    = $data['product_id'] ?? null;
                 $variant_id    = $data['variant_id'] ?? null;
                 $color_id      = $data['color_id'] ?? null;
-                $image_path    = $data['image_path'] ?? null;
+                $file          = $data['file'] ?? null;
                 $alt_text      = $data['alt_text'] ?? null;
-                $display_order = $data['display_order'] ?? 0;
-                $is_main       = $data['is_main'] ?? 0;
+                $display_order = isset($data['display_order']) ? intval($data['display_order']) : 0;
+                $is_main       = isset($data['is_main']) ? intval($data['is_main']) : 0;
 
-                file_put_contents(
-                    __DIR__ . '/../../logs/debug.log',
-                    "Inserting image: product_id={$product_id}, variant_id={$variant_id}, color_id={$color_id}, path={$image_path}, order={$display_order}, is_main={$is_main}\n",
-                    FILE_APPEND
-                );
-
-                // Validate
-                if (empty($product_id) || empty($image_path)) {
-                    error_log("addImage() skipped. Missing product_id or image_path");
-                    return false;
+                if (empty($productId) || empty($file) || !isset($file['tmp_name'])) {
+                    throw new Exception("Missing product_id or file in addImage()");
                 }
 
-                // Automatically set the first image as main if none exists
-                $count = DB::query("SELECT COUNT(*) FROM product_images WHERE product_id = ?", [$product_id])
-                            ->fetchColumn();
-
-                if ($count == 0) {
-                    $is_main = 1;
+                
+                $uploadDir = __DIR__ . '/../../public/admin/uploads/';
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
                 }
+
+                $safeName = preg_replace('/[^A-Za-z0-9_\.-]/', '_', basename($file['name']));
+                $fileName = uniqid("p{$productId}_") . "_" . $safeName;
+                $targetPath = $uploadDir . $fileName;
+                $dbPath = "admin/uploads/" . $fileName; // relative path for DB
+
+                
+                if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
+                    throw new Exception("Failed to upload image: {$file['name']}");
+                }
+
+                $count = DB::query("SELECT COUNT(*) FROM product_images WHERE product_id = ?", [$productId])->fetchColumn();
+                if ($count == 0) $is_main = 1;
 
                 DB::query("
                     INSERT INTO product_images 
-                    (product_id, variant_id, color_id, image_path,is_main,alt_text, display_order)
+                    (product_id, variant_id, color_id, image_path, is_main, alt_text, display_order)
                     VALUES (?, ?, ?, ?, ?, ?, ?)
                 ", [
-                    $product_id,
+                    $productId,
                     $variant_id,
                     $color_id,
-                    $image_path,
+                    $dbPath,
                     $is_main,
                     $alt_text,
-                    $display_order,
+                    $display_order
                 ]);
 
-                return DB::getConnection()->lastInsertId();
+                $insertId = DB::getConnection()->lastInsertId();
+
+                file_put_contents(
+                    __DIR__ . '/../../logs/image_debug.log',
+                    "✅ Inserted image: product_id=$productId | variant_id=$variant_id | color_id=$color_id | file=$dbPath\n",
+                    FILE_APPEND
+                );
+
+                return $insertId;
+
             }catch (Exception $e) {
-            error_log("Image insert failed: " . $e->getMessage());
-            return false;
+            file_put_contents(
+            __DIR__ . '/../../logs/image_error.log',"❌ Image insert failed: " . $e->getMessage() . "\n",
+            FILE_APPEND
+            );
+            throw $e;
             }
-            
         }
 
         public static function hasMainImage(int $productId, ?int $colorId): bool {

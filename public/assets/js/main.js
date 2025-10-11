@@ -158,18 +158,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
 //checkout page
 
-document.addEventListener("DOMContentLoaded", function () {
-  const phoneInput = document.querySelector("#phone");
-  if (phoneInput) {
-    window.intlTelInput(phoneInput, {
-      initialCountry: "lb", // default Lebanon 🇱🇧
-      preferredCountries: ["lb", "ae", "sa", "us"],
-      separateDialCode: true,
-      utilsScript:
-        "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.min.js",
-    });
-  }
-});
+// document.addEventListener("DOMContentLoaded", function () {
+//   const phoneInput = document.querySelector("#phone");
+//   if (phoneInput) {
+//     window.intlTelInput(phoneInput, {
+//       initialCountry: "lb", // default Lebanon 🇱🇧
+//       preferredCountries: ["lb", "ae", "sa", "us"],
+//       separateDialCode: true,
+//       utilsScript:
+//         "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.min.js",
+//     });
+//   }
+// });
 
 //Product Change Image
 
@@ -178,37 +178,6 @@ function changeImage(thumbnail) {
   console.log("clicked");
   mainImg.src = thumbnail.src;
 }
-
-$(document).ready(function () {
-  // Size selection
-  $(".flex.gap-2 > button").click(function () {
-    // Remove active class from all buttons
-    $(this).siblings().removeClass("bg-brand text-white border-brand");
-    // Add active class to clicked button
-    $(this).addClass("bg-brand text-white border-brand");
-
-    // Update hidden input
-    $("#selected-size").val($(this).text());
-  });
-});
-
-$(".flex.gap-2 > div").click(function () {
-  // Remove border highlight and hide check from siblings
-  $(this)
-    .siblings()
-    .removeClass("border-4 border-brand")
-    .find("i")
-    .addClass("hidden");
-
-  // Highlight selected
-  $(this).addClass("border-4 border-brand");
-
-  // Show checkmark in this circle
-  $(this).find("i").removeClass("hidden");
-
-  // Update hidden input
-  $("#selected-color").val($(this).attr("title"));
-});
 
 $(".accordion-btn").click(function () {
   // Toggle content
