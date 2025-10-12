@@ -3,6 +3,28 @@
     require_once __DIR__ . '/../models/Sizes.php';
     class SizesController{
 
+        public function listSizes(){
+            try{
+                $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+                $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 5;
+                $offset = ($page - 1) * $limit;
+
+                $data = Sizes::getPaginated($limit, $offset);
+                $total = Sizes::countAll();
+                $hasMore = ($offset + $limit) < $total;
+
+                return [
+                    'status' => 'success',
+                    'data' => $data,
+                    'total' => $total,
+                    'has_more' => $hasMore
+                ];
+
+            }catch (Exception $e) {
+                return ['status' => 'error', 'message' => $e->getMessage()];
+            }
+        }
+
         public function addSize(){
             $name =  isset($_POST['name']) ? ucfirst(strtolower(trim($_POST['name']))) : '';
             $type = isset($_POST['type']) ? ucfirst(strtolower(trim($_POST['type']))) : '';
@@ -40,10 +62,6 @@
             }
         }
 
-
-        public function listSizes(){
-            return Sizes::getAll();
-        }
 
         public function updateSize(){
             $id   = $_POST['id'] ?? null;

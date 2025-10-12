@@ -22,7 +22,6 @@
                 <nav class="flex flex-col gap-2">
                     <?php
                         Helper::sidebarLink("Admins", $action, "Admins","fa-font");
-                        Helper::sidebarLink("Customers", $action, "Customers","fa-circle-user");
                     ?>
                 </nav>
                 <P class="mt-4 mb-2">Colors & Sizes</P>

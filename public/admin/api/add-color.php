@@ -7,11 +7,7 @@
         $controller = new ColorsController();
         echo json_encode($controller->addColor());
     }catch (Throwable $e) {
-        echo json_encode([
-            'status' => 'error',
-            'message' => 'Internal server error: ' . $e->getMessage(),
-            'trace'   => $e->getTraceAsString()
-        ]);
+        echo json_encode(['success' => false, 'message' => 'Server error']);
     }
 
     

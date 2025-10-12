@@ -58,43 +58,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-  const openBtn = document.getElementById("openBtn"); // your plus button
-  const popup = document.getElementById("popup");
-  const closeBtn = document.getElementById("closeBtn");
-  const okBtn = document.getElementById("okBtn");
-
-  // If the modal is accidentally placed inside another container, move it to body
-  if (popup && popup.parentElement !== document.body) {
-    document.body.appendChild(popup);
-  }
-
-  const openModal = () => {
-    // prevent layout shift when scrollbar disappears
-    const scrollBarWidth =
-      window.innerWidth - document.documentElement.clientWidth;
-    if (scrollBarWidth > 0)
-      document.body.style.paddingRight = scrollBarWidth + "px";
-    document.body.style.overflow = "hidden";
-
-    popup.classList.remove("hidden");
-  };
-
-  const closeModal = () => {
-    popup.classList.add("hidden");
-    document.body.style.overflow = "";
-    document.body.style.paddingRight = "";
-  };
-
-  openBtn?.addEventListener("click", openModal);
-  closeBtn?.addEventListener("click", closeModal);
-  okBtn?.addEventListener("click", closeModal);
-
-  // close when clicking overlay
-  popup?.addEventListener("click", (e) => {
-    if (e.target === popup) closeModal();
-  });
-});
 
 const passwordInput = document.getElementById("adminPassword");
 const toggleBtn = document.getElementById("togglePassword");
@@ -118,8 +81,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const colorTemplate = document.getElementById("colorTemplate");
   const sizeTemplate = document.getElementById("sizeTemplate");
 
-  loadColors();
-  loadSizes();
 
   // --- Add a new color variant block ---
   addColorBtn.addEventListener("click", () => {

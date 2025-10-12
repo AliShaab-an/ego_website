@@ -35,15 +35,12 @@
         <script src="https://kit.fontawesome.com/7f6ab6587f.js" crossorigin="anonymous"></script>
         <title>Admin Panel - Ego Clothing</title>
     </head>
-    <body class="flex justify-center bg-white h-screen overflow-hidden">
-        <?php 
-            include(BACKEND_VIEWS . 'popup.php');
-            include(BACKEND_VIEWS . 'createAdminPopup.php');
-        ?>
+    <body class="flex justify-center bg-white h-screen overflow-hidden" data-page="<?= htmlspecialchars($action) ?>">
+    
         <div class="  h-9/10 flex mt-6">
             <?php include( BACKEND_VIEWS .'sidebar.php');?>
-
-            <main class="flex-1 ml-10 w-5xl h-full overflow-y-auto">
+            <main class="flex-1 ml-10 w-5xl h-full overflow-y-auto">    
+                
                 <?php 
                     switch($action){
                         case 'login':
@@ -61,9 +58,6 @@
                         case 'Categories':
                             $adminController->categoryPage();
                             break;
-                        case 'Customers':
-                            $adminController->customersPage();
-                            break;
                         case 'Admins':
                             // only super_admin can access
                             Auth::checkRoles(['super_admin']); 
@@ -80,12 +74,10 @@
                     }
                 ?>
             </main>
+            
         </div>
         <script src="<?= JS_PATH ?>jquery-3.7.1.min.js"></script>
-        <script src="<?= ADMIN_JS_PATH ?>index.js"></script>
-        <script src="<?= ADMIN_JS_PATH ?>admin.js"></script>
-        <script src="<?= ADMIN_JS_PATH ?>SizesAndColors.js"></script>
-        <script src="<?= ADMIN_JS_PATH ?>products.js"></script>
+        <script type="module" src="<?= ADMIN_JS_PATH ?>main.js"></script>
     </body>
     </html>
 

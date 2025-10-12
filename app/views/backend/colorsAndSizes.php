@@ -35,8 +35,8 @@
   </table>
 
   <div class="flex justify-between w-full mt-4 px-4">
-    <a href="#" class="px-3 py-1 bg-white rounded shadow">Previous</a>
-    <a href="#" class="px-3 py-1 bg-white rounded shadow">Next</a>
+    <button id="prevPage" class="px-3 py-1 bg-white rounded shadow cursor-pointer">Previous</button>
+    <button id="nextPage" class="px-3 py-1 bg-white rounded shadow cursor-pointer">Next</button>
   </div>
 </div>
 
@@ -62,9 +62,10 @@
   </table>
 
   <div class="flex justify-between w-full mt-4 px-4">
-    <a href="#" class="px-3 py-1 bg-white rounded shadow">Previous</a>
-    <a href="#" class="px-3 py-1 bg-white rounded shadow">Next</a>
+    <button id="prevSizePage" class="px-3 py-1 bg-white rounded shadow cursor-pointer">Previous</button>
+    <button id="nextSizePage" class="px-3 py-1 bg-white rounded shadow cursor-pointer">Next</button>
   </div>
+  <p class="text-center text-gray-500 mt-2" id="pageInfo"></p>
 </div>
 
 <!-- ADD COLOR MODAL -->
@@ -93,8 +94,8 @@
       <input type="color" name="hex_code" id="editColorHex"
         class="border rounded w-20 h-10 cursor-pointer">
       <div class="flex justify-end gap-2">
-        <button type="button" id="closeEditColorModal" class="px-4 py-2 border rounded">Cancel</button>
-        <button type="submit" class="px-4 py-2 bg-brand text-white rounded">Save</button>
+        <button type="button" id="closeEditColorModal" class="px-4 py-2 border rounded cursor-pointer">Cancel</button>
+        <button type="submit" class="px-4 py-2 bg-brand text-white rounded cursor-pointer">Save</button>
       </div>
     </form>
   </div>
@@ -143,7 +144,7 @@
     </p>
     <div class="flex justify-end gap-3">
       <button id="cancelDeleteBtn" class="px-4 py-2 border rounded hover:bg-gray-100 cursor-pointer">Cancel</button>
-      <button id="confirmDeleteBtn" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 cursor-pointer">Delete</button>
+      <button id="confirmDeleteBtn" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700 cursor-pointer">Delete</button>
     </div>
   </div>
 </div>

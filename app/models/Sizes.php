@@ -3,8 +3,27 @@
     require_once __DIR__ . '/../core/DB.php';
 
     class Sizes{
-        public static function getAll(){
-            return DB::query("SELECT * FROM sizes ORDER BY name ASC")->fetchAll();
+
+        public static function getPaginated($limit, $offset) {
+            try{
+                $limit = (int)$limit;
+                $offset = (int)$offset;
+                $stmt = DB::query("SELECT * FROM sizes ORDER BY id DESC LIMIT $limit OFFSET $offset");
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            }catch(PDOException $e){
+                throw new Exception("Failed to fetch sizes: " . $e->getMessage());
+            }
+        }
+
+
+        public static function countAll() {
+            try{
+                $stmt = DB::query("SELECT COUNT(*) AS count FROM sizes");
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                return (int)$row['count'];
+            }catch(PDOException $e){
+                throw new Exception("Failed to count sizes: " . $e->getMessage());
+            }
         }
 
         public static function getById($id) {

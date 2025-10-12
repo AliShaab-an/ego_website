@@ -3,6 +3,29 @@
 
     class ColorsController{
 
+
+        public function listColors(){
+            try{
+                $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+                $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 5;
+                $offset = ($page - 1) * $limit;
+
+                $data = Colors::getPaginated($limit, $offset);
+                $total = Colors::countAll();
+                $hasMore = ($offset + $limit) < $total;
+
+                return [
+                    'status' => 'success',
+                    'data' => $data,
+                    'total' => $total,
+                    'has_more' => $hasMore
+                ];
+
+            }catch (Exception $e) {
+                return ['status' => 'error', 'message' => $e->getMessage()];
+            }
+        }
+
         public function addColor(){
 
             $name = isset($_POST['name']) ? ucfirst(strtolower(trim($_POST['name']))) : '';
@@ -37,16 +60,6 @@
             }catch (Exception $e) {
                 return ['status' => 'error', 'message' => $e->getMessage()];
             }
-        }
-
-
-        public function listColors(){
-            try{
-                return Colors::getAllColors();
-            }catch(Exception $e){
-                return ['status' => 'error', 'message' => $e->getMessage()];
-            }
-            
         }
 
         public function deleteColor(){

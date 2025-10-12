@@ -8,6 +8,28 @@
             return DB::query("SELECT * FROM colors ORDER BY name ASC")-> fetchAll();
         }
 
+        public static function getPaginated($limit, $offset) {
+            try{
+                $limit = (int)$limit;
+                $offset = (int)$offset;
+                $stmt = DB::query("SELECT * FROM colors ORDER BY id DESC LIMIT $limit OFFSET $offset");
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            }catch(PDOException $e){
+                throw new Exception("Failed to fetch colors: " . $e->getMessage());
+            }
+        }
+
+
+        public static function countAll() {
+            try{
+                $stmt = DB::query("SELECT COUNT(*) AS count FROM colors");
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                return (int)$row['count'];
+            }catch(PDOException $e){
+                throw new Exception("Failed to count colors: " . $e->getMessage());
+            }
+        }
+
         public static function getById($id){
             return DB::query("SELECT * FROM colors WHERE id = ?", [$id])->fetch();
         }
