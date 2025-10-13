@@ -24,8 +24,10 @@ const Sizes = {
     $(document).on("click", ".editSizeBtn", (e) => this.openEditModal(e));
     $(document).on("click", ".deleteSizeBtn", (e) => this.confirmDelete(e));
 
-    $("#cancelDeleteBtn").on("click", () => closeModal("#confirmDeleteModal"));
-    $("#confirmDeleteBtn").on("click", () => this.deletesSize());
+    $("#cancelDeleteSizeBtn").on("click", () =>
+      closeModal("#confirmDeleteSizeModal")
+    );
+    $("#confirmDeleteSizeBtn").on("click", () => this.deleteSize());
 
     $(document).on("click", "#nextSizePage", () => this.changePage("next"));
     $(document).on("click", "#prevSizePage", () => this.changePage("prev"));
@@ -95,6 +97,7 @@ const Sizes = {
           form[0].reset();
           this.loadSizes();
         } else {
+          closeModal("#addSizeModal");
           showToast(res.message || "Error adding size", "error");
         }
       },
@@ -141,8 +144,8 @@ const Sizes = {
   confirmDelete(e) {
     this.deleteId = $(e.currentTarget).data("id");
     this.deleteName = $(e.currentTarget).data("name");
-    $("#confirmDeleteText").text(`Delete size "${this.deleteName}"?`);
-    openModal("#confirmDeleteModal");
+    $("#confirmDeleteSizeText").text(`Delete size "${this.deleteName}"?`);
+    openModal("#confirmDeleteSizeModal");
   },
 
   deleteSize() {
@@ -152,9 +155,11 @@ const Sizes = {
       data: { id: this.deleteId },
       success: (res) => {
         if (res.status === "success") {
+          closeModal("#confirmDeleteSizeModal");
           showToast("Size deleted successfully.");
           this.loadSizes();
         } else {
+          closeModal("#confirmDeleteSizeModal");
           showToast(res.message || "Error deleting size.", "error");
         }
       },

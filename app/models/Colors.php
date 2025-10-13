@@ -65,7 +65,7 @@
         public static function updateColor($id, $name, $hex){
             try {
                 $id   = intval($id);
-                $name = strtoupper(trim($name));
+                $name = trim($name);
                 $hex  = strtoupper(trim($hex));
 
                 if ($id <= 0 || $name === '' || $hex === '') {

@@ -28,7 +28,6 @@
         require_once __DIR__ . '/../app/controllers/ProductController.php';
         $categoriesController = new CategoryController();
         $productController = new ProductController();
-        $categories = $categoriesController->getCategories();
         $result = $categoriesController->listCategoriesWithProducts();
         $categoryAndProducts = $result['data'];
 

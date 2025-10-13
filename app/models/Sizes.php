@@ -53,8 +53,8 @@
         public static function updateSize($id, $name, $type){
             try {
                 $id   = intval($id);
-                $name = ucfirst(strtolower(trim($name)));
-                $type = ucfirst(strtolower(trim($type)));
+                $name = trim($name);
+                $type = trim($type);
 
                 if ($id <= 0 || $name === '' || $type === '') {
                     throw new Exception("Invalid size data.");

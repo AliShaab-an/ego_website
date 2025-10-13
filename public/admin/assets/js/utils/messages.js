@@ -1,6 +1,6 @@
 export function showToast(message, type = "success") {
   const bg =
-    type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-red-600";
+    type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white";
   const toast = $(
     `<div class="fixed top-4 right-4 ${bg} p-3 rounded shadow text-sm z-[9999]">${message}</div>`
   );

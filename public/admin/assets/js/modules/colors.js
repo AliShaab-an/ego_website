@@ -99,6 +99,7 @@ const Colors = {
           form[0].reset();
           this.loadColors();
         } else {
+          closeModal("#addColorModal");
           showToast(res.message || "Error adding color", "error");
         }
       },

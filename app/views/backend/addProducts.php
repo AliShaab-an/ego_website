@@ -10,11 +10,11 @@
                 <p class="text-3xl font-bold mb-2">Basic Details</p>
                 <div class="w-full flex flex-col gap-2">
                     <label for="" class="font-bold">Product Name</label>
-                    <input type="text" id="name" name="name" class="w-full p-2 border border-gray-300 rounded outline-none" required>
+                    <input type="text" id="name" name="name" class="w-full p-2 border border-gray-300 rounded outline-none" placeholder="Enter Product Name" required>
                 </div>
                 <div class="w-full flex flex-col gap-2">
                     <label for="" class="font-bold">Product description</label>
-                    <textarea type="text" name="description" class="w-full h-16 border border-gray-300 px-3 py-2 outline-none rounded"></textarea>
+                    <textarea type="text" name="description" class="w-full h-16 border border-gray-300 px-3 py-2 outline-none rounded" placeholder="Enter Product Description"></textarea>
                 </div>
                 <div class="flex items-center gap-2 mt-2">
                     <input type="checkbox" id="is_top" name="is_top" value="1" 
@@ -23,7 +23,7 @@
                 </div>
                 <div class="w-full flex flex-col gap-2">
                     <label for="" class="font-bold">Product price</label>
-                    <input type="number" name="base_price" class="w-full p-2 border border-gray-300 rounded outline-none" placeholder="$00.00" min="0.00" required>
+                    <input type="number" name="base_price" class="w-full p-2 border border-gray-300 rounded outline-none" placeholder="00.00" min="0.00" required>
                 </div>
                 <div class="flex flex-row  gap-2 mt-2">
                     <div class="">
@@ -35,13 +35,23 @@
                     </div>
                     <div>
                         <label for="" class="font-bold mb-2">Weight (Optional)</label>
-                        <input type="number" name="weight" class="w-full p-2 border border-gray-300 rounded outline-none">
+                        <input type="number" name="weight" class="w-full p-2 border border-gray-300 rounded outline-none" placeholder="00.00">
                     </div>
                 </div>
             </div>
             <div class="w-2/5 bg-white flex flex-col items-start py-4 px-4 shadow-[0_0_14.36px_-3.16px_rgba(0,0,0,0.25)]">
+              <p class="text-3xl font-bold mb-2">Basic Details</p>
+              <div class="w-full flex flex-col gap-2">
+                    <label for="" class="font-bold">Product Discount</label>
+                    <input type="text" id="name" name="name" class="w-full p-2 border border-gray-300 rounded outline-none" placeholder="Enter Discount Percentage">
+                </div>
+                <div class="flex items-center gap-2 mt-2">
+                    <input type="checkbox" id="is_active" name="is_active" value="1" 
+                    class="w-5 h-5 border-gray-400 rounded">
+                    <label for="is_active" class="font-bold">Mark Discount as active</label>
+                </div>
             </div>
-
+              
         </div>
 
         <p class="font-bold text-xl my-2">Inventory</p>

@@ -65,8 +65,8 @@
 
         public function updateSize(){
             $id   = $_POST['id'] ?? null;
-            $name = $_POST['name'] ?? '';
-            $type = $_POST['type'] ?? '';
+            $name = ucfirst(strtolower(trim($_POST['name']))) ?? '';
+            $type = ucfirst(strtolower(trim($_POST['type']))) ?? '';
 
             if (empty($id) || empty($name) || empty($type)) {
                 return ['status' => 'error', 'message' => 'All fields are required.'];
