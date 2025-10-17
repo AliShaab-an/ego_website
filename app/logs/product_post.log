@@ -1,0 +1,469 @@
+Array
+(
+    [name] => Jersey midi dress with cut
+    [description] => test
+    [is_top] => 1
+    [base_price] => 100
+    [category_id] => 7
+    [weight] => 
+    [discount] => 
+    [variants] => Array
+        (
+            [0] => Array
+                (
+                    [color_id] => 23
+                    [size_id] => 6
+                    [quantity] => 10
+                    [price] => 
+                )
+
+        )
+
+)
+Array
+(
+    [name] => Jersey midi dress with cut
+    [description] => test
+    [is_top] => 1
+    [base_price] => 100
+    [category_id] => 7
+    [weight] => 
+    [discount] => 
+    [variants] => Array
+        (
+            [0] => Array
+                (
+                    [color_id] => 23
+                    [size_id] => 6
+                    [quantity] => 100
+                    [price] => 
+                )
+
+        )
+
+)
+Array
+(
+    [name] => Jersey midi dress with cut
+    [description] => test
+    [is_top] => 1
+    [base_price] => 100
+    [category_id] => 7
+    [weight] => 
+    [discount] => 
+    [variants] => Array
+        (
+            [0] => Array
+                (
+                    [color_id] => 23
+                    [size_id] => 6
+                    [quantity] => 10
+                    [price] => 
+                )
+
+        )
+
+)
+Array
+(
+    [name] => Jersey midi dress with cut
+    [description] => test
+    [is_top] => 1
+    [base_price] => 100
+    [category_id] => 7
+    [weight] => 
+    [discount] => 
+    [variants] => Array
+        (
+            [0] => Array
+                (
+                    [color_id] => 23
+                    [size_id] => 10
+                    [quantity] => 100
+                    [price] => 
+                )
+
+        )
+
+)
+Array
+(
+    [name] => Jersey midi dress with cut
+    [description] => test
+    [is_top] => 1
+    [base_price] => 100
+    [category_id] => 7
+    [weight] => 
+    [discount] => 
+    [variants] => Array
+        (
+            [0] => Array
+                (
+                    [color_id] => 23
+                    [size_id] => 6
+                    [quantity] => 100
+                    [price] => 
+                )
+
+        )
+
+)
+Array
+(
+    [name] => Jersey midi dress with cut
+    [description] => test
+    [is_top] => 1
+    [base_price] => 100
+    [category_id] => 7
+    [weight] => 
+    [discount] => 
+    [variants] => Array
+        (
+            [0] => Array
+                (
+                    [color_id] => 23
+                    [size_id] => 6
+                    [quantity] => 10
+                    [price] => 
+                )
+
+        )
+
+)
+Array
+(
+    [name] => Jersey midi dress with cut
+    [description] => test
+    [is_top] => 1
+    [base_price] => 100
+    [category_id] => 7
+    [weight] => 
+    [discount] => 
+    [variants] => Array
+        (
+            [0] => Array
+                (
+                    [color_id] => 23
+                    [size_id] => 7
+                    [quantity] => 10
+                    [price] => 
+                )
+
+        )
+
+)
+Array
+(
+    [name] => test
+    [description] => test
+    [is_top] => 1
+    [base_price] => 100
+    [category_id] => 7
+    [weight] => 
+    [discount] => 
+    [variants] => Array
+        (
+            [0] => Array
+                (
+                    [color_id] => 23
+                    [size_id] => 7
+                    [quantity] => 10
+                    [price] => 
+                )
+
+        )
+
+)
+Array
+(
+    [name] => test
+    [description] => test
+    [is_top] => 1
+    [base_price] => 100
+    [category_id] => 7
+    [weight] => 
+    [discount] => 
+    [variants] => Array
+        (
+            [0] => Array
+                (
+                    [color_id] => 23
+                    [size_id] => 7
+                    [quantity] => 10
+                    [price] => 
+                )
+
+        )
+
+)
+Array
+(
+    [name] => test3
+    [description] => test
+    [is_top] => 1
+    [base_price] => 100
+    [category_id] => 7
+    [weight] => 
+    [discount] => 
+)
+Array
+(
+    [name] => test3
+    [description] => test
+    [is_top] => 1
+    [base_price] => 100
+    [category_id] => 7
+    [weight] => 
+    [discount] => 
+    [variants] => Array
+        (
+            [0] => Array
+                (
+                    [color_id] => 
+                )
+
+        )
+
+)
+Array
+(
+    [name] => test3
+    [description] => test
+    [is_top] => 1
+    [base_price] => 100
+    [category_id] => 7
+    [weight] => 
+    [discount] => 
+    [variants] => Array
+        (
+            [0] => Array
+                (
+                    [color_id] => 
+                    [size_id] => 6
+                    [quantity] => 10
+                    [price] => 
+                )
+
+        )
+
+)
+Array
+(
+    [name] => test3
+    [description] => test
+    [is_top] => 1
+    [base_price] => 100
+    [category_id] => 7
+    [weight] => 
+    [discount] => 
+    [variants] => Array
+        (
+            [0] => Array
+                (
+                    [color_id] => 23
+                    [size_id] => 6
+                    [quantity] => 10
+                    [price] => 
+                )
+
+        )
+
+)
+Array
+(
+    [name] => Jersey midi dress with cut
+    [description] => test
+    [is_top] => 1
+    [base_price] => 100
+    [category_id] => 7
+    [weight] => 
+    [discount] => 
+    [variants] => Array
+        (
+            [0] => Array
+                (
+                    [color_id] => 23
+                    [size_id] => 7
+                    [quantity] => 10
+                    [price] => 
+                )
+
+        )
+
+)
+Array
+(
+    [name] => Jersey midi dress with cut
+    [description] => test
+    [is_top] => 1
+    [base_price] => 100
+    [category_id] => 7
+    [weight] => 
+    [discount] => 
+    [variants] => Array
+        (
+            [0] => Array
+                (
+                    [color_id] => 
+                    [size_id] => 7
+                    [quantity] => 10
+                    [price] => 
+                )
+
+        )
+
+)
+Array
+(
+    [name] => test
+    [description] => test
+    [is_top] => 1
+    [base_price] => 100
+    [category_id] => 7
+    [weight] => 
+    [discount] => 
+    [variants] => Array
+        (
+            [0] => Array
+                (
+                    [color_id] => 
+                    [size_id] => 6
+                    [quantity] => 10
+                    [price] => 
+                )
+
+        )
+
+)
+Array
+(
+    [name] => test
+    [description] => test
+    [is_top] => 1
+    [base_price] => 100
+    [category_id] => 7
+    [weight] => 
+    [discount] => 
+    [variants] => Array
+        (
+            [0] => Array
+                (
+                    [color_id] => 23
+                    [size_id] => 
+                    [quantity] => 10
+                    [price] => 
+                )
+
+        )
+
+)
+Array
+(
+    [name] => test
+    [description] => test
+    [is_top] => 1
+    [base_price] => 100
+    [category_id] => 7
+    [weight] => 
+    [discount] => 
+    [variants] => Array
+        (
+            [0] => Array
+                (
+                    [color_id] => 23
+                    [size_id] => 7
+                    [quantity] => 
+                    [price] => 
+                )
+
+        )
+
+)
+Array
+(
+    [name] => test
+    [description] => test
+    [is_top] => 1
+    [base_price] => 100
+    [category_id] => 7
+    [weight] => 
+    [discount] => 
+    [variants] => Array
+        (
+            [0] => Array
+                (
+                    [color_id] => 23
+                    [size_id] => 7
+                    [quantity] => 10
+                    [price] => 
+                )
+
+        )
+
+)
+Array
+(
+    [name] => test
+    [description] => test
+    [is_top] => 1
+    [base_price] => 100
+    [category_id] => 7
+    [weight] => 
+    [discount] => 
+    [variants] => Array
+        (
+            [0] => Array
+                (
+                    [color_id] => 23
+                    [size_id] => 6
+                    [quantity] => 10
+                    [price] => 
+                )
+
+        )
+
+)
+Array
+(
+    [name] => test
+    [description] => test
+    [is_top] => 1
+    [base_price] => 100
+    [category_id] => 7
+    [weight] => 
+    [discount] => 
+    [variants] => Array
+        (
+            [0] => Array
+                (
+                    [color_id] => 23
+                    [size_id] => 6
+                    [quantity] => 
+                    [price] => 
+                )
+
+        )
+
+)
+Array
+(
+    [name] => test
+    [description] => test
+    [is_top] => 1
+    [base_price] => 100
+    [category_id] => 7
+    [weight] => 
+    [discount] => 
+    [variants] => Array
+        (
+            [0] => Array
+                (
+                    [color_id] => 23
+                    [size_id] => 
+                    [quantity] => 
+                    [price] => 
+                )
+
+        )
+
+)

@@ -43,7 +43,7 @@
               <p class="text-3xl font-bold mb-2">Basic Details</p>
               <div class="w-full flex flex-col gap-2">
                     <label for="" class="font-bold">Product Discount</label>
-                    <input type="text" id="name" name="name" class="w-full p-2 border border-gray-300 rounded outline-none" placeholder="Enter Discount Percentage">
+                    <input type="text" id="discount"  name="discount" class="w-full p-2 border border-gray-300 rounded outline-none" placeholder="Enter Discount Percentage">
                 </div>
                 <div class="flex items-center gap-2 mt-2">
                     <input type="checkbox" id="is_active" name="is_active" value="1" 
@@ -82,7 +82,7 @@
 
     <!-- Variant Images -->
     <div class="variant-images-section">
-      <p class="font-bold mb-2">Variant Images</p>
+      <p class="font-bold mb-2">Variant Images Note: the First Image is the main Image</p>
       <div class="extraImagesContainer flex gap-2"></div>
       <button type="button" class="addExtraImage mt-2 px-3 py-1 border border-gray-400 rounded hover:bg-gray-100 text-sm">
         <i class="fa-solid fa-circle-plus mr-1"></i> Add Image

@@ -1,10 +1,6 @@
 <?php
     require_once __DIR__ . '/../../app/config/path.php';
     require_once __DIR__ . '/../../app/controllers/AdminController.php';
-    require_once __DIR__ . '/../../app/controllers/OrderController.php';
-    require_once __DIR__ . '/../../app/controllers/UserController.php';
-    require_once __DIR__ . '/../../app/controllers/ProductController.php';
-    require_once __DIR__ . '/../../app/controllers/CategoryController.php';
     require_once __DIR__ . '/../../app/core/Session.php';
     require_once __DIR__ . '/../../app/core/Helper.php';
     
@@ -13,10 +9,6 @@
     Session::startSession();
 
     $adminController = new AdminController();
-    $orderController = new OrderController();
-    $userController = new UserController();
-    $productController = new ProductController();
-    $categoryController = new CategoryController();
 
     $action = $_GET['action'] ?? 'dashboard';
 
@@ -65,6 +57,15 @@
                             break;
                         case 'ColorsAndSizes':
                             $adminController->colorsAndSizesPage();
+                            break;
+                        case 'ShippingFees':
+                            $adminController->shippingPage();
+                            break;
+                        case 'Coupons':
+                            $adminController->couponsPage();
+                            break;
+                        case 'manageProducts':
+                            $adminController->manageProducts();
                             break;
                         case 'logout':
                             $adminController->logout();

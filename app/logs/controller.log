@@ -1,0 +1,238 @@
+After insert, fetched product #48:
+Array
+(
+    [id] => 48
+    [name] => Jersey midi dress with cut
+    [description] => test
+    [base_price] => 100.00
+    [weight] => 
+    [category_id] => 7
+    [created_at] => 2025-10-15 22:09:48
+    [is_top] => 1
+    [is_active] => 1
+)
+
+After insert, fetched product #52:
+Array
+(
+    [id] => 52
+    [name] => Jersey midi dress with cut
+    [description] => test
+    [base_price] => 100.00
+    [weight] => 
+    [category_id] => 7
+    [created_at] => 2025-10-15 22:41:36
+    [is_top] => 1
+    [is_active] => 1
+)
+
+After insert, fetched product #53:
+Array
+(
+    [id] => 53
+    [name] => Jersey midi dress with cut
+    [description] => test
+    [base_price] => 100.00
+    [weight] => 
+    [category_id] => 7
+    [created_at] => 2025-10-15 22:44:12
+    [is_top] => 1
+    [is_active] => 1
+)
+
+After insert, fetched product #54:
+Array
+(
+    [id] => 54
+    [name] => Jersey midi dress with cut
+    [description] => test
+    [base_price] => 100.00
+    [weight] => 
+    [category_id] => 7
+    [created_at] => 2025-10-15 22:49:54
+    [is_top] => 1
+    [is_active] => 1
+)
+
+After insert, fetched product #55:
+Array
+(
+    [id] => 55
+    [name] => Jersey midi dress with cut
+    [description] => test
+    [base_price] => 100.00
+    [weight] => 
+    [category_id] => 7
+    [created_at] => 2025-10-15 23:07:02
+    [is_top] => 1
+    [is_active] => 1
+)
+
+After insert, fetched product #56:
+Array
+(
+    [id] => 56
+    [name] => Jersey midi dress with cut
+    [description] => test
+    [base_price] => 100.00
+    [weight] => 
+    [category_id] => 7
+    [created_at] => 2025-10-15 23:13:16
+    [is_top] => 1
+    [is_active] => 1
+)
+
+After insert, fetched product #57:
+Array
+(
+    [id] => 57
+    [name] => Jersey midi dress with cut
+    [description] => test
+    [base_price] => 100.00
+    [weight] => 
+    [category_id] => 7
+    [created_at] => 2025-10-15 23:42:58
+    [is_top] => 1
+    [is_active] => 1
+)
+
+After insert, fetched product #58:
+Array
+(
+    [id] => 58
+    [name] => Test
+    [description] => test
+    [base_price] => 100.00
+    [weight] => 
+    [category_id] => 7
+    [created_at] => 2025-10-15 23:59:36
+    [is_top] => 1
+    [is_active] => 1
+)
+
+After insert, fetched product #59:
+Array
+(
+    [id] => 59
+    [name] => Test
+    [description] => test
+    [base_price] => 100.00
+    [weight] => 
+    [category_id] => 7
+    [created_at] => 2025-10-16 00:04:51
+    [is_top] => 1
+    [is_active] => 1
+)
+
+After insert, fetched product #60:
+Array
+(
+    [id] => 60
+    [name] => Test3
+    [description] => test
+    [base_price] => 100.00
+    [weight] => 
+    [category_id] => 7
+    [created_at] => 2025-10-16 00:06:23
+    [is_top] => 1
+    [is_active] => 1
+)
+
+After insert, fetched product #61:
+Array
+(
+    [id] => 61
+    [name] => Test3
+    [description] => test
+    [base_price] => 100.00
+    [weight] => 
+    [category_id] => 7
+    [created_at] => 2025-10-16 00:06:41
+    [is_top] => 1
+    [is_active] => 1
+)
+
+After insert, fetched product #62:
+Array
+(
+    [id] => 62
+    [name] => Test3
+    [description] => test
+    [base_price] => 100.00
+    [weight] => 
+    [category_id] => 7
+    [created_at] => 2025-10-16 00:07:58
+    [is_top] => 1
+    [is_active] => 1
+)
+
+After insert, fetched product #63:
+Array
+(
+    [id] => 63
+    [name] => Test3
+    [description] => test
+    [base_price] => 100.00
+    [weight] => 
+    [category_id] => 7
+    [created_at] => 2025-10-16 00:08:12
+    [is_top] => 1
+    [is_active] => 1
+)
+
+After insert, fetched product #64:
+Array
+(
+    [id] => 64
+    [name] => Jersey midi dress with cut
+    [description] => test
+    [base_price] => 100.00
+    [weight] => 
+    [category_id] => 7
+    [created_at] => 2025-10-16 13:16:15
+    [is_top] => 1
+    [is_active] => 1
+)
+
+After insert, fetched product #65:
+Array
+(
+    [id] => 65
+    [name] => Test
+    [description] => test
+    [base_price] => 100.00
+    [weight] => 
+    [category_id] => 7
+    [created_at] => 2025-10-16 13:45:10
+    [is_top] => 1
+    [is_active] => 1
+)
+
+After insert, fetched product #66:
+Array
+(
+    [id] => 66
+    [name] => Test
+    [description] => test
+    [base_price] => 100.00
+    [weight] => 
+    [category_id] => 7
+    [created_at] => 2025-10-16 13:46:34
+    [is_top] => 1
+    [is_active] => 1
+)
+
+After insert, fetched product #67:
+Array
+(
+    [id] => 67
+    [name] => Test
+    [description] => test
+    [base_price] => 100.00
+    [weight] => 
+    [category_id] => 7
+    [created_at] => 2025-10-16 13:48:21
+    [is_top] => 1
+    [is_active] => 1
+)
+

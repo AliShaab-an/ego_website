@@ -3,7 +3,7 @@
     require_once __DIR__ . '/../core/DB.php';
 
     class Product {
-
+        //frontend functions
         public static function getAllProducts($page = 1, $perPage = 12) {
             try {
                 $page = max(1, (int)$page);
@@ -35,58 +35,43 @@
             }
         }
 
-        public static function getProductsCount(){
-            try{
-                DB::query("SELECT COUNT(*) FROM products")->fetchColumn();
-            }catch(Exception $e){
-                error_log("Error counting products: " . $e->getMessage());
-                return 0;
-            }
-        }
+        public static function create($data) {
+            try {
+                $sql = "INSERT INTO products (name, description, base_price, weight, category_id, is_top, is_active, created_at)
+                        VALUES (?, ?, ?, ?, ?, ?, 1, NOW())";
+                DB::query($sql, [
+                    ucfirst(trim($data['name'] ?? '')),
+                    trim($data['description'] ?? ''),
+                    floatval($data['base_price'] ?? 0),
+                    !empty($data['weight']) ? floatval($data['weight']) : null,
+                    intval($data['category_id'] ?? 0),
+                    !empty($data['is_top']) ? 1 : 0,
 
-
-        public static function findProductById($id){
-            try{
-            return DB::query("SELECT * FROM products WHERE id = ?", [$id]) -> fetch();
-            }catch(Exception $e){
-                file_put_contents(__DIR__ . '/../../logs/model.log', $e->getMessage() . "\n", FILE_APPEND);
-                throw $e;
-            }
-        }
-
-
-        public static function createProduct($data){
-            try{
-                DB::query("INSERT INTO products (name, description, base_price,weight, category_id,is_top) VALUES (?, ?, ?, ?, ?,?)", [
-                    $data['name'],
-                    $data['description'],
-                    $data['base_price'],
-                    $data['weight'],
-                    $data['category_id'],
-                    $data['is_top'] ?? 0
                 ]);
                 return DB::getConnection()->lastInsertId();
-
-        
-            }catch(Exception $e){
-                file_put_contents(__DIR__ . '/../../logs/model.log', $e->getMessage() . "\n", FILE_APPEND);
-                throw new Exception("DB Insert Error: " . $e->getMessage());
+            } catch (Exception $e) {
+                throw new Exception("Failed to create product: " . $e->getMessage());
             }
         }
 
-        public static function updateProduct($id,$data){
-            DB::query("UPDATE products SET name = ?, description = ?, price = ?, category_id = ? WHERE id = ?", [
-                $data['name'],
-                $data['description'],
-                $data['price'],
-                $data['category_id'],
-                $id
-            ]);
-            return true;
-        }
-
-        public static function deleteProduct($id){
-            DB::query("DELETE FROM products WHERE id = ?", [$id]);
+        public static function update($id, $data) {
+            try {
+                $sql = "UPDATE products 
+                        SET name = ?, description = ?, base_price = ?, weight = ?, category_id = ?, is_top = ?
+                        WHERE id = ?";
+                DB::query($sql, [
+                    ucfirst(trim($data['name'] ?? '')),
+                    trim($data['description'] ?? ''),
+                    floatval($data['base_price'] ?? 0),
+                    !empty($data['weight']) ? floatval($data['weight']) : null,
+                    intval($data['category_id'] ?? 0),
+                    !empty($data['is_top']) ? 1 : 0,
+                    intval($id)
+                ]);
+                return true;
+            } catch (Exception $e) {
+                throw new Exception("Failed to update product: " . $e->getMessage());
+            }
         }
 
         public static function getTopProducts($limit = 8){
@@ -151,5 +136,122 @@
                 return false;
             }
         }
-        
+
+        //admin panel product management 
+
+        public static function getAllPaginated($limit = 10, $offset = 0, $search = ''){
+            try {
+                $params= [];
+                $sql = "
+                SELECT 
+                    p.*, 
+                    c.name AS category_name,
+                    (SELECT image_path 
+                    FROM product_images 
+                    WHERE product_id = p.id AND is_main = 1 
+                    LIMIT 1) AS main_image,
+                    (SELECT GROUP_CONCAT(
+                            CONCAT('Color:', COALESCE(col.name, 'N/A'),
+                                '|Size:', COALESCE(s.name, 'N/A'),
+                                '|Qty:', v.quantity,
+                                '|Price:', v.price)
+                            SEPARATOR '; '
+                        )
+                    FROM product_variants v
+                    LEFT JOIN colors col ON v.color_id = col.id
+                    LEFT JOIN sizes s ON v.size_id = s.id
+                    WHERE v.product_id = p.id
+                    ) AS variants_info
+                FROM products p
+                LEFT JOIN categories c ON p.category_id = c.id
+                WHERE p.is_active = 1
+            ";
+
+                if (!empty($search)) {
+                    $sql .= " AND p.name LIKE ?";
+                    $params[] = "%$search%";
+                }
+
+                $limit = (int)$limit;
+                $offset = (int)$offset;
+
+                $sql .= " ORDER BY p.created_at DESC LIMIT $limit OFFSET $offset";
+                
+
+                $stmt = DB::query($sql,$params);
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            } catch (PDOException $e) {
+                throw new Exception("Failed to fetch products: " . $e->getMessage());
+            }
+        }
+
+        public static function countAll($search = ''){
+            try {
+                if (!empty($search)) {
+                    $stmt = DB::query("SELECT COUNT(*) as total FROM products WHERE name LIKE ?", ["%$search%"]);
+                } else {
+                    $stmt = DB::query("SELECT COUNT(*) as total FROM products");
+                }
+                return (int)$stmt->fetch(PDO::FETCH_ASSOC)['total'];
+
+            } catch (Exception $e) {
+                throw new Exception("Failed to count products: " . $e->getMessage());
+            }
+        }
+
+        public static function delete($id){
+            try {
+                DB::query("DELETE FROM products WHERE id = ?", [$id]);
+            } catch (PDOException $e) {
+                throw new Exception("Failed to delete product: " . $e->getMessage());
+            }
+        }
+
+        public static function findById($id) {
+            try{
+                $stmt = DB::query("SELECT * FROM products WHERE id = ?", [$id]);
+                return $stmt->fetch(PDO::FETCH_ASSOC);
+            }catch(PDOException $e){
+                throw new Exception("Failed to fetch product: " . $e->getMessage());
+            }
+        }
+
+        public static function updateStatus($id, $isActive) {
+            try{
+                DB::query("UPDATE products SET is_active = ? WHERE id = ?", [$isActive, $id]);
+
+            }catch(PDOException $e){
+                throw new Exception("Failed to fetch product: " . $e->getMessage());
+            }
+        }
+
+        public static function getActiveProducts() {
+            try{
+                $stmt = DB::query("SELECT * FROM products WHERE is_active = 1 ORDER BY created_at DESC");
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            }catch(PDOException $e){
+                throw new Exception("Failed to fetch active products" . $e->getMessage());
+            }
+        }
+
+        public static function quickUpdate($id, $data){
+            try{
+                $sql = "UPDATE products 
+                        SET name = ?, base_price = ?, is_top = ?
+                        WHERE id = ?";
+
+                DB::query($sql, [
+                    ucfirst(trim($data['name'] ?? '')),
+                    floatval($data['base_price'] ?? 0),
+                    !empty($data['is_top']) ? 1 : 0,
+                    intval($id)
+                ]);
+                return true;
+            }catch(PDOException $e){
+                throw new Exception("Failed to update active product" . $e->getMessage());
+            }                       
+
+        }
+
     }

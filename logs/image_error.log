@@ -1,3 +1,6 @@
+❌ Image insert failed: Failed to upload image: p53_68eff98c44a16_blazer9.webp
+❌ Image insert failed: Failed to upload image: p54_68effae296654_blazer9.webp
 ❌ Image insert failed: Missing product_id or file in addImage()
-❌ Image insert failed: Missing product_id or file in addImage()
-❌ Image insert failed: Missing product_id or file in addImage()
+❌ Image insert failed: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`ego`.`product_images`, CONSTRAINT `fk_product_images_variant` FOREIGN KEY (`variant_id`) REFERENCES `product_variants` (`id`) ON DELETE SET NULL ON UPDATE CASCADE)
+❌ Image insert failed: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`ego`.`product_images`, CONSTRAINT `fk_product_images_variant` FOREIGN KEY (`variant_id`) REFERENCES `product_variants` (`id`) ON DELETE SET NULL ON UPDATE CASCADE)
+❌ Image insert failed: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`ego`.`product_images`, CONSTRAINT `fk_product_images_variant` FOREIGN KEY (`variant_id`) REFERENCES `product_variants` (`id`) ON DELETE SET NULL ON UPDATE CASCADE)

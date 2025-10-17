@@ -24,16 +24,16 @@
 </head>
 <body class="text-center">
     <?php 
-        require_once __DIR__ . '/../app/controllers/CategoryController.php';
-        require_once __DIR__ . '/../app/controllers/ProductController.php';
-        $categoriesController = new CategoryController();
-        $productController = new ProductController();
-        $result = $categoriesController->listCategoriesWithProducts();
-        $categoryAndProducts = $result['data'];
+        // require_once __DIR__ . '/../app/controllers/CategoryController.php';
+        // require_once __DIR__ . '/../app/controllers/ProductController.php';
+        // $categoriesController = new CategoryController();
+        // $productController = new ProductController();
+        // $result = $categoriesController->listCategoriesWithProducts();
+        // $categoryAndProducts = $result['data'];
 
-        $topProducts = $productController->getTopProducts();
+        // $topProducts = $productController->getTopProducts();
 
-        $newProducts = $productController->getNewProducts();
+        // $newProducts = $productController->getNewProducts();
 
         include __DIR__ . '/../app/views/frontend/header.php';
         include __DIR__ . '/../app/views/frontend/login.php'; 
@@ -41,8 +41,8 @@
         include __DIR__ . '/../app/views/frontend/partials/sidebar.php';
         
         
-        include __DIR__ . '/../app/views/frontend/partials/topProducts.php';
-        include __DIR__ . '/../app/views/frontend/partials/newProducts.php';
+        // include __DIR__ . '/../app/views/frontend/partials/topProducts.php';
+        // include __DIR__ . '/../app/views/frontend/partials/newProducts.php';
 
         include __DIR__ . '/../app/views/frontend/partials/homeContact.php';
 

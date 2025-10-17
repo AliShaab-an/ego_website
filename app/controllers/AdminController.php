@@ -53,10 +53,6 @@
             include __DIR__ . '/../views/backend/orders.php';
         }
 
-        public function customersPage(){
-            include __DIR__ . '/../views/backend/customers.php';
-        }
-
         public function adminsPage(){
             include __DIR__ . '/../views/backend/admins.php';
         }
@@ -67,5 +63,17 @@
         
         public function colorsAndSizesPage(){
             include __DIR__ . '/../views/backend/colorsAndSizes.php';
+        }
+
+        public function shippingPage(){
+            include __DIR__ . '/../views/backend/shippingFee.php';
+        }
+
+        public function couponsPage(){
+            include __DIR__ . '/../views/backend/coupons.php';
+        }
+
+        public function manageProducts(){
+            include __DIR__ . '/../views/backend/manageProducts.php';
         }
     }
