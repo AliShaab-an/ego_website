@@ -76,4 +76,8 @@
         public function manageProducts(){
             include __DIR__ . '/../views/backend/manageProducts.php';
         }
+
+        public function newsletterPage(){
+            include __DIR__ . '/../views/backend/newsletter.php';
+        }
     }

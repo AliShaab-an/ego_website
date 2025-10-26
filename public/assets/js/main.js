@@ -1,187 +1,55 @@
-const openBtn = document.getElementById("openLogin");
-const closeBtn = document.getElementById("closeLogin");
-const overlay = document.getElementById("loginOverlay");
+import UI from "./modules/ui.js";
+import Product from "./modules/products.js";
+import ProductDetail from "./modules/productDetail.js";
+import Cart from "./modules/cart.js";
+import Auth from "./modules/auth.js";
+import Categories from "./modules/categories.js";
+import Home from "./modules/home.js";
 
-openBtn.addEventListener("click", () => {
-  const scrollBarWidth =
-    window.innerWidth - document.documentElement.clientWidth;
-  if (scrollBarWidth > 0)
-    document.body.style.paddingRight = scrollBarWidth + "px";
-  document.body.style.overflow = "hidden";
-  overlay.classList.remove("hidden");
-});
+console.log("✅ main.js loaded");
 
-closeBtn.addEventListener("click", () => {
-  overlay.classList.add("hidden");
-  document.body.style.overflow = "";
-  document.body.style.paddingRight = "";
-});
+$(document).ready(() => {
+  const page = $("body").data("page");
 
-const openBtnPhone = document.getElementById("openLoginPhone");
+  // Make Cart module globally available
+  window.Cart = Cart;
 
-openBtnPhone.addEventListener("click", () => {
-  const scrollBarWidth =
-    window.innerWidth - document.documentElement.clientWidth;
-  if (scrollBarWidth > 0)
-    document.body.style.paddingRight = scrollBarWidth + "px";
-  document.body.style.overflow = "hidden";
-  overlay.classList.remove("hidden");
-});
+  // Initialize modules that should run on all pages
+  UI.init();
+  Cart.init(); // Cart functionality (count, messages) needed on all pages
+  Auth.init(); // Auth forms might be on multiple pages
+  Categories.init(); // Category dropdown needed on all pages
 
-const signupOverlay = document.getElementById("signupOverlay");
-const signInRedirect = document.getElementById("signInRedirect");
+  // Initialize page-specific modules
+  switch (page) {
+    case "home":
+      console.log("home page");
+      Home.init();
+      break;
+    case "shop":
+      console.log("shop page");
+      Product.init();
+      break;
+    case "category":
+      console.log("category page");
+      Product.initCategory(); // Use the same product module but for category
+      break;
+    case "product":
+      console.log("product page");
+      ProductDetail.init();
+      break;
+    case "cart":
+      console.log("cart page");
+      // Cart functionality already initialized
+      break;
+    case "checkout":
+      console.log("checkout page");
+      // Add checkout module when created
+      break;
+    default:
+      console.log("No specific module loaded for this page.");
+  }
 
-signInRedirect.addEventListener("click", (e) => {
-  e.preventDefault(); // stop the link from reloading page
-  overlay.classList.add("hidden"); // hide login
-  signupOverlay.classList.remove("hidden"); // show signup
-});
-
-const closeSignup = document.getElementById("closeSignup");
-
-closeSignup.addEventListener("click", () => {
-  signupOverlay.classList.add("hidden");
-  document.body.style.overflow = "";
-  document.body.style.paddingRight = "";
-});
-
-const loginRedirect = document.getElementById("loginRedirect");
-
-loginRedirect.addEventListener("click", (e) => {
-  e.preventDefault(); // stop the link from reloading page
-  signupOverlay.classList.add("hidden"); // hide login
-  overlay.classList.remove("hidden"); // show signup
-});
-
-// SideBar
-
-const sidebar = document.getElementById("mobileSidebar");
-const sidebarOverlay = document.getElementById("sidebarOverlay");
-const openMenu = document.getElementById("openSidebar");
-const closeMenu = document.getElementById("closeSidebar");
-
-// Dropdown elements
-const toggleBtn = document.getElementById("toggleCategories");
-const categoriesMenu = document.getElementById("categoriesMenu");
-const arrow = document.getElementById("arrow");
-
-// Open sidebar
-openMenu.addEventListener("click", () => {
-  sidebar.classList.remove("-translate-x-full");
-  sidebarOverlay.classList.remove("hidden");
-});
-
-// Close sidebar
-closeMenu.addEventListener("click", () => {
-  sidebar.classList.add("-translate-x-full");
-  sidebarOverlay.classList.add("hidden");
-});
-sidebarOverlay.addEventListener("click", () => {
-  sidebar.classList.add("-translate-x-full");
-  sidebarOverlay.classList.add("hidden");
-});
-
-// Toggle categories dropdown
-toggleBtn.addEventListener("click", () => {
-  categoriesMenu.classList.toggle("hidden");
-  arrow.textContent = categoriesMenu.classList.contains("hidden") ? "▼" : "▲";
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  new Swiper(".topProductsSwiper", {
-    slidesPerView: 1,
-    spaceBetween: 16,
-    centeredSlides: true,
-    loop: "true",
-    pagination: {
-      el: ".swiper-pagination",
-      clickable: true,
-    },
-    breakpoints: {
-      768: {
-        slidesPerView: 3.3, // show 3 full slides + peek of the next
-        centeredSlides: true,
-        pagination: false,
-      },
-    },
-  });
-});
-
-// Shop Sidebar
-
-document.addEventListener("DOMContentLoaded", () => {
-  const sidebar = document.getElementById("filterSidebar");
-  const openBtn = document.getElementById("openFilter");
-  const closeBtn = document.getElementById("closeFilter");
-
-  openBtn.addEventListener("click", () => {
-    sidebar.classList.remove("-translate-x-full");
-    document.body.classList.add("overflow-hidden");
-  });
-
-  closeBtn.addEventListener("click", () => {
-    sidebar.classList.add("-translate-x-full");
-    document.body.classList.remove("overflow-hidden");
-  });
-});
-
-//progress bar
-
-// const minSlider = document.getElementById("minSlider");
-// const maxSlider = document.getElementById("maxSlider");
-// const minPrice = document.getElementById("minPrice");
-// const maxPrice = document.getElementById("maxPrice");
-// const rangeHighlight = document.getElementById("rangeHighlight");
-
-// function updateRange() {
-//   const minVal = parseInt(minSlider.value);
-//   const maxVal = parseInt(maxSlider.value);
-
-//   if (minVal > maxVal) {
-//     minSlider.value = maxVal;
-//   }
-
-//   minPrice.textContent = `$${minSlider.value}`;
-//   maxPrice.textContent = `$${maxSlider.value}`;
-
-//   const percentMin = ((minSlider.value - 5) / (1000 - 5)) * 100;
-//   const percentMax = ((maxSlider.value - 5) / (1000 - 5)) * 100;
-
-//   rangeHighlight.style.left = `${percentMin}%`;
-//   rangeHighlight.style.width = `${percentMax - percentMin}%`;
-// }
-
-// minSlider.addEventListener("input", updateRange);
-// maxSlider.addEventListener("input", updateRange);
-
-// updateRange();
-
-//checkout page
-
-// document.addEventListener("DOMContentLoaded", function () {
-//   const phoneInput = document.querySelector("#phone");
-//   if (phoneInput) {
-//     window.intlTelInput(phoneInput, {
-//       initialCountry: "lb", // default Lebanon 🇱🇧
-//       preferredCountries: ["lb", "ae", "sa", "us"],
-//       separateDialCode: true,
-//       utilsScript:
-//         "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.min.js",
-//     });
-//   }
-// });
-
-//Product Change Image
-
-function changeImage(thumbnail) {
-  const mainImg = document.getElementById("mainImage");
-  console.log("clicked");
-  mainImg.src = thumbnail.src;
-}
-
-$(".accordion-btn").click(function () {
-  // Toggle content
-  $(this).next(".accordion-content").slideToggle();
-  // Rotate icon
-  $(this).find("i").toggleClass("rotate-90");
+  // Initialize cart count on every page load
+  Cart.updateCartCount();
 });

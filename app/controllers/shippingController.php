@@ -79,4 +79,29 @@
             }
         }
 
+        public function toggleStatus(){
+            $id = $_POST['id'] ?? null;
+            $status = $_POST['status'] ?? null;
+
+            if (!$id || !is_numeric($id)) {
+                return ['status' => 'error', 'message' => 'Valid region ID is required'];
+            }
+
+            if ($status === null || !in_array($status, ['0', '1'])) {
+                return ['status' => 'error', 'message' => 'Valid status is required'];
+            }
+
+            try {
+                Shipping::toggleStatus($id, $status);
+                $statusText = $status == 1 ? 'activated' : 'deactivated';
+                return [
+                    'status' => 'success', 
+                    'message' => "Region {$statusText} successfully!",
+                    'new_status' => (int)$status
+                ];
+            } catch (Exception $e) {
+                return ['status' => 'error', 'message' => $e->getMessage()];
+            }
+        }
+
     }

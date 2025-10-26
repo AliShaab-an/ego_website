@@ -2,6 +2,10 @@
 
     class Helper{
         public static function redirect($url){
+            // Clear any output buffer to prevent header issues
+            if (ob_get_level()) {
+                ob_end_clean();
+            }
             header("Location: $url");
             exit();
         }

@@ -1,7 +1,7 @@
 <?php
     require_once __DIR__ . '/../app/config/path.php';
     require_once __DIR__ . '/../app/core/Session.php';
-    Session::configure(1800,'/Ego_website/public/index.php');
+    Session::configure(1800,'/Ego_website/public/index.php', true);
     Session::startSession();
     $userId = Session::getCurrentUser();
     $sessionId = session_id();
@@ -32,7 +32,6 @@
     ?>
 
     <script src="<?= JS_PATH ?>jquery-3.7.1.min.js"></script>
-    <script src="<?= JS_PATH ?>main.js"></script>
-    <script src="<?= JS_PATH ?>app.js"></script>
+    <script type="module" src="<?= JS_PATH ?>main.js"></script>
 </body> 
 </html>

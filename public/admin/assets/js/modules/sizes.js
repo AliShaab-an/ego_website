@@ -2,6 +2,7 @@ import { ajaxRequest } from "../utils/ajax.js";
 import { showToast, fadeOutMessages } from "../utils/messages.js";
 import { openModal, closeModal } from "../utils/modal.js";
 import { validateFields } from "../utils/validation.js";
+import { Loader } from "../utils/loader.js";
 
 let currentPage = 1;
 const limit = 5;
@@ -19,7 +20,7 @@ const Sizes = {
     $("#closeEditSizeModal").on("click", () => closeModal("#editSizeModal"));
 
     $("#addSizeForm").on("submit", (e) => this.addSize(e));
-    $("#editSizeForm").on("submit", (e) => this.updateCategory(e));
+    $("#editSizeForm").on("submit", (e) => this.updateSize(e));
 
     $(document).on("click", ".editSizeBtn", (e) => this.openEditModal(e));
     $(document).on("click", ".deleteSizeBtn", (e) => this.confirmDelete(e));
@@ -28,17 +29,22 @@ const Sizes = {
       closeModal("#confirmDeleteSizeModal")
     );
     $("#confirmDeleteSizeBtn").on("click", () => this.deleteSize());
+    $("#confirmDeleteSizeBtn").on("click", () => this.deleteSize());
 
     $(document).on("click", "#nextSizePage", () => this.changePage("next"));
     $(document).on("click", "#prevSizePage", () => this.changePage("prev"));
   },
 
   loadSizes(page = 1) {
+    const tbody = $("#sizeTableBody");
+    Loader.show(tbody.parent(), "Loading sizes...");
+
     ajaxRequest({
-      url: `/Ego_website/public/admin/api/list-sizes.php?page=${page}&limit=${limit}`,
+      url: `api/list-sizes.php?page=${page}&limit=${limit}`,
       type: "GET",
       success: (res) => {
-        const tbody = $("#sizeTableBody").empty();
+        Loader.hide(tbody.parent());
+        tbody.empty();
         if (res.status === "success" && res.data?.length) {
           res.data.forEach((size, i) => {
             tbody.append(`
@@ -68,6 +74,10 @@ const Sizes = {
         }
         $("#totalSizes").text(res.total || 0);
       },
+      error: () => {
+        Loader.hide(tbody.parent());
+        showToast("Failed to load sizes", "error");
+      },
     });
   },
 
@@ -83,14 +93,18 @@ const Sizes = {
   addSize(e) {
     e.preventDefault();
     const form = $(e.currentTarget);
+    const submitBtn = form.find("button[type='submit']");
     const inputs = form.find("input[required]");
     if (!validateFields(inputs, form, "size-message")) return;
 
+    Loader.showButton(submitBtn, "Adding...");
+
     ajaxRequest({
-      url: "/Ego_website/public/admin/api/add-size.php",
+      url: "api/add-size.php",
       type: "POST",
       data: form.serialize(),
       success: (res) => {
+        Loader.hideButton(submitBtn);
         if (res.status === "success") {
           showToast("Size added successfully!");
           closeModal("#addSizeModal");
@@ -100,6 +114,10 @@ const Sizes = {
           closeModal("#addSizeModal");
           showToast(res.message || "Error adding size", "error");
         }
+      },
+      error: () => {
+        Loader.hideButton(submitBtn);
+        showToast("Failed to add size", "error");
       },
     });
   },
@@ -115,30 +133,36 @@ const Sizes = {
     $("#editSizeType").val(type);
 
     openModal("#editSizeModal");
+  },
 
-    $("#editSizeForm")
-      .off("submit")
-      .on("submit", (ev) => {
-        ev.preventDefault();
-        const form = $(ev.currentTarget);
-        const inputs = form.find("input[required]");
-        if (!validateFields(inputs, form, "edit-size-message")) return;
+  updateSize(e) {
+    e.preventDefault();
+    const form = $(e.currentTarget);
+    const submitBtn = form.find("button[type='submit']");
+    const inputs = form.find("input[required]");
+    if (!validateFields(inputs, form, "edit-size-message")) return;
 
-        ajaxRequest({
-          url: "/Ego_website/public/admin/api/update-size.php",
-          type: "POST",
-          data: form.serialize(),
-          success: (res) => {
-            if (res.status === "success") {
-              showToast("Size updated successfully!");
-              closeModal("#editSizeModal");
-              this.loadSizes();
-            } else {
-              showToast(res.message || "Error updating size", "error");
-            }
-          },
-        });
-      });
+    Loader.showButton(submitBtn, "Updating...");
+
+    ajaxRequest({
+      url: "api/update-size.php",
+      type: "POST",
+      data: form.serialize(),
+      success: (res) => {
+        Loader.hideButton(submitBtn);
+        if (res.status === "success") {
+          showToast("Size updated successfully!");
+          closeModal("#editSizeModal");
+          this.loadSizes();
+        } else {
+          showToast(res.message || "Error updating size", "error");
+        }
+      },
+      error: () => {
+        Loader.hideButton(submitBtn);
+        showToast("Failed to update size", "error");
+      },
+    });
   },
 
   confirmDelete(e) {
@@ -149,11 +173,15 @@ const Sizes = {
   },
 
   deleteSize() {
+    const deleteBtn = $("#confirmDeleteSizeBtn");
+    Loader.showButton(deleteBtn, "Deleting...");
+
     ajaxRequest({
-      url: "/Ego_website/public/admin/api/delete-size.php",
+      url: "api/delete-size.php",
       type: "POST",
       data: { id: this.deleteId },
       success: (res) => {
+        Loader.hideButton(deleteBtn);
         if (res.status === "success") {
           closeModal("#confirmDeleteSizeModal");
           showToast("Size deleted successfully.");
@@ -162,6 +190,10 @@ const Sizes = {
           closeModal("#confirmDeleteSizeModal");
           showToast(res.message || "Error deleting size.", "error");
         }
+      },
+      error: () => {
+        Loader.hideButton(deleteBtn);
+        showToast("Failed to delete size", "error");
       },
     });
   },

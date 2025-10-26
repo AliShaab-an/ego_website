@@ -1,6 +1,7 @@
 import { ajaxRequest } from "../utils/ajax.js";
 import { showToast } from "../utils/messages.js";
 import { openModal, closeModal } from "../utils/modal.js";
+import { Loader } from "../utils/loader.js";
 
 const Coupons = {
   init() {
@@ -21,8 +22,10 @@ const Coupons = {
   },
 
   loadCoupons() {
+    Loader.show("#couponTableBody");
+
     ajaxRequest({
-      url: "/Ego_website/public/admin/api/list-coupons.php",
+      url: "api/list-coupons.php",
       type: "GET",
       success: (res) => {
         const tbody = $("#couponTableBody").empty();
@@ -55,6 +58,11 @@ const Coupons = {
           );
         }
         $("#totalCoupons").text(res.data?.length || 0);
+        Loader.hide("#couponTableBody");
+      },
+      error: () => {
+        Loader.hide("#couponTableBody");
+        showToast("Failed to load coupons", "error");
       },
     });
   },
@@ -68,10 +76,15 @@ const Coupons = {
 
   openEditModal(e) {
     const id = $(e.currentTarget).data("id");
+    const btn = $(e.currentTarget);
+
+    Loader.showButton(btn, "Loading...");
+
     ajaxRequest({
-      url: `/Ego_website/public/admin/api/get-coupon.php?id=${id}`,
+      url: `api/get-coupon.php?id=${id}`,
       type: "GET",
       success: (res) => {
+        Loader.hideButton(btn);
         if (res.status === "success") {
           const c = res.data;
           $("#couponId").val(c.id);
@@ -84,7 +97,13 @@ const Coupons = {
           $("#isActive").prop("checked", c.is_active == 1);
           $("#couponModalTitle").text("Edit Coupon");
           openModal("#couponModal");
+        } else {
+          showToast(res.message || "Error loading coupon", "error");
         }
+      },
+      error: () => {
+        Loader.hideButton(btn);
+        showToast("Failed to load coupon", "error");
       },
     });
   },
@@ -92,16 +111,19 @@ const Coupons = {
   saveCoupon(e) {
     e.preventDefault();
     const form = $(e.currentTarget);
+    const submitBtn = form.find("button[type='submit']");
     const id = $("#couponId").val();
-    const url = id
-      ? "/Ego_website/public/admin/api/update-coupon.php"
-      : "/Ego_website/public/admin/api/add-coupon.php";
+    const url = id ? "api/update-coupon.php" : "api/add-coupon.php";
+    const action = id ? "Updating..." : "Adding...";
+
+    Loader.showButton(submitBtn, action);
 
     ajaxRequest({
       url,
       type: "POST",
       data: form.serialize(),
       success: (res) => {
+        Loader.hideButton(submitBtn);
         if (res.status === "success") {
           showToast("Coupon saved successfully!");
           closeModal("#couponModal");
@@ -109,6 +131,10 @@ const Coupons = {
         } else {
           showToast(res.message || "Error saving coupon", "error");
         }
+      },
+      error: () => {
+        Loader.hideButton(submitBtn);
+        showToast("Failed to save coupon", "error");
       },
     });
   },
@@ -121,11 +147,15 @@ const Coupons = {
   },
 
   deleteCoupon() {
+    const deleteBtn = $("#confirmDeleteBtn");
+    Loader.showButton(deleteBtn, "Deleting...");
+
     ajaxRequest({
-      url: "/Ego_website/public/admin/api/delete-coupon.php",
+      url: "api/delete-coupon.php",
       type: "POST",
       data: { id: this.deleteId },
       success: (res) => {
+        Loader.hideButton(deleteBtn);
         closeModal("#confirmDeleteModal");
         if (res.status === "success") {
           showToast("Coupon deleted successfully!");
@@ -133,6 +163,11 @@ const Coupons = {
         } else {
           showToast(res.message || "Error deleting coupon", "error");
         }
+      },
+      error: () => {
+        Loader.hideButton(deleteBtn);
+        closeModal("#confirmDeleteModal");
+        showToast("Failed to delete coupon", "error");
       },
     });
   },

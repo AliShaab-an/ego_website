@@ -1,7 +1,7 @@
 <?php 
     require_once __DIR__ . '/../app/config/path.php';
     require_once CORE .'Session.php';
-    Session::configure(1800,'/Ego_website/public/index.php');
+    Session::configure(1800,'/Ego_website/public/index.php', true);
     Session::startSession();
     $userId = Session::getCurrentUser();
     $sessionId = session_id();
@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="assets/css/style.css">
     <title>Ego Clothing</title>
 </head>
-<body>
+<body data-page="cart">
     <div class="h-28 shadow-[0px_-7px_22.5px_0px_rgba(0,0,0,0.25)] py-4">
         <?php include __DIR__ . '/../app/views/frontend/partials/nav.php'; ?>
     </div>
@@ -30,8 +30,7 @@
         include __DIR__ . '/../app/views/frontend/footer.php';
     ?>
 
-    <script src="<?= JS_PATH ?>jquery-3.7.1.min.js"></script>
-    <script src="<?= JS_PATH ?>main.js"></script>
-    <script src="<?= JS_PATH ?>app.js"></script>
+    <script src="assets/js/jquery-3.7.1.min.js"></script>
+    <script type="module" src="assets/js/main.js"></script>
 </body>
 </html>

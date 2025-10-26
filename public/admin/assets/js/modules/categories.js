@@ -1,6 +1,7 @@
 import { ajaxRequest } from "../utils/ajax.js";
 import { showToast } from "../utils/messages.js";
 import { openModal, closeModal } from "../utils/modal.js";
+import { Loader } from "../utils/loader.js";
 
 let currentPage = 1;
 const limit = 5;
@@ -67,16 +68,23 @@ const Categories = {
 
   // ======= Load all categories =======
   loadCategories(page = 1) {
+    const tbody = $("#categoryTableBody");
+    Loader.show(tbody.parent(), "Loading categories...");
+
     ajaxRequest({
-      url: `/Ego_website/public/admin/api/list-categories.php?page=${page}&limit=${limit}`,
+      url: `api/list-categories.php?page=${page}&limit=${limit}`,
       type: "GET",
       success: (res) => {
-        const tbody = $("#categoryTableBody").empty();
+        Loader.hide(tbody.parent());
+        tbody.empty();
 
         if (res.status === "success" && res.data?.length) {
           res.data.forEach((cat, i) => {
+            // Handle both old and new image path formats
+            let imageSrc = `/Ego_website/public/${cat.image}`;
+
             const imageCell = cat.image
-              ? `<img src="/Ego_website/public/admin/uploads/${cat.image}" alt="${cat.name}" class="w-12 h-12 object-cover rounded mx-auto">`
+              ? `<img src="${imageSrc}" alt="${cat.name}" class="w-12 h-12 object-cover rounded mx-auto">`
               : `<span class="text-gray-400 text-sm">No image</span>`;
 
             tbody.append(`
@@ -108,6 +116,10 @@ const Categories = {
         }
         $("#totalCategories").text(res.total || 0);
       },
+      error: () => {
+        Loader.hide(tbody.parent());
+        showToast("Failed to load categories", "error");
+      },
     });
   },
 
@@ -125,6 +137,7 @@ const Categories = {
     e.preventDefault();
     const formEl = $(e.currentTarget)[0];
     const formData = new FormData(formEl);
+    const submitBtn = $(e.currentTarget).find('button[type="submit"]');
 
     const name = formData.get("name");
     const image = formData.get("image");
@@ -134,13 +147,16 @@ const Categories = {
       return;
     }
 
+    Loader.showButton(submitBtn, "Adding...");
+
     ajaxRequest({
-      url: "/Ego_website/public/admin/api/add-category.php",
+      url: "api/add-category.php",
       type: "POST",
       data: formData,
       contentType: false,
       processData: false,
       success: (res) => {
+        Loader.hideButton(submitBtn);
         if (res.status === "success") {
           showToast("Category added successfully!");
           formEl.reset();
@@ -156,6 +172,10 @@ const Categories = {
         } else {
           showToast(res.message || "Error adding category", "error");
         }
+      },
+      error: () => {
+        Loader.hideButton(submitBtn);
+        showToast("Failed to add category", "error");
       },
     });
   },
@@ -180,9 +200,19 @@ const Categories = {
       .find("i")
       .show();
     if (image) {
+      // Handle both old and new image path formats
+      let imageSrc = "";
+      if (image.startsWith("admin/uploads/")) {
+        // New format: admin/uploads/categories/filename.jpg
+        imageSrc = `/Ego_website/public/${image}`;
+      } else {
+        // Old format: just filename.jpg (backward compatibility)
+        imageSrc = `/Ego_website/public/admin/uploads/${image}`;
+      }
+
       imageBox
         .css({
-          "background-image": `url('/Ego_website/public/admin/uploads/${image}')`,
+          "background-image": `url('${imageSrc}')`,
           "background-size": "cover",
           "background-position": "center",
           "border-color": "#3b82f6",
@@ -227,6 +257,7 @@ const Categories = {
     e.preventDefault();
     const formEl = $(e.currentTarget)[0];
     const formData = new FormData(formEl);
+    const submitBtn = $(e.currentTarget).find('button[type="submit"]');
 
     const name = formData.get("name");
     if (!name) {
@@ -234,13 +265,16 @@ const Categories = {
       return;
     }
 
+    Loader.showButton(submitBtn, "Updating...");
+
     ajaxRequest({
-      url: "/Ego_website/public/admin/api/update-category.php",
+      url: "api/update-category.php",
       type: "POST",
       data: formData,
       contentType: false,
       processData: false,
       success: (res) => {
+        Loader.hideButton(submitBtn);
         if (res.status === "success") {
           showToast("Category updated successfully!");
           closeModal("#editCategoryModal");
@@ -248,6 +282,10 @@ const Categories = {
         } else {
           showToast(res.message || "Error updating category", "error");
         }
+      },
+      error: () => {
+        Loader.hideButton(submitBtn);
+        showToast("Failed to update category", "error");
       },
     });
   },
@@ -262,11 +300,17 @@ const Categories = {
 
   // ======= Delete Category =======
   deleteCategory() {
+    const deleteBtn = $("#confirmDeleteModal").find(
+      'button[onclick*="deleteCategory"]'
+    );
+    Loader.showButton(deleteBtn, "Deleting...");
+
     ajaxRequest({
-      url: "/Ego_website/public/admin/api/delete-category.php",
+      url: "api/delete-category.php",
       type: "POST",
       data: { id: this.deleteId },
       success: (res) => {
+        Loader.hideButton(deleteBtn);
         closeModal("#confirmDeleteModal");
         if (res.status === "success") {
           showToast("Category deleted successfully!");
@@ -274,6 +318,10 @@ const Categories = {
         } else {
           showToast(res.message || "Error deleting category", "error");
         }
+      },
+      error: () => {
+        Loader.hideButton(deleteBtn);
+        showToast("Failed to delete category", "error");
       },
     });
   },

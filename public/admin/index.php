@@ -1,8 +1,11 @@
 <?php
+    // Start output buffering to prevent header issues
+    ob_start();
+    
     require_once __DIR__ . '/../../app/config/path.php';
-    require_once __DIR__ . '/../../app/controllers/AdminController.php';
-    require_once __DIR__ . '/../../app/core/Session.php';
-    require_once __DIR__ . '/../../app/core/Helper.php';
+    require_once CONT . 'AdminController.php';
+    require_once CORE . 'Session.php';
+    require_once CORE . 'Helper.php';
     
     
     Session::configure(900,'/Ego_website/public/admin/login.php');
@@ -12,8 +15,15 @@
 
     $action = $_GET['action'] ?? 'dashboard';
 
+    // Handle actions that require redirects BEFORE any HTML output
+    if ($action === 'logout') {
+        ob_end_clean(); // Clear any output buffer before redirect
+        $adminController->logout();
+        exit;
+    }
+
     if (!in_array($action, ['login', 'logout'])) {
-        Auth::checkAdmin();   // will allow admin or super_admin
+        Auth::checkAdmin(); 
     }
 ?>
     <!DOCTYPE html>
@@ -67,8 +77,8 @@
                         case 'manageProducts':
                             $adminController->manageProducts();
                             break;
-                        case 'logout':
-                            $adminController->logout();
+                        case 'Newsletter':
+                            $adminController->newsletterPage();
                             break;
                         default:
                             echo "<h1 class='text-2xl font-bold'>404 - Page not found</h1>";
@@ -77,8 +87,8 @@
             </main>
             
         </div>
-        <script src="<?= JS_PATH ?>jquery-3.7.1.min.js"></script>
-        <script type="module" src="<?= ADMIN_JS_PATH ?>main.js"></script>
+        <script src="../assets/js/jquery-3.7.1.min.js"></script>
+        <script type="module" src="assets/js/main.js"></script>
     </body>
     </html>
 

@@ -25,7 +25,7 @@
 
         public static function getAll() {
             try{
-                $stmt =  DB::query("SELECT * FROM shipping_regions ORDER BY region_name ASC");
+                $stmt =  DB::query("SELECT * FROM shipping_regions WHERE is_active = 1 ORDER BY region_name ASC");
                 return $stmt->fetchAll(PDO::FETCH_ASSOC);
             }catch(PDOException $e){
                 throw new Exception("Failed to fetch shipping fees: " . $e->getMessage());
@@ -64,6 +64,28 @@
 
             }catch(PDOException $e){
                 throw new Exception("Failed to delete shipping: " . $e->getMessage());
+            }
+        }
+
+        public static function toggleStatus($id, $status) {
+            try{
+                if (!is_numeric($id) || $id <= 0) {
+                    throw new Exception("Invalid shipping ID.");
+                }
+
+                if (!in_array($status, ['0', '1', 0, 1])) {
+                    throw new Exception("Invalid status value.");
+                }
+
+                $updated = DB::query("UPDATE shipping_regions SET is_active = ? WHERE id = ?", [$status, $id]);
+
+                if ($updated === false) {
+                    throw new Exception("Failed to update region status.");
+                }
+                return true;
+
+            }catch(PDOException $e){
+                throw new Exception("Failed to toggle shipping status: " . $e->getMessage());
             }
         }
     }

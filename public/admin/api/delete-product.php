@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . "/../../../app/controllers/ProductAdminController.php";
+require_once __DIR__ . "/../../../app/controllers/admin/ProductAdminController.php";
 header('Content-Type: application/json');
 
 try {

@@ -124,3 +124,11 @@ Response: Array
     [message] => Each variant must have a size selected.
 )
 
+Inserted Variant: Product #74 | Color 23 | Size 6 | Price 0 | Qty 10
+Response: Array
+(
+    [status] => success
+    [product_id] => 74
+    [message] => Product with variants and images added successfully
+)
+

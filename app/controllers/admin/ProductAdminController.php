@@ -3,6 +3,7 @@
     require_once MODELS . 'Product.php';
     require_once MODELS . "ProductVariant.php";
     require_once MODELS . "ProductImages.php";
+    require_once MODELS . "ProductDiscount.php";
 
 
     class ProductAdminController{
@@ -16,8 +17,7 @@
             $category_id = intval($_POST['category_id'] ?? 0);
             $is_top = isset($_POST['is_top']) ? 1 : 0;
 
-            file_put_contents(__DIR__ . '/../../logs/product_post.log', print_r($_POST, true), FILE_APPEND);
-
+            
              // Validate basic product fields
             if($name === '' || $base_price <= 0 || $category_id <= 0){
                 return ['status' => 'error', 'message' => 'Invalid product data'];
@@ -135,6 +135,26 @@
                     }
                 }
                 
+                // ===== 4. HANDLE DISCOUNT =====
+                $discountPercentage = floatval($_POST['discount'] ?? 0);
+                $isDiscountActive = isset($_POST['is_active']) ? 1 : 0;
+                
+                // Validate discount logic
+                if ($isDiscountActive && $discountPercentage <= 0) {
+                    return ['status' => 'error', 'message' => 'Please enter a valid discount percentage when marking discount as active.'];
+                }
+                
+                // Only create discount if percentage is provided and > 0
+                if ($discountPercentage > 0) {
+                    try {
+                        ProductDiscount::create($productId, $discountPercentage, $isDiscountActive);
+                        Logger::info("ProductController::addProduct", "Discount created: {$discountPercentage}% (Active: {$isDiscountActive})");
+                    } catch (Exception $e) {
+                        Logger::error("ProductController::addProduct", "Failed to create discount: " . $e->getMessage());
+                        return ['status' => 'error', 'message' => 'Failed to create product discount: ' . $e->getMessage()];
+                    }
+                }
+                
                 return [
                     'status' => 'success',
                     'product_id' => $productId,
@@ -151,19 +171,24 @@
 
             $limit  = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
             $page   = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-            $search = trim($_GET['search'] ?? '');
-
             $offset = ($page - 1) * $limit;
 
+            $filters = [
+                'search'   => $_GET['search'] ?? '',
+                'category' => $_GET['category'] ?? '',
+                'status'   => $_GET['status'] ?? '',
+                'top'      => $_GET['top'] ?? ''
+            ];
+
             try {
-                $products = Product::getAllPaginated($limit, $offset, $search);
-                $total = Product::countAll($search);
+                $products = Product::getAllPaginated($limit, $offset, $filters);
+                $total = Product::countAll($filters);
 
                 return [
                     'status' => 'success',
                     'data' => $products,
                     'total' => $total,
-                    'has_more' => $offset + $limit < $total
+                    'has_more' => ($offset + $limit) < $total
                 ];
 
             } catch (Exception $e) {
@@ -198,14 +223,18 @@
                     return ['status' => 'error', 'message' => 'Product not found'];
                 }
 
-                // Get variants + images
+                // Get variants + images + discount
                 $variants = ProductVariant::getById($id);
                 $images = ProductImages::getById($id);
+                $discount = ProductDiscount::getByProductId($id);
+                
                 return [
                     'status' => 'success',
                     'data' => [
                         'product' => $product,
-                        'variants' => $variants
+                        'variants' => $variants,
+                        'images' => $images,
+                        'discount' => $discount
                     ]
                 ];
             } catch (Exception $e) {
@@ -216,56 +245,134 @@
         public function toggleProductStatus() {
             try {
                 $id = (int)($_POST['id'] ?? 0);
-                $status = (int)($_POST['is_active'] ?? 0);
+                $action = $_POST['action'] ?? 0;
+
+                file_put_contents(__DIR__ . '/../../logs/app.log', print_r($_POST, true), FILE_APPEND);
+
+                if ($id <= 0) {
+                    return ['status' => 'error', 'message' => 'Invalid product data'];
+                }
+
+                $status = ($action === 'activate') ? 1 : 0;
+
 
                 Product::updateStatus($id, $status);
                 ProductVariant::updateStatusByProduct($id, $status);
 
-                $msg = $status ? 'Product activated successfully' : 'Product deactivated successfully';
+                $msg = $status
+                    ? 'Product activated successfully'
+                    : 'Product deactivated successfully';
                 return['status' => 'success', 'message' => $msg];
+
             } catch (Exception $e) {
                 return['status' => 'error', 'message' => $e->getMessage()];
             }
         }
 
-        // public function updateProduct(){
-        //     try {
-        //         $id = (int)($_POST['id'] ?? 0);
-        //         if ($id <= 0) throw new Exception("Invalid product ID.");
+        public function updateProduct(){
+            try {
+                $id = (int)($_POST['id'] ?? 0);
+                if ($id <= 0) throw new Exception("Invalid product ID.");
 
-        //         Product::update($id, $_POST);
+                // Debug logging for form data
+                Logger::info("update-product", "Form data received: " . json_encode($_POST));
+                Logger::info("update-product", "Category ID: " . ($_POST['category_id'] ?? 'NOT_SET'));
 
-        //         // Update or create variants
-        //         if (!empty($_POST['variants']) && is_array($_POST['variants'])) {
-        //             foreach ($_POST['variants'] as $variantData) {
-        //                 if (!empty($variantData['id'])) {
-        //                     ProductVariant::update($variantData['id'], $variantData);
-        //                 } else {
-        //                     ProductVariant::create($id, $variantData);
-        //                 }
-        //             }
-        //         }
+                // ===== 1. VALIDATE BASIC PRODUCT FIELDS =====
+                $name = trim($_POST['name'] ?? '');
+                $description = trim($_POST['description'] ?? '');
+                $base_price = floatval($_POST['base_price'] ?? 0);
+                $weight = floatval($_POST['weight'] ?? 0);
+                $category_id = intval($_POST['category_id'] ?? 0);
 
-        //         // Handle deleted images (marked in form)
-        //         if (!empty($_POST['deleted_images'])) {
-        //             foreach ($_POST['deleted_images'] as $imgId) {
-        //                 ProductImages::deleteById((int)$imgId);
-        //             }
-        //         }
+                if($name === ''){
+                    return ['status' => 'error', 'message' => 'Product name is required.'];
+                }
+                if($base_price <= 0){
+                    return ['status' => 'error', 'message' => 'Product price must be greater than 0.'];
+                }
 
-        //         // Handle new uploads
-        //         if (!empty($_FILES['variants']['name'])) {
-        //             ProductImages::handleUploads($id, null, $_FILES);
-        //         }
+                // ===== 2. VALIDATE VARIANTS =====
+                $variants = $_POST['variants'] ?? [];
+                if(!empty($variants) && is_array($variants)){
+                    foreach($variants as $index => $variant){
+                        $colorId = $variant['color_id'] ?? null;
+                        $sizeId  = $variant['size_id'] ?? null;
+                        $quantity = $variant['quantity'] ?? null;
 
-        //         return([
-        //             'status' => 'success',
-        //             'message' => 'Product updated successfully.'
-        //         ]);
-        //     } catch (Exception $e) {
-        //         return ['status' => 'error', 'message' => $e->getMessage()];
-        //     }
-        // }
+                        if(empty($colorId) || !is_numeric($colorId)){
+                            return ['status' => 'error', 'message' => 'Each variant must have a color selected.'];
+                        }
+
+                        if (empty($sizeId) || !is_numeric($sizeId)) {
+                            return ['status' => 'error', 'message' => 'Each variant must have a size selected.'];
+                        }
+
+                        if($quantity === '' || !is_numeric($quantity) || intval($quantity) < 0){
+                            return ['status' => 'error', 'message' => 'Each variant must have a valid quantity (0 or more).'];
+                        }
+                    }
+                }
+
+                // ===== 3. VALIDATE DISCOUNT =====
+                $discountPercentage = floatval($_POST['discount'] ?? 0);
+                $isDiscountActive = isset($_POST['is_active']) ? 1 : 0;
+                
+                if ($isDiscountActive && $discountPercentage <= 0) {
+                    return ['status' => 'error', 'message' => 'Please enter a valid discount percentage when marking discount as active.'];
+                }
+
+                Product::update($id, $_POST);
+
+                // Update or create variants
+                if (!empty($_POST['variants']) && is_array($_POST['variants'])) {
+                    foreach ($_POST['variants'] as $variantData) {
+                        if (!empty($variantData['id'])) {
+                            ProductVariant::update($variantData['id'], $variantData);
+                        } else {
+                            ProductVariant::create($id, $variantData);
+                        }
+                    }
+                }
+
+                // Handle deleted images (marked in form)
+                if (!empty($_POST['deleted_images'])) {
+                    Logger::info("update-product", "Deleting images: " . json_encode($_POST['deleted_images']));
+                    foreach ($_POST['deleted_images'] as $imgId) {
+                        ProductImages::deleteById((int)$imgId);
+                        Logger::info("update-product", "Deleted image ID: " . $imgId);
+                    }
+                }
+
+                // TODO: Handle new image uploads in future update
+                // if (!empty($_FILES['variants']['name'])) {
+                //     $this->handleImageUploads($id, $_FILES);
+                // }
+
+                // ===== HANDLE DISCOUNT UPDATE =====
+                try {
+                    if ($discountPercentage > 0) {
+                        // Create or update discount
+                        ProductDiscount::update($id, $discountPercentage, $isDiscountActive);
+                        Logger::info("update-product", "Discount updated: {$discountPercentage}% (Active: {$isDiscountActive})");
+                    } else {
+                        // Remove discount if percentage is 0 or empty
+                        ProductDiscount::deleteByProductId($id);
+                        Logger::info("update-product", "Discount removed for product ID: {$id}");
+                    }
+                } catch (Exception $e) {
+                    Logger::error("update-product", "Failed to handle discount: " . $e->getMessage());
+                    return ['status' => 'error', 'message' => 'Failed to update product discount: ' . $e->getMessage()];
+                }
+
+                return([
+                    'status' => 'success',
+                    'message' => 'Product updated successfully.'
+                ]);
+            } catch (Exception $e) {
+                return ['status' => 'error', 'message' => $e->getMessage()];
+            }
+        }
 
         public function quickUpdate(){
             try{

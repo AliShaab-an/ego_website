@@ -1,6 +1,7 @@
 import { ajaxRequest } from "../utils/ajax.js";
 import { showToast } from "../utils/messages.js";
 import { openModal, closeModal } from "../utils/modal.js";
+import { Loader } from "../utils/loader.js";
 
 const Shipping = {
   init() {
@@ -16,17 +17,22 @@ const Shipping = {
 
     $(document).on("click", ".editRegionBtn", (e) => this.openEditModal(e));
     $(document).on("click", ".deleteRegionBtn", (e) => this.confirmDelete(e));
+    $(document).on("click", ".toggleStatusBtn", (e) => this.toggleStatus(e));
 
     $("#cancelDeleteBtn").on("click", () => closeModal("#confirmDeleteModal"));
     $("#confirmDeleteBtn").on("click", () => this.deleteRegion());
   },
 
   loadRegions() {
+    const tbody = $("#regionTableBody");
+    Loader.show(tbody.parent(), "Loading shipping regions...");
+
     ajaxRequest({
-      url: "/Ego_website/public/admin/api/list-shipping.php",
+      url: "api/list-shipping.php",
       type: "GET",
       success: (res) => {
-        const tbody = $("#regionTableBody").empty();
+        Loader.hide(tbody.parent());
+        tbody.empty();
         if (res.status === "success" && res.data?.length) {
           res.data.forEach((region, i) => {
             tbody.append(`
@@ -34,7 +40,15 @@ const Shipping = {
                 <td>${i + 1}</td>
                 <td>${region.region_name}</td>
                 <td>${region.fee_per_kg}</td>
-                <td>${region.is_active ? "Active" : "Inactive"}</td>
+                <td class="cursor-pointer font-medium toggleStatusBtn"
+                    data-id="${region.id}"
+                    data-status="${region.is_active}">
+                  <span class="status-text ${
+                    region.is_active ? "text-green-600" : "text-red-600"
+                  }">
+                    ${region.is_active ? "Active" : "Inactive"}
+                  </span>
+                </td>
                 <td class="flex justify-center gap-2 py-4">
                   <button class="text-blue-500 hover:underline editRegionBtn" data-id="${
                     region.id
@@ -54,6 +68,10 @@ const Shipping = {
           );
         }
         $("#totalRegions").text(res.data?.length || 0);
+      },
+      error: () => {
+        Loader.hide(tbody.parent());
+        showToast("Failed to load shipping regions", "error");
       },
     });
   },
@@ -79,15 +97,17 @@ const Shipping = {
     e.preventDefault();
     const form = $(e.currentTarget);
     const id = $("#regionId").val();
-    const url = id
-      ? "/Ego_website/public/admin/api/update-shipping.php"
-      : "/Ego_website/public/admin/api/add-shipping.php";
+    const url = id ? "api/update-shipping.php" : "api/add-shipping.php";
+    const submitBtn = form.find('button[type="submit"]');
+
+    Loader.showButton(submitBtn, id ? "Updating..." : "Adding...");
 
     ajaxRequest({
       url,
       type: "POST",
       data: form.serialize(),
       success: (res) => {
+        Loader.hideButton(submitBtn);
         if (res.status === "success") {
           showToast("Region saved successfully!");
           closeModal("#regionModal");
@@ -95,6 +115,10 @@ const Shipping = {
         } else {
           showToast(res.message || "Error saving region", "error");
         }
+      },
+      error: () => {
+        Loader.hideButton(submitBtn);
+        showToast("Failed to save region", "error");
       },
     });
   },
@@ -107,11 +131,17 @@ const Shipping = {
   },
 
   deleteRegion() {
+    const deleteBtn = $("#confirmDeleteModal").find(
+      'button[onclick*="deleteRegion"]'
+    );
+    Loader.showButton(deleteBtn, "Deleting...");
+
     ajaxRequest({
-      url: "/Ego_website/public/admin/api/delete-shipping.php",
+      url: "api/delete-shipping.php",
       type: "POST",
       data: { id: this.deleteId },
       success: (res) => {
+        Loader.hideButton(deleteBtn);
         closeModal("#confirmDeleteModal");
         if (res.status === "success") {
           showToast("Region deleted successfully!");
@@ -119,6 +149,49 @@ const Shipping = {
         } else {
           showToast(res.message || "Error deleting region", "error");
         }
+      },
+      error: () => {
+        Loader.hideButton(deleteBtn);
+        showToast("Failed to delete region", "error");
+      },
+    });
+  },
+
+  toggleStatus(e) {
+    const cell = $(e.currentTarget);
+    const id = cell.data("id");
+    const currentStatus = parseInt(cell.data("status"));
+    const newStatus = currentStatus === 1 ? 0 : 1;
+
+    // Show inline loader in the status cell
+    Loader.showInline(cell);
+
+    ajaxRequest({
+      url: "api/toggle-shipping-status.php",
+      type: "POST",
+      data: { id, status: newStatus },
+      success: (res) => {
+        Loader.hideInline(cell);
+
+        if (res.status === "success") {
+          // Update the UI
+          cell.data("status", newStatus);
+          cell
+            .find(".status-text")
+            .text(newStatus ? "Active" : "Inactive")
+            .removeClass("text-green-600 text-red-600")
+            .addClass(newStatus ? "text-green-600" : "text-red-600");
+
+          showToast(
+            `Region ${newStatus ? "activated" : "deactivated"} successfully!`
+          );
+        } else {
+          showToast(res.message || "Error updating status", "error");
+        }
+      },
+      error: () => {
+        Loader.hideInline(cell);
+        showToast("Failed to update region status", "error");
       },
     });
   },

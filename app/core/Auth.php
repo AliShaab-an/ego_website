@@ -10,7 +10,7 @@
             Session::startSession();
             $role = $_SESSION['role'] ?? null;
             if(!isset($_SESSION['user_id']) || !in_array($role,['admin','super_admin'])){
-                Helper::redirect('../login.php');
+                Helper::redirect('login.php');
             }
             
         }

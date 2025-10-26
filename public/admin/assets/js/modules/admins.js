@@ -2,6 +2,7 @@ import { ajaxRequest } from "../utils/ajax.js";
 import { showToast } from "../utils/messages.js";
 import { openModal, closeModal } from "../utils/modal.js";
 import { validateFields } from "../utils/validation.js";
+import { Loader } from "../utils/loader.js";
 
 const Admins = {
   init() {
@@ -24,11 +25,15 @@ const Admins = {
   },
 
   loadAdmins() {
+    const tbody = $("#adminTableBody");
+    Loader.show(tbody.parent(), "Loading admins...");
+
     ajaxRequest({
-      url: "/Ego_website/public/admin/api/list-admins.php",
+      url: "api/list-admins.php",
       type: "GET",
       success: (res) => {
-        const tbody = $("#adminTableBody").empty();
+        Loader.hide(tbody.parent());
+        tbody.empty();
         if (res.status === "success" && res.data?.length) {
           res.data.forEach((admin, i) => {
             tbody.append(`
@@ -58,6 +63,10 @@ const Admins = {
         }
         $("#totalAdmins").text(res.data?.length || 0);
       },
+      error: () => {
+        Loader.hide(tbody.parent());
+        showToast("Failed to load admins", "error");
+      },
     });
   },
 
@@ -65,13 +74,17 @@ const Admins = {
     e.preventDefault();
     const form = $(e.currentTarget);
     const inputs = form.find("input[required], select[required]");
+    const submitBtn = form.find('button[type="submit"]');
     if (!validateFields(inputs, form, "admin-message")) return;
 
+    Loader.showButton(submitBtn, "Adding...");
+
     ajaxRequest({
-      url: "/Ego_website/public/admin/api/add-admin.php",
+      url: "api/add-admin.php",
       type: "POST",
       data: form.serialize(),
       success: (res) => {
+        Loader.hideButton(submitBtn);
         if (res.status === "success") {
           showToast("Admin added successfully!");
           form[0].reset();
@@ -80,6 +93,10 @@ const Admins = {
         } else {
           showToast(res.message || "Error adding admin", "error");
         }
+      },
+      error: () => {
+        Loader.hideButton(submitBtn);
+        showToast("Failed to add admin", "error");
       },
     });
   },
@@ -97,13 +114,17 @@ const Admins = {
     e.preventDefault();
     const form = $(e.currentTarget);
     const inputs = form.find("input[required], select[required]");
+    const submitBtn = form.find('button[type="submit"]');
     if (!validateFields(inputs, form, "edit-admin-message")) return;
 
+    Loader.showButton(submitBtn, "Updating...");
+
     ajaxRequest({
-      url: "/Ego_website/public/admin/api/update-admin.php",
+      url: "api/update-admin.php",
       type: "POST",
       data: form.serialize(),
       success: (res) => {
+        Loader.hideButton(submitBtn);
         if (res.status === "success") {
           showToast("Admin updated successfully!");
           closeModal("#editAdminModal");
@@ -111,6 +132,10 @@ const Admins = {
         } else {
           showToast(res.message || "Error updating admin", "error");
         }
+      },
+      error: () => {
+        Loader.hideButton(submitBtn);
+        showToast("Failed to update admin", "error");
       },
     });
   },
@@ -123,11 +148,17 @@ const Admins = {
   },
 
   deleteAdmin() {
+    const deleteBtn = $("#confirmDeleteModal").find(
+      'button[onclick*="deleteAdmin"]'
+    );
+    Loader.showButton(deleteBtn, "Deleting...");
+
     ajaxRequest({
-      url: "/Ego_website/public/admin/api/delete-admin.php",
+      url: "api/delete-admin.php",
       type: "POST",
       data: { id: this.deleteId },
       success: (res) => {
+        Loader.hideButton(deleteBtn);
         closeModal("#confirmDeleteModal");
         if (res.status === "success") {
           showToast("Admin deleted successfully!");
@@ -135,6 +166,10 @@ const Admins = {
         } else {
           showToast(res.message || "Error deleting admin", "error");
         }
+      },
+      error: () => {
+        Loader.hideButton(deleteBtn);
+        showToast("Failed to delete admin", "error");
       },
     });
   },

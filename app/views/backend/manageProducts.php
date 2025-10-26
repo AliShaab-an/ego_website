@@ -6,19 +6,28 @@
   </div>
 </div>
 
-<div class="w-full bg-white flex flex-col items-start p-8 shadow mt-8">
-  <div class="flex justify-between items-center mb-4">
-    <input type="text" id="searchProduct" class="border p-2 rounded w-1/3" placeholder="Search product...">
-    <select id="filterCategory" class="border p-2 rounded">
-      <option value="">All Categories</option>
-    </select>
-    <select id="filterStatus" class="border p-2 rounded">
-      <option value="">All Status</option>
-      <option value="1">Active</option>
-      <option value="0">Inactive</option>
-    </select>
-    <button id="addProductPageBtn" class="bg-brand text-white px-4 py-2 rounded">+ Add Product</button>
-  </div>
+<div class="flex justify-between items-center mb-4 gap-3 flex-wrap mt-2">
+  <input type="text" id="searchProduct" class="border p-2 rounded w-1/3" placeholder="Search product...">
+
+  <select id="filterCategory" class="border p-2 rounded">
+    <option value="">All Categories</option>
+  </select>
+
+  <select id="filterStatus" class="border p-2 rounded">
+    <option value="">All Status</option>
+    <option value="1">Active</option>
+    <option value="0">Inactive</option>
+  </select>
+
+  <select id="filterTop" class="border p-2 rounded">
+    <option value="">All</option>
+    <option value="1">Top Products</option>
+    <option value="0">Not Top</option>
+  </select>
+
+  <button id="searchBtn" class="bg-brand text-white px-4 py-2 rounded">Filter</button>
+  <button id="addProductPageBtn" class="bg-brand text-white px-4 py-2 rounded">+ Add Product</button>
+</div>
 
   <table class="table-auto w-full md:table-fixed">
     <thead class="bg-[rgba(240,215,186,0.2)]">
@@ -81,11 +90,7 @@
               class="bg-white px-2 py-1 rounded border cursor-pointer">
         Cancel
       </button>
-      <button id="inactiveProductBtn"
-              class="bg-yellow-500 text-white px-3 py-1 text-sm rounded hover:bg-yellow-600 cursor-pointer">
-        Set Inactive
-      </button>
-      <button id="deleteProductBtn"
+      <button id="confirmDeleteBtn"
               class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 cursor-pointer">
         Delete Permanently
       </button>

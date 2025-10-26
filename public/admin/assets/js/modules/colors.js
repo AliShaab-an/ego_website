@@ -2,6 +2,7 @@ import { ajaxRequest } from "../utils/ajax.js";
 import { showToast, fadeOutMessages } from "../utils/messages.js";
 import { openModal, closeModal } from "../utils/modal.js";
 import { validateFields } from "../utils/validation.js";
+import { Loader } from "../utils/loader.js";
 
 let currentPage = 1;
 const limit = 5;
@@ -33,11 +34,15 @@ const Colors = {
   },
 
   loadColors(page = 1) {
+    const tbody = $("#colorTableBody");
+    Loader.show(tbody.parent(), "Loading colors...");
+
     ajaxRequest({
-      url: `/Ego_website/public/admin/api/list-colors.php?page=${page}&limit=${limit}`,
+      url: `api/list-colors.php?page=${page}&limit=${limit}`,
       type: "GET",
       success: (res) => {
-        const tbody = $("#colorTableBody").empty();
+        Loader.hide(tbody.parent());
+        tbody.empty();
         if (res.status === "success" && res.data?.length) {
           res.data.forEach((color, i) => {
             tbody.append(`
@@ -70,6 +75,10 @@ const Colors = {
         }
         $("#totalColors").text(res.total || 0);
       },
+      error: () => {
+        Loader.hide(tbody.parent());
+        showToast("Failed to load colors", "error");
+      },
     });
   },
 
@@ -86,13 +95,17 @@ const Colors = {
     e.preventDefault();
     const form = $(e.currentTarget);
     const inputs = form.find("input[required]");
+    const submitBtn = form.find('button[type="submit"]');
     if (!validateFields(inputs, form, "color-message")) return;
 
+    Loader.showButton(submitBtn, "Adding...");
+
     ajaxRequest({
-      url: "/Ego_website/public/admin/api/add-color.php",
+      url: "api/add-color.php",
       type: "POST",
       data: form.serialize(),
       success: (res) => {
+        Loader.hideButton(submitBtn);
         if (res.status === "success") {
           showToast("Color added successfully!");
           closeModal("#addColorModal");
@@ -102,6 +115,10 @@ const Colors = {
           closeModal("#addColorModal");
           showToast(res.message || "Error adding color", "error");
         }
+      },
+      error: () => {
+        Loader.hideButton(submitBtn);
+        showToast("Failed to add color", "error");
       },
     });
   },
@@ -124,13 +141,17 @@ const Colors = {
         ev.preventDefault();
         const form = $(ev.currentTarget);
         const inputs = form.find("input[required]");
+        const submitBtn = form.find('button[type="submit"]');
         if (!validateFields(inputs, form, "edit-color-message")) return;
 
+        Loader.showButton(submitBtn, "Updating...");
+
         ajaxRequest({
-          url: "/Ego_website/public/admin/api/update-color.php",
+          url: "api/update-color.php",
           type: "POST",
           data: form.serialize(),
           success: (res) => {
+            Loader.hideButton(submitBtn);
             if (res.status === "success") {
               showToast("Color updated successfully!");
               closeModal("#editColorModal");
@@ -138,6 +159,10 @@ const Colors = {
             } else {
               showToast(res.message || "Error updating color", "error");
             }
+          },
+          error: () => {
+            Loader.hideButton(submitBtn);
+            showToast("Failed to update color", "error");
           },
         });
       });
@@ -152,7 +177,7 @@ const Colors = {
 
   deleteColor() {
     ajaxRequest({
-      url: "/Ego_website/public/admin/api/delete-color.php",
+      url: "api/delete-color.php",
       type: "POST",
       data: { id: this.deleteId },
       success: (res) => {

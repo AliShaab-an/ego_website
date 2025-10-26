@@ -1,6 +1,5 @@
 <?php 
-    require_once __DIR__ . '/../config/path.php';
-    require_once CORE . 'Logger.php';
+    require_once __DIR__ . '/../../config/path.php';
     require_once MODELS . 'Product.php';
     require_once MODELS .'ProductVariant.php';
     require_once MODELS . 'ProductImages.php';
@@ -8,15 +7,58 @@
     class ProductController{
 
         public function getTopProducts(){
-            return Product::getTopProducts(8);
+            try{
+                return Product::getTopProducts(8);
+            }catch(Exception $e){
+                return ['status' => 'error', 'message' => $e->getMessage()];
+            }
         }
 
         public function getNewProducts(){
-            return Product::getNewProducts(8);
+            try{
+                return Product::getNewProducts(8);
+            }catch(Exception $e){
+                return ['status' => 'error', 'message' => $e->getMessage()];
+            }
         }
 
-        public function listAllProducts($page = 1, $perPage = 12) {
-            return Product::getAllProducts($page, $perPage);
+        public function listProducts() {
+            try{
+                // Debug logging
+                error_log("ProductController::listProducts - GET parameters: " . print_r($_GET, true));
+                
+                $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+                $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 12;
+                $offset = ($page - 1) * $limit;
+
+                $filters = [
+                    'categories' => isset($_GET['categories']) ? (array)$_GET['categories'] : [],
+                    'colors' => isset($_GET['colors']) ? (array)$_GET['colors'] : [],
+                    'sizes' => isset($_GET['sizes']) ? (array)$_GET['sizes'] : [],
+                    'minPrice' => isset($_GET['minPrice']) ? (float)$_GET['minPrice'] : 0,
+                    'maxPrice' => isset($_GET['maxPrice']) ? (float)$_GET['maxPrice'] : 10000,
+                ];
+
+                // Handle single category parameter (for category pages)
+                if (isset($_GET['category']) && !empty($_GET['category'])) {
+                    $filters['categories'] = [(int)$_GET['category']];
+                    error_log("Single category filter applied: " . $_GET['category']);
+                }
+                
+                error_log("Final filters: " . print_r($filters, true));
+
+                $products = Product::getAllProducts($limit, $offset,$filters);
+                $total = Product::countAllProducts($filters);
+
+                return [
+                    'status' => 'success',
+                    'data' => $products,
+                    'total' => $total,
+                    'has_more' => count($products) === (int)$limit
+                ];
+            }catch(Exception $e){
+                return ['status' => 'error', 'message' => $e->getMessage()];
+            }
         }
 
         
@@ -39,8 +81,8 @@
             ];
 
             foreach ($productData as $row) {
-                if ($row['image_path'] && !in_array($row['image_path'], $product['images'])) {
-                $product['images'][] = $row['image_path'];
+                if (!empty($productData[0]['images'])) {
+                $product['images'] = explode(',', $productData[0]['images']);
                 }
                 if ($row['variant_id']) {
                     $product['variants'][] = [

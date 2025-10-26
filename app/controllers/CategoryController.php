@@ -1,6 +1,6 @@
 <?php
-
-    require_once __DIR__ . '/../models/Category.php';
+    require_once __DIR__ . '/../config/path.php';
+    require_once MODELS. 'Category.php';
 
     class CategoryController{
         
@@ -35,14 +35,30 @@
             try{
                 $filename = null;
                 if(!empty($_FILES['image']['name'])){
-                    $uploadDir = __DIR__ . '/../../public/admin/uploads/'; 
+                    $uploadDir = __DIR__ . '/../../public/admin/uploads/categories/'; 
                     if(!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
-                    $filename = time() . '_' . basename($_FILES['image']['name']);
-                    move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $filename);
+                    
+                    $uniqueName = time() . '_' . basename($_FILES['image']['name']);
+                    $targetPath = $uploadDir . $uniqueName;
+                    
+                    if(move_uploaded_file($_FILES['image']['tmp_name'], $targetPath)){
+                        $filename = "admin/uploads/categories/" . $uniqueName;
+                    }
                 }
-                $id = Category::createCategory($name,$filename);
-                return ['status' => 'success', 'id' =>$id,'message' => 'Category added successfully'];
 
+                $existing = Category::findByName($name);
+                
+                if($existing){
+                    return ['status' => 'error', 'message' => 'Category already exists.'];
+                }
+
+                $id = Category::createCategory($name,$filename);
+
+                return [
+                    'status'  => 'success',
+                    'id'      => $id,
+                    'message' => 'Category added successfully.'
+                ];
             }catch(Exception $e){
                 return ['status' => 'error', 'message' => $e->getMessage()];
             }
@@ -59,14 +75,14 @@
             try{
                 $imagePath = null;
                 if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-                    $uploadDir = __DIR__ . '/../../public/admin/uploads/';
+                    $uploadDir = __DIR__ . '/../../public/admin/uploads/categories/';
                     if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
 
-                    $filename = uniqid() . '-' . basename($_FILES['image']['name']);
-                    $targetPath = $uploadDir . $filename;
+                    $uniqueName = uniqid() . '-' . basename($_FILES['image']['name']);
+                    $targetPath = $uploadDir . $uniqueName;
 
                     if (move_uploaded_file($_FILES['image']['tmp_name'], $targetPath)) {
-                        $imagePath =  $filename;
+                        $imagePath = "admin/uploads/categories/" . $uniqueName;
                     } else {
                         return ['status' => 'error', 'message' => 'Failed to upload image'];
                     }
@@ -89,7 +105,16 @@
             try{
                 $cat = Category::getCategoryById($id);
                 if($cat && $cat['image']){
-                    $file = __DIR__ .  '/../../public/admin/uploads/' . $cat['image'];
+                    // Handle both old and new path formats for backward compatibility
+                    $imagePath = $cat['image'];
+                    if(strpos($imagePath, 'admin/uploads/') === 0) {
+                        // New format: admin/uploads/categories/filename.jpg
+                        $file = __DIR__ . '/../../public/' . $imagePath;
+                    } else {
+                        // Old format: just filename.jpg
+                        $file = __DIR__ . '/../../public/admin/uploads/' . $imagePath;
+                    }
+                    
                     if(file_exists($file)) unlink($file);
                 }
 

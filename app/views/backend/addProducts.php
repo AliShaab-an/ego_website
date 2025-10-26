@@ -1,8 +1,8 @@
 <div>
     <form id="productForm" enctype="multipart/form-data">
         <div class="flex justify-between p-2 mb-2">
-            <p class="text-3xl font-semibold">Add New Product</p>
-            <button type="submit" class="bg-brand text-sm text-white px-4 py-2 rounded font-bold cursor-pointer">Publish Product</button>
+            <p id="pageTitle" class="text-3xl font-semibold">Add New Product</p>
+            <button id="publishBtn" type="submit" class="bg-brand text-sm text-white px-4 py-2 rounded font-bold cursor-pointer">Publish Product</button>
         </div>
 
         <div class="w-full flex gap-4">
@@ -40,10 +40,13 @@
                 </div>
             </div>
             <div class="w-2/5 bg-white flex flex-col items-start py-4 px-4 shadow-[0_0_14.36px_-3.16px_rgba(0,0,0,0.25)]">
-              <p class="text-3xl font-bold mb-2">Basic Details</p>
+              <p class="text-3xl font-bold mb-2">Discount Details</p>
               <div class="w-full flex flex-col gap-2">
                     <label for="" class="font-bold">Product Discount</label>
-                    <input type="text" id="discount"  name="discount" class="w-full p-2 border border-gray-300 rounded outline-none" placeholder="Enter Discount Percentage">
+                    <input type="number" id="discount" name="discount" 
+                           class="w-full p-2 border border-gray-300 rounded outline-none" 
+                           placeholder="Enter Discount Percentage" 
+                           min="0" max="100" step="0.01">
                 </div>
                 <div class="flex items-center gap-2 mt-2">
                     <input type="checkbox" id="is_active" name="is_active" value="1" 

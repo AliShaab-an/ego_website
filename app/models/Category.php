@@ -70,10 +70,32 @@
                 throw new Exception("Failed to update category: " . $e->getMessage());
             }
         }
+
+        public static function findByName($name){
+            $name = ucfirst(strtolower(trim($name)));
+            try{
+                $stmt = DB::query("SELECT * FROM categories WHERE name = ? LIMIT 1", [$name]);
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                return $result ?: null;
+            }catch(PDOException $e){
+                throw new Exception("Failed to find category: " . $e->getMessage());
+            }
+        }
+
         
         // Frontend functions
+        public static function getById($id){
+            try {
+                $stmt = DB::query("SELECT * FROM categories WHERE id = ? LIMIT 1", [$id]);
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                return $result ?: null;
+            } catch(PDOException $e) {
+                throw new Exception("Failed to fetch category: " . $e->getMessage());
+            }
+        }
+
         public static function getCategoryById($id){
-            DB::query("SELECT * FROM categories WHERE id = ?", [$id]);
+            return self::getById($id);
         }
 
         public static function getCategoriesWithProducts($limit = 4) {

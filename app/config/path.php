@@ -35,6 +35,10 @@ if (!defined('BACKEND_VIEWS')) {
     define('BACKEND_VIEWS', ROOT_PATH . 'app/views/backend/');
 }
 
+if (!defined('FRONTEND_VIEWS')) {
+    define('FRONTEND_VIEWS', ROOT_PATH . 'app/views/frontend/');
+}
+
 if (!defined('CONT')) {
     define('CONT', ROOT_PATH . 'app/controllers/');
 }
