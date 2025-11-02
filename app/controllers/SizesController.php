@@ -1,10 +1,21 @@
 <?php  
-
-    require_once __DIR__ . '/../models/Sizes.php';
+    require_once __DIR__ . '/../config/path.php';
+    require_once MODELS . 'Sizes.php';
     class SizesController{
 
         public function listSizes(){
             try{
+                // If 'all' parameter is set, return all sizes without pagination (for dropdowns)
+                if (isset($_GET['all']) && $_GET['all'] === 'true') {
+                    $data = Sizes::getAll();
+                    return [
+                        'status' => 'success',
+                        'data' => $data,
+                        'total' => count($data)
+                    ];
+                }
+
+                // Otherwise, use pagination (for table views)
                 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
                 $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 5;
                 $offset = ($page - 1) * $limit;

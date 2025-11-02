@@ -1,4 +1,6 @@
 import { ajaxRequest } from "../utils/ajax.js";
+import { showToast } from "../utils/messages.js";
+import Config from "../config.js";
 
 const ProductDetail = {
   productId: null,
@@ -251,38 +253,16 @@ const ProductDetail = {
           });
         }
       });
-    }
-
-    // If a color is selected, check size availability for that color
-    if (selectedColor) {
-      $(".size-option").each(function () {
-        const sizeName = $(this).data("size");
-        const hasVariant = variantData.some(
-          (variant) =>
-            variant.color === selectedColor &&
-            variant.size === sizeName &&
-            variant.quantity > 0
-        );
-
-        if (hasVariant) {
-          // Available variant
-          $(this)
-            .removeClass("unavailable opacity-50 cursor-not-allowed")
-            .addClass("cursor-pointer");
-          $(this).find("p").css({
-            "text-decoration": "none",
-            opacity: "1",
-          });
-        } else {
-          // Unavailable variant
-          $(this)
-            .addClass("unavailable opacity-50 cursor-not-allowed")
-            .removeClass("cursor-pointer");
-          $(this).find("p").css({
-            "text-decoration": "line-through",
-            opacity: "0.6",
-          });
-        }
+    } else {
+      // If no size is selected, reset all colors to available state
+      $(".color-option").each(function () {
+        $(this)
+          .removeClass("unavailable opacity-50 cursor-not-allowed")
+          .addClass("cursor-pointer");
+        $(this).find("p").css({
+          "text-decoration": "none",
+          opacity: "1",
+        });
       });
     }
 
@@ -365,11 +345,11 @@ const ProductDetail = {
 
       // Basic validation
       if (!selectedSize) {
-        alert("Please select a size");
+        showToast("Please select a size", "error");
         return;
       }
       if (!selectedColor) {
-        alert("Please select a color");
+        showToast("Please select a color", "error");
         return;
       }
 
@@ -385,7 +365,7 @@ const ProductDetail = {
 
       // Send AJAX request
       $.ajax({
-        url: "/Ego_website/public/api/add-to-cart.php",
+        url: Config.getApiUrl("add-to-cart.php"),
         type: "POST",
         data: formData,
         processData: false,
@@ -409,19 +389,12 @@ const ProductDetail = {
               window.Cart.showCartMessage(response.message, "success");
             }
 
-            // Reset button
-            $button
-              .text("Added to Cart!")
-              .removeClass("bg-brand")
-              .addClass("bg-green-500");
+            // Show success text briefly while keeping brand color
+            $button.text("Added to Cart!");
 
             // Reset after 2 seconds
             setTimeout(() => {
-              $button
-                .text(originalText)
-                .removeClass("bg-green-500")
-                .addClass("bg-brand")
-                .prop("disabled", false);
+              $button.text(originalText).prop("disabled", false);
             }, 2000);
           } else {
             if (
@@ -433,7 +406,10 @@ const ProductDetail = {
                 "error"
               );
             } else {
-              alert(response.message || "Failed to add item to cart");
+              showToast(
+                response.message || "Failed to add item to cart",
+                "error"
+              );
             }
             $button.text(originalText).prop("disabled", false);
           }
@@ -448,7 +424,7 @@ const ProductDetail = {
               "error"
             );
           } else {
-            alert("Server error. Please try again.");
+            showToast("Server error. Please try again.", "error");
           }
           $button.text(originalText).prop("disabled", false);
         },

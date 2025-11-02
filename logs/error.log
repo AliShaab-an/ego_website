@@ -132,3 +132,162 @@ Response: Array
     [message] => Product with variants and images added successfully
 )
 
+Updating product #79 to status=0
+Updating product #79 to status=1
+Inserted Variant: Product #80 | Color 23 | Size 7 | Price 0 | Qty 10
+Response: Array
+(
+    [status] => success
+    [product_id] => 80
+    [message] => Product with variants and images added successfully
+)
+
+Inserted Variant: Product #80 | Color 23 | Size 6 | Price 0 | Qty 10
+Inserted Variant: Product #81 | Color 24 | Size 7 | Price 0 | Qty 10
+Response: Array
+(
+    [status] => success
+    [product_id] => 81
+    [message] => Product with variants and images added successfully
+)
+
+Inserted Variant: Product #82 | Color 24 | Size 7 | Price 0 | Qty 100
+Response: Array
+(
+    [status] => success
+    [product_id] => 82
+    [message] => Product with variants and images added successfully
+)
+
+Inserted Variant: Product #83 | Color 24 | Size 5 | Price 0 | Qty 10
+Response: Array
+(
+    [status] => success
+    [product_id] => 83
+    [message] => Product with variants and images added successfully
+)
+
+Inserted Variant: Product #84 | Color 23 | Size 6 | Price 0 | Qty 10
+Response: Array
+(
+    [status] => success
+    [product_id] => 84
+    [message] => Product with variants and images added successfully
+)
+
+Inserted Variant: Product #85 | Color 23 | Size 7 | Price 0 | Qty 10
+Response: Array
+(
+    [status] => success
+    [product_id] => 85
+    [message] => Product with variants and images added successfully
+)
+
+Inserted Variant: Product #86 | Color 16 | Size 6 | Price 0 | Qty 10
+Response: Array
+(
+    [status] => success
+    [product_id] => 86
+    [message] => Product with variants and images added successfully
+)
+
+Response: Array
+(
+    [status] => error
+    [message] => Please upload at least one product image.
+)
+
+Response: Array
+(
+    [status] => error
+    [message] => Please upload at least one product image.
+)
+
+Response: Array
+(
+    [status] => error
+    [message] => Please upload at least one product image.
+)
+
+Inserted Variant: Product #87 | Color 16 | Size 5 | Price 0 | Qty 10
+Inserted Variant: Product #87 | Color 16 | Size 4 | Price 0 | Qty 10
+[2025-11-01 10:20:31] [ProductController::addProduct] ERROR: Image upload error for blazer.webp
+Response: Array
+(
+    [status] => error
+    [message] => Image upload error for blazer.webp
+)
+
+Inserted Variant: Product #88 | Color 16 | Size 5 | Price 0 | Qty 10
+Inserted Variant: Product #88 | Color 16 | Size 4 | Price 0 | Qty 10
+[2025-11-01 10:20:38] [ProductController::addProduct] ERROR: Image upload error for blazer.webp
+Response: Array
+(
+    [status] => error
+    [message] => Image upload error for blazer.webp
+)
+
+Inserted Variant: Product #89 | Color 16 | Size 5 | Price 0 | Qty 10
+Inserted Variant: Product #89 | Color 16 | Size 4 | Price 0 | Qty 10
+[2025-11-01 10:20:45] [ProductController::addProduct] ERROR: Image upload error for blazer.webp
+Response: Array
+(
+    [status] => error
+    [message] => Image upload error for blazer.webp
+)
+
+Inserted Variant: Product #90 | Color 16 | Size 5 | Price 0 | Qty 10
+Inserted Variant: Product #90 | Color 16 | Size 4 | Price 0 | Qty 10
+[2025-11-01 10:20:52] [ProductController::addProduct] ERROR: Image upload error for blazer.webp
+Response: Array
+(
+    [status] => error
+    [message] => Image upload error for blazer.webp
+)
+
+Inserted Variant: Product #91 | Color 16 | Size 5 | Price 0 | Qty 10
+Inserted Variant: Product #91 | Color 16 | Size 4 | Price 0 | Qty 10
+[2025-11-01 10:21:01] [ProductController::addProduct] ERROR: Image upload error for blazer.webp
+Response: Array
+(
+    [status] => error
+    [message] => Image upload error for blazer.webp
+)
+
+Inserted Variant: Product #92 | Color 16 | Size 5 | Price 0 | Qty 10
+Inserted Variant: Product #92 | Color 16 | Size 4 | Price 0 | Qty 10
+[2025-11-01 10:21:06] [ProductController::addProduct] ERROR: Image upload error for blazer.webp
+Response: Array
+(
+    [status] => error
+    [message] => Image upload error for blazer.webp
+)
+
+Inserted Variant: Product #93 | Color 16 | Size 5 | Price 0 | Qty 10
+Inserted Variant: Product #93 | Color 16 | Size 4 | Price 0 | Qty 10
+[2025-11-01 10:21:12] [ProductController::addProduct] ERROR: Image upload error for blazer.webp
+Response: Array
+(
+    [status] => error
+    [message] => Image upload error for blazer.webp
+)
+
+Inserted Variant: Product #94 | Color 16 | Size 5 | Price 0 | Qty 10
+Inserted Variant: Product #94 | Color 16 | Size 4 | Price 0 | Qty 10
+Inserted Variant: Product #94 | Color 23 | Size 6 | Price 0 | Qty 10
+Inserted Variant: Product #94 | Color 23 | Size 7 | Price 0 | Qty 10
+Response: Array
+(
+    [status] => success
+    [product_id] => 94
+    [message] => Product with variants and images added successfully
+)
+
+Inserted Variant: Product #95 | Color 16 | Size 4 | Price 0 | Qty 10
+Response: Array
+(
+    [status] => success
+    [product_id] => 95
+    [message] => Product with variants and images added successfully
+)
+

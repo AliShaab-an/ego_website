@@ -36,18 +36,28 @@ class ContactMessage {
         }
     }
     
-    public static function getAll($limit = 50, $offset = 0) {
+    public static function getAll($limit = 50, $offset = 0, $status = 'all') {
         try {
             $limit = (int)$limit;
             $offset = (int)$offset;
             
-            $sql = "SELECT cm.*, u.username 
+            $whereClause = "";
+            $params = [];
+            
+            if ($status === 'read') {
+                $whereClause = "WHERE cm.is_read = 1";
+            } elseif ($status === 'unread') {
+                $whereClause = "WHERE cm.is_read = 0";
+            }
+            
+            $sql = "SELECT cm.*, u.name as username 
                     FROM contact_messages cm
                     LEFT JOIN users u ON cm.user_id = u.id
+                    $whereClause
                     ORDER BY cm.created_at DESC 
                     LIMIT $limit OFFSET $offset";
                     
-            $stmt = DB::query($sql);
+            $stmt = DB::query($sql, $params);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
             throw new Exception("Failed to fetch contact messages: " . $e->getMessage());
@@ -56,7 +66,7 @@ class ContactMessage {
     
     public static function getById($id) {
         try {
-            $sql = "SELECT cm.*, u.username 
+            $sql = "SELECT cm.*, u.name as username 
                     FROM contact_messages cm
                     LEFT JOIN users u ON cm.user_id = u.id
                     WHERE cm.id = ?";
@@ -78,9 +88,38 @@ class ContactMessage {
         }
     }
     
-    public static function countAll() {
+    public static function markAsUnread($id) {
         try {
-            $stmt = DB::query("SELECT COUNT(*) AS count FROM contact_messages");
+            $sql = "UPDATE contact_messages SET is_read = 0 WHERE id = ?";
+            DB::query($sql, [$id]);
+            return true;
+        } catch (Exception $e) {
+            throw new Exception("Failed to mark message as unread: " . $e->getMessage());
+        }
+    }
+    
+    public static function delete($id) {
+        try {
+            $sql = "DELETE FROM contact_messages WHERE id = ?";
+            DB::query($sql, [$id]);
+            return true;
+        } catch (Exception $e) {
+            throw new Exception("Failed to delete contact message: " . $e->getMessage());
+        }
+    }
+    
+    public static function countAll($status = 'all') {
+        try {
+            $whereClause = "";
+            $params = [];
+            
+            if ($status === 'read') {
+                $whereClause = "WHERE is_read = 1";
+            } elseif ($status === 'unread') {
+                $whereClause = "WHERE is_read = 0";
+            }
+            
+            $stmt = DB::query("SELECT COUNT(*) AS count FROM contact_messages $whereClause", $params);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             return (int)$row['count'];
         } catch (Exception $e) {
@@ -88,61 +127,53 @@ class ContactMessage {
         }
     }
     
-    public static function countUnread() {
-        try {
-            $stmt = DB::query("SELECT COUNT(*) AS count FROM contact_messages WHERE is_read = 0");
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
-            return (int)$row['count'];
-        } catch (Exception $e) {
-            throw new Exception("Failed to count unread messages: " . $e->getMessage());
-        }
-    }
-    
     public static function countRead() {
+        return self::countAll('read');
+    }
+    
+    public static function countUnread() {
+        return self::countAll('unread');
+    }
+    
+    public static function getAllForExport($status = 'all') {
         try {
-            $stmt = DB::query("SELECT COUNT(*) AS count FROM contact_messages WHERE is_read = 1");
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
-            return (int)$row['count'];
+            $whereClause = "";
+            $params = [];
+            
+            if ($status === 'read') {
+                $whereClause = "WHERE cm.is_read = 1";
+            } elseif ($status === 'unread') {
+                $whereClause = "WHERE cm.is_read = 0";
+            }
+            
+            $sql = "SELECT cm.name, cm.email, cm.message, cm.is_read, cm.created_at, u.name as registered_user
+                    FROM contact_messages cm
+                    LEFT JOIN users u ON cm.user_id = u.id
+                    $whereClause
+                    ORDER BY cm.created_at DESC";
+                    
+            $stmt = DB::query($sql, $params);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
-            throw new Exception("Failed to count read messages: " . $e->getMessage());
+            throw new Exception("Failed to fetch contact messages for export: " . $e->getMessage());
         }
     }
     
-    public static function getUnread($limit = 50, $offset = 0) {
-        try {
-            $limit = (int)$limit;
-            $offset = (int)$offset;
-            
-            $sql = "SELECT cm.*, u.username 
-                    FROM contact_messages cm
-                    LEFT JOIN users u ON cm.user_id = u.id
-                    WHERE cm.is_read = 0
-                    ORDER BY cm.created_at DESC 
-                    LIMIT $limit OFFSET $offset";
-                    
-            $stmt = DB::query($sql);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (Exception $e) {
-            throw new Exception("Failed to fetch unread contact messages: " . $e->getMessage());
+    public static function generateCSV($data) {
+        $csv = "Name,Email,Message,Status,Sent Date,Registered User\n";
+        
+        foreach ($data as $row) {
+            $csv .= sprintf(
+                '"%s","%s","%s","%s","%s","%s"' . "\n",
+                str_replace('"', '""', $row['name']),
+                str_replace('"', '""', $row['email']),
+                str_replace('"', '""', $row['message']),
+                $row['is_read'] ? 'Read' : 'Unread',
+                date('Y-m-d H:i:s', strtotime($row['created_at'])),
+                $row['registered_user'] ? 'Yes (' . str_replace('"', '""', $row['registered_user']) . ')' : 'No'
+            );
         }
-    }
-    
-    public static function getRead($limit = 50, $offset = 0) {
-        try {
-            $limit = (int)$limit;
-            $offset = (int)$offset;
-            
-            $sql = "SELECT cm.*, u.username 
-                    FROM contact_messages cm
-                    LEFT JOIN users u ON cm.user_id = u.id
-                    WHERE cm.is_read = 1
-                    ORDER BY cm.created_at DESC 
-                    LIMIT $limit OFFSET $offset";
-                    
-            $stmt = DB::query($sql);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (Exception $e) {
-            throw new Exception("Failed to fetch read contact messages: " . $e->getMessage());
-        }
+        
+        return $csv;
     }
 }

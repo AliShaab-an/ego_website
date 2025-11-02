@@ -10,6 +10,15 @@
 
         public function createProduct(){
             
+            // Debug: Log all FILES data
+            file_put_contents(__DIR__ . '/../../logs/files_debug.log', 
+                "=== FILES DEBUG ===\n" . 
+                print_r($_FILES, true) . "\n" .
+                "=== POST DEBUG ===\n" . 
+                print_r($_POST, true) . "\n\n", 
+                FILE_APPEND
+            );
+            
             $name = trim($_POST['name'] ?? '');
             $description = trim($_POST['description'] ?? '');
             $base_price = floatval($_POST['base_price'] ?? 0);
@@ -24,7 +33,14 @@
             }
 
             // ===== 2. VALIDATE VARIANTS =====
-            $variants = $_POST['variants'] ?? [];
+            // Decode JSON if variants is sent as JSON string
+            $variantsRaw = $_POST['variants'] ?? [];
+            if (is_string($variantsRaw)) {
+                $variants = json_decode($variantsRaw, true);
+            } else {
+                $variants = $variantsRaw;
+            }
+            
             if(empty($variants) || !is_array($variants)){
                 return ['status' => 'error', 'message' => "Please add at least one variant before saving."
                 ];
@@ -50,7 +66,17 @@
 
              // ===== 3. VALIDATE IMAGES =====
             $hasImages = false;
-            if (isset($_FILES['variants']['name']) && is_array($_FILES['variants']['name'])) {
+            // Check for images sent as variant_images[index][]
+            if (isset($_FILES['variant_images'])) {
+                foreach ($_FILES['variant_images']['name'] as $variantIndex => $images) {
+                    if (!empty($images) && count(array_filter($images)) > 0) {
+                        $hasImages = true;
+                        break;
+                    }
+                }
+            }
+            // Also check for images sent as variants[index][images][]
+            if (!$hasImages && isset($_FILES['variants']['name']) && is_array($_FILES['variants']['name'])) {
                 foreach ($_FILES['variants']['name'] as $variantIndex => $variantFiles) {
                     if (!empty($variantFiles['images']) && count(array_filter($variantFiles['images'])) > 0) {
                         $hasImages = true;
@@ -79,6 +105,7 @@
                 );
 
                 $isFirstImage = true;
+                $processedColorBlocks = []; // Track which color blocks we've already processed images for
 
                 foreach ($variants as $index => $variant) {
                     $variantId = ProductVariant::create($productId, [
@@ -89,16 +116,46 @@
                         'is_active' => 1
                     ]);
 
-                    if(isset($_FILES['variants']['name'][$index]['images'])){
+                    // Check for images sent as variant_images[color_block_index][]
+                    // Use color_block_index to find images for this variant's color
+                    $colorBlockIndex = $variant['color_block_index'] ?? $index;
+                    
+                    // Only process images once per color block
+                    if (in_array($colorBlockIndex, $processedColorBlocks)) {
+                        continue; // Skip if we've already processed this color block's images
+                    }
+                    
+                    $fileNames = null;
+                    $tmpNames = null;
+                    $errors = null;
+
+                    if(isset($_FILES['variant_images']['name'][$colorBlockIndex])){
+                        $fileNames = $_FILES['variant_images']['name'][$colorBlockIndex];
+                        $tmpNames  = $_FILES['variant_images']['tmp_name'][$colorBlockIndex];
+                        $errors    = $_FILES['variant_images']['error'][$colorBlockIndex];
+                    }
+                    // Fallback to old format variants[index][images][]
+                    elseif(isset($_FILES['variants']['name'][$index]['images'])){
                         $fileNames = $_FILES['variants']['name'][$index]['images'];
                         $tmpNames  = $_FILES['variants']['tmp_name'][$index]['images'];
                         $errors    = $_FILES['variants']['error'][$index]['images'];
+                    }
 
+                    if($fileNames && is_array($fileNames)){
                         for($i = 0; $i < count($fileNames); $i++){
                             $fileName = $fileNames[$i];
                             $tmpName  = $tmpNames[$i];
                             $error    = $errors[$i];
 
+                            // Debug logging for file upload
+                            file_put_contents(__DIR__ . '/../../logs/upload_debug.log',
+                                "File: $fileName\n" .
+                                "Temp Name: $tmpName\n" .
+                                "Error Code: $error\n" .
+                                "Is Uploaded File: " . (is_uploaded_file($tmpName) ? 'YES' : 'NO') . "\n" .
+                                "File Exists: " . (file_exists($tmpName) ? 'YES' : 'NO') . "\n\n",
+                                FILE_APPEND
+                            );
 
                             if($error === UPLOAD_ERR_OK && is_uploaded_file($tmpName)){
                                 $uniqueName = uniqid("p{$productId}_") . "_" . basename($fileName);
@@ -128,10 +185,22 @@
                                     return ['status' => 'error', 'message' => "Failed to save image: $fileName"];
                                 }
                             }else{
-                                Logger::error("ProductController::addProduct", "Image upload error for $fileName");
-                                return ['status' => 'error', 'message' => "Image upload error for $fileName"];
+                                $errorMessages = [
+                                    UPLOAD_ERR_INI_SIZE => 'File exceeds upload_max_filesize',
+                                    UPLOAD_ERR_FORM_SIZE => 'File exceeds MAX_FILE_SIZE',
+                                    UPLOAD_ERR_PARTIAL => 'File was only partially uploaded',
+                                    UPLOAD_ERR_NO_FILE => 'No file was uploaded',
+                                    UPLOAD_ERR_NO_TMP_DIR => 'Missing temporary folder',
+                                    UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk',
+                                    UPLOAD_ERR_EXTENSION => 'Upload stopped by extension'
+                                ];
+                                $errorMsg = $errorMessages[$error] ?? "Unknown error (code: $error)";
+                                Logger::error("ProductController::addProduct", "Image upload error for $fileName: $errorMsg");
+                                return ['status' => 'error', 'message' => "Image upload error for $fileName: $errorMsg"];
                             }
                         }
+                        // Mark this color block as processed
+                        $processedColorBlocks[] = $colorBlockIndex;
                     }
                 }
                 

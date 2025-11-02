@@ -1,11 +1,23 @@
 <?php 
-    require_once __DIR__ . '/../models/Colors.php';
+    require_once __DIR__ . '/../config/path.php';
+    require_once MODELS . 'Colors.php';
 
     class ColorsController{
 
 
         public function listColors(){
             try{
+                // If 'all' parameter is set, return all colors without pagination (for dropdowns)
+                if (isset($_GET['all']) && $_GET['all'] === 'true') {
+                    $data = Colors::getAllColors();
+                    return [
+                        'status' => 'success',
+                        'data' => $data,
+                        'total' => count($data)
+                    ];
+                }
+
+                // Otherwise, use pagination (for table views)
                 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
                 $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 5;
                 $offset = ($page - 1) * $limit;

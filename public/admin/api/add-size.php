@@ -1,7 +1,7 @@
 <?php 
 
-
-    require_once __DIR__ . "/../../../app/controllers/SizesController.php";
+    require_once __DIR__ . '/../../../app/config/path.php';
+    require_once CONT . 'SizesController.php';
 
     header('Content-Type: application/json');
     try{

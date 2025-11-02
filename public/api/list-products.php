@@ -1,4 +1,5 @@
 <?php 
+
     require_once __DIR__ . "/../../app/config/path.php";
     require_once CONT. '/frontend/ProductController.php';
 
@@ -8,5 +9,6 @@
         $controller = new ProductController();
         echo json_encode($controller->listProducts());
     }catch (Throwable $e) {
-        echo json_encode(['success' => false, 'message' => 'Server error']);
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Server error', 'error' => $e->getMessage()]);
     }

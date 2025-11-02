@@ -55,6 +55,17 @@
             ]);
         }
 
+        public static function updateContactInfo($id, $phone, $address = null, $city = null, $state = null, $zip = null) {
+            try {
+                $sql = "UPDATE users SET phone = ?, address = ?, city = ?, state = ?, zip_code = ? WHERE id = ?";
+                DB::query($sql, [$phone, $address, $city, $state, $zip, $id]);
+                return true;
+            } catch (Exception $e) {
+                error_log("User update contact info error: " . $e->getMessage());
+                return false;
+            }
+        }
+
         public static function delete($id){
             DB::query("DELETE FROM users WHERE id = ?", [$id]);
         }

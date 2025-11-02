@@ -44,3 +44,13 @@
 [2025-10-26 14:25:59] [update-product] INFO: Category ID: 7
 [2025-10-26 14:25:59] [update-product] INFO: Discount updated: 10% (Active: 1)
 [2025-10-26 18:29:09] [ProductController::addProduct] INFO: Discount created: 10% (Active: 1)
+[2025-10-30 20:07:39] [ProductController::addProduct] INFO: Discount created: 10% (Active: 1)
+[2025-10-30 20:08:29] [update-product] INFO: Form data received: {"name":"Blazer","description":"test","is_top":"1","base_price":"100.00","category_id":"11","weight":"","discount":"10.00","is_active":"1","variants":[{"color_id":"23","size_id":"6","quantity":"10","price":""}],"existing_images":["admin\/uploads\/products\/p80_6903b77b4eee7_blazer10.webp"],"id":"80"}
+[2025-10-30 20:08:29] [update-product] INFO: Category ID: 11
+[2025-10-30 20:08:30] [update-product] INFO: Discount updated: 10% (Active: 1)
+[2025-10-30 20:46:00] [ProductController::addProduct] INFO: Discount created: 30% (Active: 1)
+[2025-10-30 21:30:26] [ProductController::addProduct] INFO: Discount created: 40% (Active: 1)
+[2025-10-30 21:31:31] [ProductController::addProduct] INFO: Discount created: 50% (Active: 1)
+[2025-10-30 21:33:15] [ProductController::addProduct] INFO: Discount created: 30% (Active: 1)
+[2025-11-01 09:57:09] [ProductController::addProduct] INFO: Discount created: 40% (Active: 1)
+[2025-11-01 10:25:36] [ProductController::addProduct] INFO: Discount created: 30% (Active: 1)

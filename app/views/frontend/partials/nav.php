@@ -16,12 +16,16 @@
                     <a href="contact.php" class="hover:underline cursor-pointer hover:font-bold">Contact Us</a>
                 </nav>
                 <div class="md:hidden">
-                    <img src="<?php echo $nav_logo ?? 'assets/images/egologo3.php';?>" alt="EGO" class="h-10 w-auto">
+                    <a href="index.php">
+                        <img src="<?php echo $nav_logo ?? 'assets/images/egologo3.php';?>" alt="EGO" class="h-10 w-auto cursor-pointer">
+                    </a>
                 </div>
             </div>
             <!-- Desktop logo (centered absolutely) -->
             <div class="hidden md:block absolute left-1/2 -translate-x-1/2">
-                <img src=<?php echo $nav_logo ?? 'assets/images/egologo3.php';?> alt="EGO" class="h-14 w-auto">
+                <a href="index.php">
+                    <img src=<?php echo $nav_logo ?? 'assets/images/egologo3.php';?> alt="EGO" class="h-14 w-auto cursor-pointer">
+                </a>
             </div>
 
              <!-- Right side (icons) -->

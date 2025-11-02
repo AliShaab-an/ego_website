@@ -1,10 +1,15 @@
 <?php
-    // Start output buffering to prevent header issues
-    ob_start();
+    require_once __DIR__ . '/../../app/config/path.php';
+    require_once CORE . 'Session.php';
 
-    require_once __DIR__ . '/../../app/controllers/AdminController.php';
+    Session::configure(1800, url('admin/login.php'), true);
+    Session::startSession();
 
-    $controller = new AdminController();
-    $controller->login();
+    // If already logged in as admin, redirect to dashboard
+    if (isset($_SESSION['user_id']) && isset($_SESSION['role']) && in_array($_SESSION['role'], ['admin', 'super_admin'])) {
+        header('Location: index.php?action=dashboard');
+        exit;
+    }
 
-    ?>
+    include BACKEND_VIEWS . 'login.php';
+?>

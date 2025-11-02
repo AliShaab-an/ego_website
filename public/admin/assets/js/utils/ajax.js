@@ -5,13 +5,7 @@ export function ajaxRequest(options) {
     ...options,
     dataType: "json",
     error: (xhr) => {
-      console.error(
-        "AJAX Error:",
-        xhr.status,
-        xhr.statusText,
-        xhr.responseText
-      );
-      showToast("Server error. Check console for details.", "error");
+      showToast("Server error. Please try again.", "error");
     },
   });
 }

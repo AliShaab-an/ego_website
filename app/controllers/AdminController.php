@@ -1,39 +1,12 @@
 <?php
-
-    require_once __DIR__ .'/../models/User.php';
-    require_once __DIR__ . '/../core/Session.php';
-    require_once __DIR__ . '/../core/Auth.php';
-    require_once __DIR__ . '/../core/Helper.php';
+    require_once __DIR__ . '/../config/path.php';
+    require_once MODELS . 'Dashboard.php';
+    require_once MODELS . 'User.php';
+    require_once CORE . 'Session.php';
+    require_once CORE . 'Auth.php';
+    require_once CORE . 'Helper.php';
 
     class AdminController {
-        public function login() {
-            Session::startSession();
-
-            $error = '';
-
-            if($_SERVER['REQUEST_METHOD'] === 'POST'){
-                $email = $_POST['email'] ?? '';
-                $password = $_POST['password'] ?? '';
-                
-                if(User::emailExists($email) === false){
-                    $error = "Email already exists.";
-                    exit;
-                }
-                $user = User::verifyLogin($email,$password);
-
-                if($user && in_array($user['role'], ['admin','super_admin'])){
-                    Session::set('user_id',$user['id']);
-                    Session::set('user_name',$user['name']);
-                    Session::set('user_email',$user['email']);
-                    Session::set('role', $user['role']);
-                    Helper::redirect('index.php?action=dashboard');
-                    exit;
-                }else{
-                    $error = "Invalid email or password.";
-                }
-            }
-            include __DIR__ . '/../views/backend/login.php';
-        }
 
         public function logout() {
             Session::destroySession();
@@ -42,42 +15,82 @@
         }
 
         public function dashboard(){
-            include __DIR__ . '/../views/backend/dashboard.php';
+            include BACKEND_VIEWS . 'dashboard.php';
         }
 
         public function categoryPage(){
-            include __DIR__ . '/../views/backend/category.php';
+            include BACKEND_VIEWS . 'category.php';
         }
 
         public function ordersPage() {
-            include __DIR__ . '/../views/backend/orders.php';
+            include BACKEND_VIEWS . 'orders_new.php';
         }
 
         public function adminsPage(){
-            include __DIR__ . '/../views/backend/admins.php';
+            include BACKEND_VIEWS . 'admins.php';
         }
 
         public function productsPage(){
-            include __DIR__ . '/../views/backend/addProducts.php';
+            include BACKEND_VIEWS . 'addProducts.php';
         }
         
         public function colorsAndSizesPage(){
-            include __DIR__ . '/../views/backend/colorsAndSizes.php';
+            include BACKEND_VIEWS . 'colorsAndSizes.php';
         }
 
         public function shippingPage(){
-            include __DIR__ . '/../views/backend/shippingFee.php';
+            include BACKEND_VIEWS . 'shippingFee.php';
         }
 
         public function couponsPage(){
-            include __DIR__ . '/../views/backend/coupons.php';
+            include BACKEND_VIEWS . 'coupons.php';
         }
 
         public function manageProducts(){
-            include __DIR__ . '/../views/backend/manageProducts.php';
+            include BACKEND_VIEWS . 'manageProducts.php';
         }
 
         public function newsletterPage(){
-            include __DIR__ . '/../views/backend/newsletter.php';
+            include BACKEND_VIEWS . 'newsletter.php';
+        }
+
+        public function contactMessagesPage(){
+            include BACKEND_VIEWS . 'contact-messages.php';
+        }
+
+        /**
+         * Get dashboard statistics
+         */
+        public function getDashboardStats() {
+            header('Content-Type: application/json');
+            
+            try {
+                error_log("getDashboardStats called");
+                
+                $stats = Dashboard::getStatistics();
+                
+                error_log("Stats result: " . ($stats === null ? "NULL" : "SUCCESS"));
+                
+                if ($stats === null) {
+                    error_log("Dashboard::getStatistics returned null");
+                    throw new Exception('Failed to retrieve dashboard statistics - check error logs');
+                }
+                
+                echo json_encode([
+                    'success' => true,
+                    'stats' => $stats
+                ]);
+                
+            } catch (Exception $e) {
+                error_log("getDashboardStats exception: " . $e->getMessage());
+                error_log("Exception trace: " . $e->getTraceAsString());
+                
+                http_response_code(500);
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Error fetching dashboard statistics',
+                    'error' => $e->getMessage()
+                ]);
+            }
         }
     }

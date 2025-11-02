@@ -5,109 +5,74 @@ if (!isset($categoriesWithProducts) || !is_array($categoriesWithProducts)) {
 }
 ?>
 
-<section class="collections py-16 bg-gray-50">
-  <div class="max-w-7xl mx-auto px-4">
-    <h2 class="text-4xl font-normal mb-12 text-center font-cor">Collections</h2>
+
+
+<section class="collections py-20 bg-white">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Section Header -->
+    <div class="text-center mb-12">
+  <p class="text-sm tracking-[0.2em] text-brand uppercase mb-3">Check Out Our</p>
+  <h2 class="text-4xl font-light text-gray-900 font-cor">Collections</h2>
+    </div>
     
     <div class="collections-container relative">
       <!-- Collections Slider -->
       <div class="collectionsSwiper overflow-hidden">
         <div class="swiper-wrapper">
           <?php if (!empty($categoriesWithProducts)): ?>
-            <?php foreach($categoriesWithProducts as $index => $category): ?>
-              <!-- Collection Slide -->
+            <?php foreach($categoriesWithProducts as $category): ?>
+              <!-- Collection Slide - One category per slide -->
               <div class="swiper-slide">
-                <div class="collection-grid h-full">
-                  <?php if (!empty($category['products'])): ?>
-                    <?php if ($index % 2 == 0): ?>
-                      <!-- Layout 1: Large image left, 3 small right -->
-                      <div class="grid grid-cols-3 gap-4 h-[500px]">
-                        <!-- Large product (first) -->
-                        <div class="col-span-2 row-span-2">
-                          <a href="product.php?id=<?= $category['products'][0]['id'] ?>" 
-                             class="block h-full group relative overflow-hidden rounded-lg">
-                            <img src="/Ego_website/public/<?= $category['products'][0]['image_path'] ?>" 
-                                 alt="<?= htmlspecialchars($category['products'][0]['name']) ?>"
-                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                            <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300"></div>
-                            <div class="absolute bottom-4 left-4 text-white">
-                              <h3 class="text-2xl font-bold"><?= htmlspecialchars($category['name']) ?></h3>
-                              <p class="text-lg"><?= htmlspecialchars($category['products'][0]['name']) ?></p>
-                              <p class="text-xl font-semibold">$<?= number_format($category['products'][0]['base_price'], 2) ?></p>
+                <div class="flex flex-col lg:flex-row gap-8 lg:gap-12 items-stretch lg:h-[540px]">
+                  <?php 
+                  $categoryImage = !empty($category['image'])
+                    ? PUBLIC_URL . $category['image']
+                    : PUBLIC_URL . 'assets/images/placeholder.jpg';
+                  $products = !empty($category['products']) ? array_slice($category['products'], 0, 4) : [];
+                  ?>
+                  <!-- Left: Category image -->
+                  <div class="w-full lg:w-1/2 max-w-md mx-auto lg:mx-0 flex flex-col">
+                    <a href="category.php?id=<?= $category['id'] ?>" class="relative overflow-hidden bg-gray-100 group h-[320px] sm:h-[420px] lg:h-full block">
+                      <img src="<?= $categoryImage ?>" 
+                           alt="<?= htmlspecialchars($category['name']) ?>"
+                           class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]">
+                    </a>
+                    <a href="category.php?id=<?= $category['id'] ?>" class="mt-4 text-xl lg:text-3xl text-gray-900 tracking-wide text-start hover:text-brand transition-colors">
+                      <?= htmlspecialchars($category['name']) ?>
+                    </a>
+                  </div>
+
+                  <!-- Right: Product grid -->
+                  <div class="w-full lg:w-1/2 flex">
+                    <?php if (!empty($products)): ?>
+                      <div class="grid grid-cols-2 grid-rows-2 gap-4 lg:gap-4 w-full">
+                        <?php foreach ($products as $product): ?>
+                          <a href="product.php?id=<?= $product['id'] ?>" class="group flex flex-col h-full">
+                            <div class="relative overflow-hidden bg-gray-100 w-full h-72 sm:h-72 md:h-80">
+                              <img src="<?= PUBLIC_URL ?><?= $product['image_path'] ?>" 
+                                   alt="<?= htmlspecialchars($product['name']) ?>"
+                                   class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]">
                             </div>
+                            <h4 class="mt-3 text-xl lg:text-xl text-gray-900 font-medium leading-snug text-start">
+                              <?= htmlspecialchars($product['name']) ?>
+                            </h4>
+                            <p class="mt-1 text-xl lg:text-xl font-semibold text-brand text-start">
+                              $<?= number_format($product['base_price'], 0) ?>
+                            </p>
                           </a>
-                        </div>
-                        
-                        <!-- Small products (remaining) -->
-                        <?php for($i = 1; $i < min(4, count($category['products'])); $i++): ?>
-                          <div class="col-span-1">
-                            <a href="product.php?id=<?= $category['products'][$i]['id'] ?>" 
-                               class="block h-full group relative overflow-hidden rounded-lg">
-                              <img src="/Ego_website/public/<?= $category['products'][$i]['image_path'] ?>" 
-                                   alt="<?= htmlspecialchars($category['products'][$i]['name']) ?>"
-                                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                              <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300"></div>
-                              <div class="absolute bottom-2 left-2 text-white">
-                                <p class="text-sm font-medium"><?= htmlspecialchars($category['products'][$i]['name']) ?></p>
-                                <p class="text-sm font-semibold">$<?= number_format($category['products'][$i]['base_price'], 2) ?></p>
-                              </div>
-                            </a>
-                          </div>
-                        <?php endfor; ?>
+                        <?php endforeach; ?>
                       </div>
                     <?php else: ?>
-                      <!-- Layout 2: 3 small left, Large image right -->
-                      <div class="grid grid-cols-3 gap-4 h-[500px]">
-                        <!-- Small products (first 3) -->
-                        <?php for($i = 1; $i < min(4, count($category['products'])); $i++): ?>
-                          <div class="col-span-1">
-                            <a href="product.php?id=<?= $category['products'][$i]['id'] ?>" 
-                               class="block h-full group relative overflow-hidden rounded-lg">
-                              <img src="/Ego_website/public/<?= $category['products'][$i]['image_path'] ?>" 
-                                   alt="<?= htmlspecialchars($category['products'][$i]['name']) ?>"
-                                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                              <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300"></div>
-                              <div class="absolute bottom-2 left-2 text-white">
-                                <p class="text-sm font-medium"><?= htmlspecialchars($category['products'][$i]['name']) ?></p>
-                                <p class="text-sm font-semibold">$<?= number_format($category['products'][$i]['base_price'], 2) ?></p>
-                              </div>
-                            </a>
-                          </div>
-                        <?php endfor; ?>
-                        
-                        <!-- Large product (first) -->
-                        <div class="col-span-2 row-span-2">
-                          <a href="product.php?id=<?= $category['products'][0]['id'] ?>" 
-                             class="block h-full group relative overflow-hidden rounded-lg">
-                            <img src="/Ego_website/public/<?= $category['products'][0]['image_path'] ?>" 
-                                 alt="<?= htmlspecialchars($category['products'][0]['name']) ?>"
-                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                            <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300"></div>
-                            <div class="absolute bottom-4 right-4 text-white text-right">
-                              <h3 class="text-2xl font-bold"><?= htmlspecialchars($category['name']) ?></h3>
-                              <p class="text-lg"><?= htmlspecialchars($category['products'][0]['name']) ?></p>
-                              <p class="text-xl font-semibold">$<?= number_format($category['products'][0]['base_price'], 2) ?></p>
-                            </div>
-                          </a>
-                        </div>
-                      </div>
+                      <p class="text-gray-400">No products available in this category right now.</p>
                     <?php endif; ?>
-                  <?php else: ?>
-                    <!-- No products in this category -->
-                    <div class="h-[500px] flex items-center justify-center bg-gray-200 rounded-lg">
-                      <div class="text-center text-gray-500">
-                        <h3 class="text-2xl font-bold mb-2"><?= htmlspecialchars($category['name']) ?></h3>
-                        <p>No products available</p>
-                      </div>
-                    </div>
-                  <?php endif; ?>
+                  </div>
                 </div>
               </div>
             <?php endforeach; ?>
           <?php else: ?>
             <!-- No categories available -->
             <div class="swiper-slide">
-              <div class="h-[500px] flex items-center justify-center bg-gray-200 rounded-lg">
+              <div class="h-96 flex items-center justify-center bg-gray-100 rounded-lg">
                 <div class="text-center text-gray-500">
                   <p class="text-lg">No collections available at the moment.</p>
                 </div>
@@ -118,23 +83,23 @@ if (!isset($categoriesWithProducts) || !is_array($categoriesWithProducts)) {
       </div>
       
       <!-- Navigation Arrows -->
-      <div class="collections-nav absolute top-1/2 transform -translate-y-1/2 left-4 z-10">
-        <button class="collections-prev bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-300">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="hidden lg:block collections-nav absolute top-1/2 transform -translate-y-1/2 -left-4 z-10">
+        <button class="collections-prev bg-white hover:bg-gray-50 shadow-lg rounded-full p-3 transition-all duration-300 hover:scale-110">
+          <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
           </svg>
         </button>
       </div>
-      <div class="collections-nav absolute top-1/2 transform -translate-y-1/2 right-4 z-10">
-        <button class="collections-next bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all duration-300">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="hidden lg:block collections-nav absolute top-1/2 transform -translate-y-1/2 -right-4 z-10">
+        <button class="collections-next bg-white hover:bg-gray-50 shadow-lg rounded-full p-3 transition-all duration-300 hover:scale-110">
+          <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
           </svg>
         </button>
       </div>
       
-      <!-- Pagination Dots -->
-      <div class="collections-pagination flex justify-center mt-8 space-x-2"></div>
+      <!-- Pagination Dots (Hidden on mobile, visible on desktop) -->
+      <div class="collections-pagination hidden lg:flex justify-center mt-8 space-x-2"></div>
     </div>
   </div>
 </section>

@@ -1,6 +1,6 @@
 <?php 
-
-    require_once __DIR__ . '/../models/User.php';
+    require_once __DIR__ . '/../config/path.php';
+    require_once MODELS . 'User.php';
     class UserController{
 
         public function listUsers(){
@@ -185,6 +185,36 @@
                 
                 return ['status' => 'success', 'message' => 'Logged out successfully'];
             } catch(Exception $e) {
+                return ['status' => 'error', 'message' => 'Server error: ' . $e->getMessage()];
+            }
+        }
+
+        public function adminLogin() {
+            $email = trim($_POST['email'] ?? '');
+            $password = trim($_POST['password'] ?? '');
+
+            if ($email === '' || $password === '') {
+                return ['status' => 'error', 'message' => 'All fields are required'];
+            }
+
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                return ['status' => 'error', 'message' => 'Invalid email address'];
+            }
+
+            try {
+                $user = User::verifyLogin($email, $password);
+
+                if ($user && in_array($user['role'], ['admin', 'super_admin'])) {
+                    $_SESSION['user_id'] = $user['id'];
+                    $_SESSION['user_name'] = $user['name'];
+                    $_SESSION['user_email'] = $user['email'];
+                    $_SESSION['role'] = $user['role'];
+                    
+                    return ['status' => 'success', 'message' => 'Login successful', 'redirect' => 'index.php?action=dashboard'];
+                } else {
+                    return ['status' => 'error', 'message' => 'Invalid credentials or insufficient permissions'];
+                }
+            } catch (Exception $e) {
                 return ['status' => 'error', 'message' => 'Server error: ' . $e->getMessage()];
             }
         }

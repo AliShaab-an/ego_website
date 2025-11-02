@@ -7,17 +7,16 @@
     require_once CORE . 'Session.php';
     require_once CORE . 'Helper.php';
     
-    
-    Session::configure(900,'/Ego_website/public/admin/login.php');
+    // Set session timeout to 15 minutes (900 seconds) for admin panel
+    Session::configure(900, url('admin/login.php'), false);
     Session::startSession();
 
     $adminController = new AdminController();
 
     $action = $_GET['action'] ?? 'dashboard';
 
-    // Handle actions that require redirects BEFORE any HTML output
     if ($action === 'logout') {
-        ob_end_clean(); // Clear any output buffer before redirect
+        ob_end_clean(); 
         $adminController->logout();
         exit;
     }
@@ -31,6 +30,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="image/png" href="<?= IMG_PATH ?>egologo.png">
         <link rel="stylesheet" href="<?= CSS_PATH ?>/style.css">
         <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css'>
         <script src="<?= ADMIN_JS_PATH ?>chart.umd.min.js"></script>
@@ -45,9 +45,6 @@
                 
                 <?php 
                     switch($action){
-                        case 'login':
-                            $adminController->login();
-                            break;
                         case 'dashboard':
                             $adminController->dashboard();
                             break;
@@ -79,6 +76,9 @@
                             break;
                         case 'Newsletter':
                             $adminController->newsletterPage();
+                            break;
+                        case 'ContactMessages':
+                            $adminController->contactMessagesPage();
                             break;
                         default:
                             echo "<h1 class='text-2xl font-bold'>404 - Page not found</h1>";

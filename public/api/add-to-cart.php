@@ -3,7 +3,7 @@
     require_once CORE . 'Session.php';
     require_once CONT . "CartController.php";
     
-    Session::configure(1800,'/Ego_website/public/index.php');
+    Session::configure(1800, url('index.php'));
     Session::startSession();
 
     header('Content-Type: application/json');

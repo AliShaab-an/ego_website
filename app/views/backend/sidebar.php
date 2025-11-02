@@ -18,6 +18,7 @@
                         Helper::sidebarLink("ShippingFees", $action, "Shipping Fees","fa-truck-fast");
                         Helper::sidebarLink("Coupons", $action, "Coupons","fa-ticket");
                         Helper::sidebarLink("Newsletter", $action, "Newsletter","fa-envelope");
+                        Helper::sidebarLink("ContactMessages", $action, "Contact Messages","fa-message");
                     ?>
                 </nav>
                 

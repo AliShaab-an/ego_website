@@ -4,7 +4,7 @@ require_once __DIR__ . '/../core/DB.php';
 
 class Newsletter {
     
-    public static function subscribe($name, $email, $userId = null) {
+    public static function subscribe($name, $email) {
         try {
             // Validate input
             if (empty(trim($name))) {
@@ -22,13 +22,12 @@ class Newsletter {
                 throw new Exception("This email is already subscribed to our newsletter.");
             }
             
-            $sql = "INSERT INTO newsletter_subscriptions (name, email, user_id, subscribed_at) 
-                    VALUES (?, ?, ?, NOW())";
+            $sql = "INSERT INTO newsletter_subscribers (name, email, created_at) 
+                    VALUES (?, ?, NOW())";
             
             DB::query($sql, [
                 trim($name),
-                trim($email),
-                $userId
+                trim($email)
             ]);
             
             return DB::getConnection()->lastInsertId();
@@ -39,7 +38,7 @@ class Newsletter {
     
     public static function emailExists($email) {
         try {
-            $sql = "SELECT id FROM newsletter_subscriptions WHERE email = ? AND status = 'active'";
+            $sql = "SELECT id FROM newsletter_subscribers WHERE email = ? AND is_active = 1";
             $stmt = DB::query($sql, [$email]);
             return $stmt->fetch(PDO::FETCH_ASSOC) !== false;
         } catch (Exception $e) {
@@ -55,56 +54,61 @@ class Newsletter {
             $whereClause = "";
             $params = [];
             
-            if ($status !== 'all') {
-                $whereClause = "WHERE ns.status = ?";
-                $params[] = $status;
+            if ($status === 'active') {
+                $whereClause = "WHERE is_active = 1";
+            } elseif ($status === 'inactive') {
+                $whereClause = "WHERE is_active = 0";
             }
             
-            $sql = "SELECT ns.*, u.username 
-                    FROM newsletter_subscriptions ns
-                    LEFT JOIN users u ON ns.user_id = u.id
+            $sql = "SELECT * FROM newsletter_subscribers 
                     $whereClause
-                    ORDER BY ns.subscribed_at DESC 
+                    ORDER BY created_at DESC 
                     LIMIT $limit OFFSET $offset";
                     
             $stmt = DB::query($sql, $params);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
-            throw new Exception("Failed to fetch newsletter subscriptions: " . $e->getMessage());
+            throw new Exception("Failed to fetch newsletter subscribers: " . $e->getMessage());
         }
     }
     
     public static function getById($id) {
         try {
-            $sql = "SELECT ns.*, u.username 
-                    FROM newsletter_subscriptions ns
-                    LEFT JOIN users u ON ns.user_id = u.id
-                    WHERE ns.id = ?";
-                    
+            $sql = "SELECT * FROM newsletter_subscribers WHERE id = ?";
             $stmt = DB::query($sql, [$id]);
             return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
-            throw new Exception("Failed to fetch newsletter subscription: " . $e->getMessage());
+            throw new Exception("Failed to fetch newsletter subscriber: " . $e->getMessage());
         }
     }
     
-    public static function unsubscribe($id) {
+    public static function activate($id) {
         try {
-            $sql = "UPDATE newsletter_subscriptions SET status = 'unsubscribed', updated_at = NOW() WHERE id = ?";
+            $sql = "UPDATE newsletter_subscribers SET is_active = 1 WHERE id = ?";
             DB::query($sql, [$id]);
             return true;
         } catch (Exception $e) {
-            throw new Exception("Failed to unsubscribe: " . $e->getMessage());
+            throw new Exception("Failed to activate subscriber: " . $e->getMessage());
         }
     }
     
-    public static function resubscribe($id) {
+    public static function deactivate($id) {
         try {
-            $sql = "UPDATE newsletter_subscriptions SET status = 'active', updated_at = NOW() WHERE id = ?";
+            $sql = "UPDATE newsletter_subscribers SET is_active = 0 WHERE id = ?";
             DB::query($sql, [$id]);
             return true;
         } catch (Exception $e) {
-            throw new Exception("Failed to resubscribe: " . $e->getMessage());
+            throw new Exception("Failed to deactivate subscriber: " . $e->getMessage());
+        }
+    }
+    
+    public static function delete($id) {
+        try {
+            $sql = "DELETE FROM newsletter_subscribers WHERE id = ?";
+            DB::query($sql, [$id]);
+            return true;
+        } catch (Exception $e) {
+            throw new Exception("Failed to delete subscriber: " . $e->getMessage());
         }
     }
     
@@ -113,16 +117,17 @@ class Newsletter {
             $whereClause = "";
             $params = [];
             
-            if ($status !== 'all') {
-                $whereClause = "WHERE status = ?";
-                $params[] = $status;
+            if ($status === 'active') {
+                $whereClause = "WHERE is_active = 1";
+            } elseif ($status === 'inactive') {
+                $whereClause = "WHERE is_active = 0";
             }
             
-            $stmt = DB::query("SELECT COUNT(*) AS count FROM newsletter_subscriptions $whereClause", $params);
+            $stmt = DB::query("SELECT COUNT(*) AS count FROM newsletter_subscribers $whereClause", $params);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             return (int)$row['count'];
         } catch (Exception $e) {
-            throw new Exception("Failed to count newsletter subscriptions: " . $e->getMessage());
+            throw new Exception("Failed to count newsletter subscribers: " . $e->getMessage());
         }
     }
     
@@ -130,25 +135,25 @@ class Newsletter {
         return self::countAll('active');
     }
     
-    public static function countUnsubscribed() {
-        return self::countAll('unsubscribed');
+    public static function countInactive() {
+        return self::countAll('inactive');
     }
     
-    public static function getAllForExport($status = 'active') {
+    public static function getAllForExport($status = 'all') {
         try {
             $whereClause = "";
             $params = [];
             
-            if ($status !== 'all') {
-                $whereClause = "WHERE ns.status = ?";
-                $params[] = $status;
+            if ($status === 'active') {
+                $whereClause = "WHERE is_active = 1";
+            } elseif ($status === 'inactive') {
+                $whereClause = "WHERE is_active = 0";
             }
             
-            $sql = "SELECT ns.name, ns.email, ns.status, ns.subscribed_at, u.username as registered_user
-                    FROM newsletter_subscriptions ns
-                    LEFT JOIN users u ON ns.user_id = u.id
+            $sql = "SELECT name, email, is_active, created_at
+                    FROM newsletter_subscribers 
                     $whereClause
-                    ORDER BY ns.subscribed_at DESC";
+                    ORDER BY created_at DESC";
                     
             $stmt = DB::query($sql, $params);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -158,16 +163,15 @@ class Newsletter {
     }
     
     public static function generateCSV($data) {
-        $csv = "Name,Email,Status,Subscribed Date,Registered User\n";
+        $csv = "Name,Email,Status,Subscribed Date\n";
         
         foreach ($data as $row) {
             $csv .= sprintf(
-                '"%s","%s","%s","%s","%s"' . "\n",
+                '"%s","%s","%s","%s"' . "\n",
                 str_replace('"', '""', $row['name']),
                 str_replace('"', '""', $row['email']),
-                $row['status'],
-                date('Y-m-d H:i:s', strtotime($row['subscribed_at'])),
-                $row['registered_user'] ? 'Yes (' . str_replace('"', '""', $row['registered_user']) . ')' : 'No'
+                $row['is_active'] ? 'Active' : 'Inactive',
+                date('Y-m-d H:i:s', strtotime($row['created_at']))
             );
         }
         

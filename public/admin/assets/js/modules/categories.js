@@ -2,6 +2,7 @@ import { ajaxRequest } from "../utils/ajax.js";
 import { showToast } from "../utils/messages.js";
 import { openModal, closeModal } from "../utils/modal.js";
 import { Loader } from "../utils/loader.js";
+import Config from "../../../../assets/js/config.js";
 
 let currentPage = 1;
 const limit = 5;
@@ -81,7 +82,7 @@ const Categories = {
         if (res.status === "success" && res.data?.length) {
           res.data.forEach((cat, i) => {
             // Handle both old and new image path formats
-            let imageSrc = `/Ego_website/public/${cat.image}`;
+            let imageSrc = Config.getAssetUrl(cat.image);
 
             const imageCell = cat.image
               ? `<img src="${imageSrc}" alt="${cat.name}" class="w-12 h-12 object-cover rounded mx-auto">`
@@ -204,10 +205,10 @@ const Categories = {
       let imageSrc = "";
       if (image.startsWith("admin/uploads/")) {
         // New format: admin/uploads/categories/filename.jpg
-        imageSrc = `/Ego_website/public/${image}`;
+        imageSrc = Config.getAssetUrl(image);
       } else {
         // Old format: just filename.jpg (backward compatibility)
-        imageSrc = `/Ego_website/public/admin/uploads/${image}`;
+        imageSrc = Config.getAssetUrl(`admin/uploads/${image}`);
       }
 
       imageBox

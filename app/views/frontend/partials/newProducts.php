@@ -13,7 +13,7 @@ if (!isset($newProducts) || !is_array($newProducts)) {
                 <a href="product.php?id=<?= $product['id'] ?>" 
                    class="group block bg-white overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300">
                     <div class="w-full h-48 md:h-80 overflow-hidden">
-                        <img src="/Ego_website/public/<?= $product['image_path'] ?>" 
+                        <img src="<?= PUBLIC_URL ?><?= $product['image_path'] ?>" 
                              alt="<?= htmlspecialchars($product['name']) ?>" 
                              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
                     </div>

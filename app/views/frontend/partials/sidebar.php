@@ -9,25 +9,20 @@
   </div>
 
   <!-- Navigation -->
-  <nav class="px-4 space-y-2 text-start">
+  <nav class="px-4 space-y-2 text-start" id="mobileNav">
     <a href="index.php" class="block py-2 border-b font-semibold">Home</a>
     <a href="shop.php" class="block py-2 border-b font-semibold">Shop</a>
 
-    <!-- Dropdown -->
-    <div>
-      <button id="toggleCategories"
-              class="flex items-center justify-between w-full py-2 border-b">
+    <!-- Categories with Arrow -->
+    <div class="border-b">
+      <button class="mobile-categories-toggle w-full flex items-center justify-between py-2">
         <span class="font-semibold">Categories</span>
-        <span id="arrow" class="ml-2">▼</span>
+        <i class="fas fa-chevron-down text-xs transition-transform duration-300"></i>
       </button>
-
-      <div id="categoriesMenu" class="hidden pl-4 space-y-2">
-        <a href="#" class="block py-2 border-b font-thin">Jeans</a>
-        <a href="#" class="block py-2 border-b font-thin">Sets</a>
-        <a href="#" class="block py-2 border-b font-thin">Tops</a>
-        <a href="#" class="block py-2 border-b font-thin">Coats</a>
-      </div>
     </div>
+    
+    <!-- Categories Dropdown - Will be populated by JavaScript -->
+    <div class="mobile-categories-dropdown hidden" id="mobileCategoriesDropdown"></div>
 
     <a href="contact.php" class="block py-2 border-b font-semibold">Contact us</a>
   </nav>

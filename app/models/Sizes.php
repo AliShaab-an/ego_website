@@ -15,6 +15,15 @@
             }
         }
 
+        public static function getAll() {
+            try{
+                $stmt = DB::query("SELECT * FROM sizes ORDER BY id DESC");
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            }catch(PDOException $e){
+                throw new Exception("Failed to fetch all sizes: " . $e->getMessage());
+            }
+        }
+
 
         public static function countAll() {
             try{

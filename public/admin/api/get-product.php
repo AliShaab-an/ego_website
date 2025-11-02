@@ -1,5 +1,6 @@
 <?php
-    require_once __DIR__ . "/../../../app/controllers/admin/ProductAdminController.php";
+    require_once __DIR__ . '/../../../app/config/path.php';
+    require_once CONT . "/admin/ProductAdminController.php";
 
     header('Content-Type: application/json');
 

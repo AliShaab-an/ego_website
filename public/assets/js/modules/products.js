@@ -1,5 +1,6 @@
 import { ajaxRequest } from "../utils/ajax.js";
 import { showLoader, hideLoader } from "../utils/loader.js";
+import Config from "../config.js";
 
 const Products = {
   currentPage: 1,
@@ -83,7 +84,9 @@ const Products = {
     `);
 
     ajaxRequest({
-      url: `/Ego_website/public/api/list-products.php?page=${page}&limit=${this.limit}`,
+      url: Config.getApiUrl(
+        `list-products.php?page=${page}&limit=${this.limit}`
+      ),
       type: "GET",
       data: filters,
       success: (res) => {
@@ -94,18 +97,40 @@ const Products = {
           $("#totalCount").text(res.total);
           $("#showingCount").text(res.data.length);
           res.data.forEach((p) => {
+            // Build price display with discount if applicable
+            let priceHtml = "";
+            if (p.discount_active && p.discount_percentage > 0) {
+              const discountedPrice =
+                p.base_price * (1 - p.discount_percentage / 100);
+              priceHtml = `
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-brand font-bold">$${discountedPrice.toFixed(
+                    2
+                  )}</span>
+                  <span class="text-gray-500 text-sm line-through">$${Number(
+                    p.base_price
+                  ).toFixed(2)}</span>
+                  <span class="bg-red-500 text-white px-1.5 py-0.5 rounded text-xs font-semibold">-${Math.round(
+                    p.discount_percentage
+                  )}%</span>
+                </div>
+              `;
+            } else {
+              priceHtml = `<p class="text-brand font-bold">$${Number(
+                p.base_price
+              ).toFixed(2)}</p>`;
+            }
+
             container.append(`
               <a href="product.php?id=${p.id}" class="flex flex-col group">
                 <div class="md:w-full md:h-96 overflow-hidden">
-                  <img src="/Ego_website/public/${p.image_path}" 
+                  <img src="${Config.getAssetUrl(p.image_path)}" 
                        alt="${p.name}" 
                        loading="lazy" 
                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                 </div>
                 <p class="mt-2 text-gray-600 text-lg">${p.name}</p>
-                <p class="text-brand font-bold">$${Number(p.base_price).toFixed(
-                  2
-                )}</p>
+                ${priceHtml}
               </a>
             `);
           });
@@ -146,7 +171,6 @@ const Products = {
         }
       },
       error: (xhr) => {
-        console.error(xhr.responseText);
         container.html(`
           <div class="col-span-full w-full text-center">
             <p class="text-center text-red-500 py-10">Error loading products. Please try again.</p>
@@ -172,7 +196,6 @@ const Products = {
     const categoryId = $("body").data("category-id");
 
     if (!categoryId) {
-      console.error("No category ID found");
       return;
     }
 
@@ -188,7 +211,9 @@ const Products = {
       </div>
     `);
 
-    const apiUrl = `/Ego_website/public/api/list-products.php?page=${page}&limit=${this.categoryLimit}&category=${categoryId}`;
+    const apiUrl = Config.getApiUrl(
+      `list-products.php?page=${page}&limit=${this.categoryLimit}&category=${categoryId}`
+    );
 
     ajaxRequest({
       url: apiUrl,
@@ -201,18 +226,40 @@ const Products = {
           $("#totalCount").text(res.total);
           $("#showingCount").text(res.data.length);
           res.data.forEach((p) => {
+            // Build price display with discount if applicable
+            let priceHtml = "";
+            if (p.discount_active && p.discount_percentage > 0) {
+              const discountedPrice =
+                p.base_price * (1 - p.discount_percentage / 100);
+              priceHtml = `
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-brand font-bold">$${discountedPrice.toFixed(
+                    2
+                  )}</span>
+                  <span class="text-gray-500 text-sm line-through">$${Number(
+                    p.base_price
+                  ).toFixed(2)}</span>
+                  <span class="bg-red-500 text-white px-1.5 py-0.5 rounded text-xs font-semibold">-${Math.round(
+                    p.discount_percentage
+                  )}%</span>
+                </div>
+              `;
+            } else {
+              priceHtml = `<p class="text-brand font-bold">$${Number(
+                p.base_price
+              ).toFixed(2)}</p>`;
+            }
+
             container.append(`
               <a href="product.php?id=${p.id}" class="flex flex-col group">
                 <div class="md:w-full md:h-96 overflow-hidden">
-                  <img src="/Ego_website/public/${p.image_path}" 
+                  <img src="${Config.getAssetUrl(p.image_path)}" 
                        alt="${p.name}" 
                        loading="lazy" 
                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                 </div>
                 <p class="mt-2 text-gray-600 text-lg">${p.name}</p>
-                <p class="text-brand font-bold">$${Number(p.base_price).toFixed(
-                  2
-                )}</p>
+                ${priceHtml}
               </a>
             `);
           });
@@ -272,7 +319,6 @@ const Products = {
         }
       },
       error: (xhr) => {
-        console.error(xhr.responseText);
         container.html(`
           <div class="col-span-full w-full text-center">
             <p class="text-center text-red-500 py-10">Error loading products. Please try again.</p>
@@ -285,7 +331,7 @@ const Products = {
   loadFilters() {
     // Load categories
     ajaxRequest({
-      url: "/Ego_website/public/admin/api/list-categories.php",
+      url: Config.getApiUrl("list-categories.php"),
       type: "GET",
       success: (res) => {
         const container = $("#categoryFilters").empty();
@@ -308,7 +354,7 @@ const Products = {
 
     // Load colors
     ajaxRequest({
-      url: "/Ego_website/public/admin/api/list-colors.php",
+      url: Config.getAdminApiUrl("list-colors.php"),
       type: "GET",
       success: (res) => {
         const container = $("#colorFilters").empty();
@@ -333,7 +379,7 @@ const Products = {
 
     // Load sizes
     ajaxRequest({
-      url: "/Ego_website/public/admin/api/list-sizes.php",
+      url: Config.getAdminApiUrl("list-sizes.php"),
       type: "GET",
       success: (res) => {
         const container = $("#sizeFilters").empty();

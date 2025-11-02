@@ -22,6 +22,21 @@
             }
         }
 
+        public function getProductsByCategoryName($categoryName, $limit = 8){
+            try{
+                require_once MODELS . 'Category.php';
+                $category = Category::findByName($categoryName);
+                
+                if (!$category) {
+                    return [];
+                }
+                
+                return Product::getAllProducts($limit, 0, ['categories' => [$category['id']]]);
+            }catch(Exception $e){
+                return [];
+            }
+        }
+
         public function listProducts() {
             try{
                 // Debug logging
@@ -67,7 +82,7 @@
             $productData = Product::getProductById($id);
 
             if(!$productData){
-                header("Location: /Ego_website/public/404.php");
+                header("Location: " . url('404.php'));
                 exit;
             }
 
@@ -76,6 +91,8 @@
                 'name' => $productData[0]['name'],
                 'description' => $productData[0]['description'],
                 'base_price' => $productData[0]['base_price'],
+                'discount_percentage' => $productData[0]['discount_percentage'] ?? 0,
+                'discount_active' => $productData[0]['discount_active'] ?? 0,
                 'images' => [],
                 'variants' => []
             ];

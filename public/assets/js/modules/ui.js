@@ -105,8 +105,8 @@ const UI = {
         slides.forEach((_, i) => {
           const dot = document.createElement("div");
           dot.className =
-            "w-2.5 h-2.5 rounded-full bg-gray-400 opacity-50 transition";
-          if (i === 0) dot.classList.add("bg-brand", "opacity-100");
+            "w-2.5 h-2.5 rounded-full bg-brand opacity-30 transition";
+          if (i === 0) dot.classList.add("opacity-100");
           dotsContainer.appendChild(dot);
         });
       }
@@ -116,8 +116,8 @@ const UI = {
         const dots = dotsContainer.querySelectorAll("div");
         dots.forEach((dot, i) => {
           dot.className =
-            "w-2.5 h-2.5 rounded-full transition " +
-            (i === index ? "bg-brand opacity-100" : "bg-gray-400 opacity-50");
+            "w-2.5 h-2.5 rounded-full bg-brand transition " +
+            (i === index ? "opacity-100" : "opacity-30");
         });
       };
 

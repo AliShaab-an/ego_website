@@ -5,7 +5,11 @@
     class Colors{
 
         public static function getAllColors(){
-            return DB::query("SELECT * FROM colors ORDER BY name ASC")-> fetchAll();
+            try{
+                return DB::query("SELECT * FROM colors ORDER BY name ASC")-> fetchAll(PDO::FETCH_ASSOC);
+            }catch(PDOException $e){
+                throw new Exception("Failed to fetch colors: " . $e->getMessage());
+            }
         }
 
         public static function getPaginated($limit, $offset) {

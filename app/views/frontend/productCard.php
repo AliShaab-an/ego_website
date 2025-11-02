@@ -54,7 +54,7 @@
       <div class="hidden md:flex flex-col gap-4 w-24 order-1">
         <?php foreach($product['images'] as $img): ?>
           <img 
-            src="/Ego_website/public/<?= $img ?>" 
+            src="<?= PUBLIC_URL ?><?= $img ?>" 
             loading="lazy"
             class="thumbnail-image cursor-pointer hover:ring-2 hover:ring-brand transition-all rounded">
         <?php endforeach; ?>
@@ -65,7 +65,7 @@
         <img 
             id="mainImage" 
             loading="lazy"
-            src="/Ego_website/public/<?= $product['images'][0] ?>" 
+            src="<?= PUBLIC_URL ?><?= $product['images'][0] ?>" 
             alt="<?= htmlspecialchars($product['name']) ?>"
             class="w-full h-full object-cover rounded"/>
       </div>
@@ -76,7 +76,7 @@
       <?php foreach($product['images'] as $img): ?>
           <img 
             loading="lazy"
-            src="/Ego_website/public/<?= $img ?>" 
+            src="<?= PUBLIC_URL ?><?= $img ?>" 
             class="thumbnail-image cursor-pointer hover:ring-2 hover:ring-brand transition-all rounded"/>
         <?php endforeach; ?>
     </div>
@@ -199,65 +199,3 @@
     </div>
   </div> <!-- End of productContent -->
 </section>
-
-        // Basic validation
-        if (!selectedSize) {
-            alert('Please select a size');
-            return;
-        }
-        if (!selectedColor) {
-            alert('Please select a color');
-            return;
-        }
-
-        // Prepare form data
-        const formData = new FormData();
-        formData.append('productId', productId);
-        formData.append('size', selectedSize);
-        formData.append('color', selectedColor);
-        formData.append('quantity', quantity);
-
-        // Show loading state
-        const $button = $(this);
-        const originalText = $button.text();
-        $button.text('Adding...').prop('disabled', true);
-
-        // Send AJAX request
-        $.ajax({
-            url: '/Ego_website/public/api/add-to-cart.php',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            dataType: 'json',
-            success: function(response) {
-                if (response.success) {
-                    // Update cart count
-                    updateCartCount();
-                    
-                    // Show success message
-                    showCartMessage(response.message, 'success');
-                    
-                    // Reset button
-                    $button.text('Added to Cart!').removeClass('bg-brand').addClass('bg-green-500');
-                    
-                    // Reset after 2 seconds
-                    setTimeout(() => {
-                        $button.text(originalText).removeClass('bg-green-500').addClass('bg-brand').prop('disabled', false);
-                    }, 2000);
-                } else {
-                    showCartMessage(response.message || 'Failed to add item to cart', 'error');
-                    $button.text(originalText).prop('disabled', false);
-                }
-            },
-            error: function() {
-                showCartMessage('Server error. Please try again.', 'error');
-                $button.text(originalText).prop('disabled', false);
-            }
-        });
-    });
-
-    // Update cart count on page load
-    updateCartCount();
-});
-</script>

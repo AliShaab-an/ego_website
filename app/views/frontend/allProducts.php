@@ -11,7 +11,7 @@ if (!isset($products) || !is_array($products)) {
         <i class="fi fi-rr-angle-small-right text-lg mt-2"></i>
       </div>
       
-      <p class="text-gray-600">Showing <span id="productsCount"><?= count($products['products']); ?></span> out of <span id="totalProducts"><?= $products['totalProducts']; ?></span> results</p>
+      <p class="text-gray-600">Showing <span id="showingCount">0</span> out of <span id="totalCount">0</span> results</p>
     </div>
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 p-8 text-start" id="productsContainer">
     <?php if (!empty($products['products'])): ?>
@@ -19,7 +19,7 @@ if (!isset($products) || !is_array($products)) {
         <a href="product.php?id=<?= $product['id'] ?>" 
             class="flex flex-col group">
           <div class="md:w-full md:h-96 overflow-hidden">
-            <img src="/Ego_website/public/<?= $product['image_path'] ?>" 
+            <img src="<?= PUBLIC_URL ?><?= $product['image_path'] ?>" 
                   alt="<?= htmlspecialchars($product['name']) ?>" 
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
           </div>

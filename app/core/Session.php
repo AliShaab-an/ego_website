@@ -12,11 +12,26 @@
 
         public static function startSession(){
             if(session_status() == PHP_SESSION_NONE){
+                // Set PHP's session garbage collection lifetime to match our timeout
+                ini_set('session.gc_maxlifetime', self::$timeout);
+                // Also set the session cookie lifetime
+                ini_set('session.cookie_lifetime', self::$timeout);
+                
                 // Configure session cookie parameters for browser-session-only if needed
                 if(self::$browserSessionOnly) {
                     // Set session cookie to expire when browser closes (lifetime = 0)
                     session_set_cookie_params([
                         'lifetime' => 0, // Session cookie (expires when browser closes)
+                        'path' => '/',
+                        'domain' => '',
+                        'secure' => false, // Set to true if using HTTPS
+                        'httponly' => true,
+                        'samesite' => 'Lax'
+                    ]);
+                } else {
+                    // Set session cookie to expire after timeout period
+                    session_set_cookie_params([
+                        'lifetime' => self::$timeout,
                         'path' => '/',
                         'domain' => '',
                         'secure' => false, // Set to true if using HTTPS

@@ -1,4 +1,5 @@
 import { ajaxRequest } from "../utils/ajax.js";
+import Config from "../config.js";
 
 const Categories = {
   categories: [],
@@ -18,7 +19,7 @@ const Categories = {
     // Mobile category dropdown (click)
     $(document).on("click", ".mobile-categories-toggle", (e) => {
       e.preventDefault();
-      this.toggleDropdown(".mobile-categories-dropdown");
+      this.toggleDropdown("#mobileCategoriesDropdown");
     });
 
     // Close dropdown when clicking outside
@@ -31,7 +32,7 @@ const Categories = {
 
   loadCategories() {
     ajaxRequest({
-      url: "/Ego_website/public/admin/api/list-categories.php",
+      url: Config.getApiUrl("list-categories.php"),
       type: "GET",
       success: (res) => {
         if (res.status === "success" && res.data?.length) {
@@ -41,7 +42,7 @@ const Categories = {
         }
       },
       error: (xhr) => {
-        console.error("Failed to load categories:", xhr.responseText);
+        console.error("Error loading categories:", xhr);
       },
     });
   },
@@ -79,64 +80,66 @@ const Categories = {
   },
 
   renderMobileDropdown() {
-    const mobileDropdownHtml = `
-      <div class="mobile-categories-dropdown hidden">
-        ${this.categories
-          .map(
-            (cat) => `
-          <a href="category.php?id=${cat.id}" class="block py-2 pl-4 text-white hover:text-gray-300">
-            ${cat.name}
-          </a>
-        `
-          )
-          .join("")}
-      </div>
-    `;
+    const dropdown = $("#mobileCategoriesDropdown");
 
-    // Update mobile navigation
-    const mobileNav = $("#mobileNav");
-    const mobileCategoriesLink = mobileNav.find('a:contains("Categories")');
-    if (mobileCategoriesLink.length) {
-      mobileCategoriesLink.addClass(
-        "mobile-categories-toggle flex items-center justify-between"
-      );
-      mobileCategoriesLink.html(
-        'Categories <i class="fas fa-chevron-down text-xs"></i>'
-      );
-      mobileCategoriesLink.after(mobileDropdownHtml);
+    if (dropdown.length) {
+      dropdown.empty();
+
+      this.categories.forEach((cat) => {
+        const link = $(
+          `<a href="category.php?id=${cat.id}" class="block py-2 pl-4 text-gray-700 hover:text-brand transition-colors border-b">${cat.name}</a>`
+        );
+        dropdown.append(link);
+      });
     }
   },
 
   showDropdown(selector) {
     const dropdown = $(selector);
     dropdown.removeClass("hidden");
-    dropdown.prev().find(".fa-chevron-down").addClass("rotate-180");
+    // Find the toggle button and rotate its chevron
+    if (selector === ".mobile-categories-dropdown") {
+      $(".mobile-categories-toggle .fa-chevron-down").addClass("rotate-180");
+    } else {
+      dropdown.prev().find(".fa-chevron-down").addClass("rotate-180");
+    }
   },
 
   hideDropdown(selector) {
     const dropdown = $(selector);
     dropdown.addClass("hidden");
-    dropdown.prev().find(".fa-chevron-down").removeClass("rotate-180");
+    // Find the toggle button and un-rotate its chevron
+    if (selector === ".mobile-categories-dropdown") {
+      $(".mobile-categories-toggle .fa-chevron-down").removeClass("rotate-180");
+    } else {
+      dropdown.prev().find(".fa-chevron-down").removeClass("rotate-180");
+    }
   },
 
   toggleDropdown(selector) {
     const dropdown = $(selector);
     const isVisible = !dropdown.hasClass("hidden");
 
-    // Close all dropdowns first
     this.closeAllDropdowns();
 
-    // Toggle the clicked dropdown
     if (!isVisible) {
       dropdown.removeClass("hidden");
-      // Rotate chevron
-      dropdown.prev().find(".fa-chevron-down").addClass("rotate-180");
+
+      if (selector === "#mobileCategoriesDropdown") {
+        $(".mobile-categories-toggle .transform").addClass("rotate-180");
+      } else if (selector === ".mobile-categories-dropdown") {
+        $(".mobile-categories-toggle .transform").addClass("rotate-180");
+      } else {
+        dropdown.prev().find(".fa-chevron-down").addClass("rotate-180");
+      }
     }
   },
 
   closeAllDropdowns() {
-    $(".categories-dropdown, .mobile-categories-dropdown").addClass("hidden");
-    $(".fa-chevron-down").removeClass("rotate-180");
+    $(
+      ".categories-dropdown, .mobile-categories-dropdown, #mobileCategoriesDropdown"
+    ).addClass("hidden");
+    $(".fa-chevron-down, .transform").removeClass("rotate-180");
   },
 };
 

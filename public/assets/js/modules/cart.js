@@ -10,8 +10,7 @@ const Cart = {
     this.addToCartGeneric();
     this.cartQuantityControls();
     this.removeCartItem();
-    this.loadShippingRegions();
-    this.initShippingCalculation();
+    this.checkoutButton();
 
     // Delay cart count update to allow page to fully load
     setTimeout(() => {
@@ -49,17 +48,6 @@ const Cart = {
       const color = $("#selected-color").val();
       const quantity = parseInt($("#qty-value").text());
 
-      console.log(
-        "productId: " +
-          productId +
-          " Size: " +
-          size +
-          " Color: " +
-          color +
-          " Quantity: " +
-          quantity
-      );
-
       $.ajax({
         url: "api/add-to-cart.php",
         type: "POST",
@@ -67,16 +55,15 @@ const Cart = {
         dataType: "json",
         success: function (res) {
           if (res.success) {
-            alert("✅ Added to cart successfully");
+            showToast("Added to cart successfully", "success");
             $("#cart-count").text(res.cart_count);
             Cart.updateCartCount();
           } else {
-            alert("❌ " + res.message);
+            showToast(res.message, "error");
           }
         },
         error: function (xhr) {
-          console.error("❌ AJAX error:", xhr.responseText);
-          alert("❌ Server error. Try again.");
+          showToast("Server error. Try again.", "error");
         },
       });
     });
@@ -145,24 +132,11 @@ const Cart = {
             $(".cart-count-display").show();
           }
         } else {
-          console.warn("Cart count API returned success=false:", response);
           // Set count to 0 as fallback
           $(".cart-count-display").text("0").hide();
         }
       },
       error: function (xhr, status, error) {
-        console.error("Failed to update cart count");
-        console.error("Status:", status);
-        console.error("Error:", error);
-        console.error("Response:", xhr.responseText?.substring(0, 200));
-
-        // Try to parse the response to see if it's HTML
-        if (xhr.responseText && xhr.responseText.startsWith("<!DOCTYPE")) {
-          console.error(
-            "Server returned HTML instead of JSON - there may be a PHP error"
-          );
-        }
-
         // Fallback: hide cart count badge to avoid breaking the UI
         $(".cart-count-display").text("0").hide();
       },
@@ -238,11 +212,15 @@ const Cart = {
       const size = cartItem.data("size") || "";
       const color = cartItem.data("color") || "";
 
-      if (
-        confirm("Are you sure you want to remove this item from your cart?")
-      ) {
-        Cart.removeCartItemAction(productId, size, color, cartItem);
-      }
+      // Remove item directly without confirmation
+      Cart.removeCartItemAction(productId, size, color, cartItem);
+    });
+  },
+
+  checkoutButton() {
+    $(document).on("click", "#checkout-btn", function (e) {
+      e.preventDefault();
+      window.location.href = "checkout.php";
     });
   },
 
@@ -262,16 +240,24 @@ const Cart = {
       dataType: "json",
       success: function (response) {
         if (response.success) {
-          // Update the quantity display
-          cartItemElement.find(".quantity-display").text(quantity);
-
-          // Update the item subtotal
-          const price = parseFloat(cartItemElement.data("price")) || 0;
-          const newSubtotal = (price * quantity).toFixed(2);
-          console.log(
-            `🧮 Updating item subtotal: price=${price}, quantity=${quantity}, newSubtotal=${newSubtotal}`
+          // Update ALL cart items with same product/size/color (both desktop and mobile)
+          const allMatchingItems = $(
+            `.cart-item[data-product-id="${productId}"][data-size="${size}"][data-color="${color}"]`
           );
-          cartItemElement.find(".item-subtotal").text("$" + newSubtotal);
+
+          allMatchingItems.each(function () {
+            // Update the quantity display
+            $(this).find(".quantity-display").text(quantity);
+
+            // Get the price and calculate new subtotal
+            const price = parseFloat($(this).data("price")) || 0;
+            const newSubtotal = price * quantity;
+
+            // Update the item subtotal in the DOM
+            $(this)
+              .find(".item-subtotal")
+              .text("$" + newSubtotal.toFixed(2));
+          });
 
           // Update cart count
           Cart.updateCartCount();
@@ -317,15 +303,31 @@ const Cart = {
 
             // Check if cart is now empty
             if ($(".cart-item").length === 0) {
-              location.reload(); // Reload to show empty cart message
+              // Show empty cart message without reloading
+              const emptyCartHTML = `
+                <div class="text-center py-16">
+                  <i class="fi fi-rr-shopping-cart text-6xl text-gray-300 mb-4"></i>
+                  <h2 class="text-2xl font-semibold text-gray-600 mb-2">Your cart is empty</h2>
+                  <p class="text-gray-500 mb-6">Add some products to get started!</p>
+                  <a href="shop.php" class="bg-brand text-white px-8 py-3 rounded-lg hover:bg-brand-dark transition-colors">
+                    Continue Shopping
+                  </a>
+                </div>
+              `;
+
+              // Replace cart section content with empty cart message
+              $("section.max-w-7xl").html(
+                '<h1 class="text-4xl md:text-5xl font-bold mb-8 text-center font-cor">Cart</h1>' +
+                  emptyCartHTML
+              );
+            } else {
+              // Recalculate totals if there are still items
+              Cart.updateCartTotals();
             }
           });
 
           // Update cart count
           Cart.updateCartCount();
-
-          // Recalculate totals
-          Cart.updateCartTotals();
 
           Cart.showCartMessage(
             response.message || "Item removed from cart!",
@@ -345,135 +347,32 @@ const Cart = {
   },
 
   updateCartTotals() {
-    console.log("🧮 updateCartTotals() called");
-    // Calculate new subtotal from all cart items
+    // Calculate new subtotal from all visible cart items only
+    // (to avoid counting both desktop and mobile versions)
     let subtotal = 0;
-    $(".cart-item").each(function () {
-      const itemSubtotalText = $(this).find(".item-subtotal").text();
-      const itemSubtotal = parseFloat(itemSubtotalText.replace("$", "")) || 0;
-      console.log(
-        `📊 Item subtotal text: "${itemSubtotalText}" → parsed: ${itemSubtotal}`
-      );
+    let itemCount = 0;
+
+    $(".cart-item:visible").each(function () {
+      const itemSubtotalText = $(this).find(".item-subtotal").text().trim();
+      const itemSubtotal =
+        parseFloat(itemSubtotalText.replace("$", "").replace(",", "")) || 0;
+
       subtotal += itemSubtotal;
+      itemCount++;
     });
 
-    console.log(`💰 Calculated subtotal: ${subtotal}`);
-    // Update subtotal display
+    // Update subtotal and total display (no shipping in cart page)
     $("#cart-subtotal").text("$" + subtotal.toFixed(2));
+    $("#cart-total").text("$" + subtotal.toFixed(2));
 
-    // Get current shipping fee
-    const shippingFee = this.getCurrentShippingFee();
-
-    // Update shipping total display
-    if (shippingFee > 0) {
-      $("#shipping-total-row").show();
-      $("#shipping-total").text("$" + shippingFee.toFixed(2));
-    } else {
-      $("#shipping-total-row").hide();
-    }
-
-    // Calculate total (subtotal + shipping)
-    const total = subtotal + shippingFee;
-    $("#cart-total").text("$" + total.toFixed(2));
-  },
-
-  loadShippingRegions() {
-    console.log("🔄 loadShippingRegions() called");
-    const shippingSelect = $("#shipping-region");
-    console.log("📍 Shipping select element found:", shippingSelect.length > 0);
-
-    if (shippingSelect.length === 0) {
-      console.log(
-        "❌ No #shipping-region element found - not on cart page or element missing"
+    // Update checkout button text with item count
+    const checkoutBtn = $("#checkout-btn");
+    if (checkoutBtn.length > 0) {
+      checkoutBtn.text(
+        `Checkout (${itemCount} item${itemCount !== 1 ? "s" : ""})`
       );
-      return; // Only run on cart page
     }
-
-    console.log("🌐 Making AJAX call to get shipping regions...");
-    $.ajax({
-      url: "api/get-shipping-regions.php",
-      type: "GET",
-      dataType: "json",
-      success: function (response) {
-        console.log("✅ Shipping regions API response:", response);
-        if (response.success && response.regions) {
-          console.log(
-            "📋 Found " + response.regions.length + " shipping regions"
-          );
-          shippingSelect
-            .empty()
-            .append('<option value="">Choose a region...</option>');
-
-          response.regions.forEach((region) => {
-            const optionHtml = `<option value="${region.id}" data-fee="${
-              region.fee_per_kg
-            }">
-                ${region.region_name} - $${parseFloat(
-              region.fee_per_kg
-            ).toFixed(2)}/kg
-              </option>`;
-            console.log("➕ Adding option:", optionHtml.trim());
-            shippingSelect.append(optionHtml);
-          });
-
-          console.log(
-            "✅ Dropdown populated with " +
-              (shippingSelect.find("option").length - 1) +
-              " regions"
-          );
-        } else {
-          console.error(
-            "❌ API returned success=false or no regions:",
-            response
-          );
-        }
-      },
-      error: function (xhr, status, error) {
-        console.error("❌ Failed to load shipping regions:", {
-          status: status,
-          error: error,
-          responseText: xhr.responseText?.substring(0, 200),
-        });
-      },
-    });
-  },
-
-  initShippingCalculation() {
-    const shippingSelect = $("#shipping-region");
-    if (shippingSelect.length === 0) return; // Only run on cart page
-
-    shippingSelect.on("change", function () {
-      const selectedOption = $(this).find("option:selected");
-      const fee = parseFloat(selectedOption.data("fee")) || 0;
-      const regionName = selectedOption.text();
-
-      if (fee > 0) {
-        // Show shipping display
-        $("#shipping-display").removeClass("hidden").addClass("flex");
-        $("#shipping-region-name").text(
-          `Shipping Fee (${selectedOption.text().split(" - ")[0]})`
-        );
-        $("#shipping-fee").text("$" + fee.toFixed(2));
-
-        // Store the current shipping fee for calculations
-        Cart.currentShippingFee = fee;
-      } else {
-        // Hide shipping display
-        $("#shipping-display").removeClass("flex").addClass("hidden");
-        Cart.currentShippingFee = 0;
-      }
-
-      // Update cart totals
-      Cart.updateCartTotals();
-    });
-  },
-
-  getCurrentShippingFee() {
-    return this.currentShippingFee || 0;
   },
 };
-
-// Initialize shipping fee
-Cart.currentShippingFee = 0;
 
 export default Cart;

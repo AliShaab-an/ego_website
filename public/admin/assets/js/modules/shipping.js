@@ -5,7 +5,6 @@ import { Loader } from "../utils/loader.js";
 
 const Shipping = {
   init() {
-    console.log("📦 Shipping module initialized");
     this.bindEvents();
     this.loadRegions();
   },

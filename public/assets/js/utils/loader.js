@@ -1,7 +1,15 @@
 export function showLoader() {
-  document.getElementById("loaderOverlay").classList.remove("hidden");
+  const loader = document.getElementById("loaderOverlay");
+  if (loader) {
+    loader.classList.remove("hidden");
+    loader.style.display = "flex";
+  }
 }
 
 export function hideLoader() {
-  document.getElementById("loaderOverlay").classList.add("hidden");
+  const loader = document.getElementById("loaderOverlay");
+  if (loader) {
+    loader.classList.add("hidden");
+    loader.style.display = "none";
+  }
 }

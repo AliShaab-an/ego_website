@@ -7,7 +7,7 @@
             You don’t have permission to view this page.<br>
             Please contact a Super Admin if you believe this is an error.
         </p>
-        <a href="/Ego_website/public/admin/index.php?action=dashboard"
+        <a href="<?= url('admin/index.php?action=dashboard') ?>"
             class="px-4 py-2 bg-blue-600 text-black rounded hover:bg-blue-700 transition">
             ⬅ Back to Dashboard
         </a>

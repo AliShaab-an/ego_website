@@ -310,6 +310,10 @@
                         p.name,
                         p.description,
                         p.base_price,
+                        
+                        -- Discount information
+                        pd.discount_percentage,
+                        pd.is_active AS discount_active,
 
                         -- Get all images as comma-separated list
                         GROUP_CONCAT(DISTINCT pi.image_path ORDER BY pi.id SEPARATOR ',') AS images,
@@ -327,6 +331,7 @@
                     LEFT JOIN colors c ON v.color_id = c.id
                     LEFT JOIN sizes s ON v.size_id = s.id
                     LEFT JOIN product_images pi ON p.id = pi.product_id
+                    LEFT JOIN product_discounts pd ON p.id = pd.product_id
 
                     WHERE p.id = ?
                     GROUP BY v.id

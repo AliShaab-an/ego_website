@@ -3,7 +3,7 @@
     require_once CORE . 'Session.php';
     require_once CONT . 'frontend/ProductController.php';
     
-    Session::configure(1800,'/Ego_website/public/index.php', true);
+    Session::configure(1800, url('index.php'), true);
     Session::startSession();
     $userId = Session::getCurrentUser();
     $header_bg = "assets/images/header2.png";
@@ -15,6 +15,7 @@
     $productController = new ProductController();
     $topProducts = $productController->getTopProducts();
     $newProducts = $productController->getNewProducts();
+    $shopTheLookProducts = $productController->getProductsByCategoryName('Shop the Look', 8);
     
     // Fetch categories with products for collections section
     require_once MODELS . 'Category.php';
@@ -26,6 +27,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="assets/images/egologo.png">
     <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css'>
     <script src="https://kit.fontawesome.com/7f6ab6587f.js" crossorigin="anonymous"></script>
     <!-- Swiper CSS -->
@@ -43,6 +45,7 @@
         
         // Collections section
         include FRONTEND_VIEWS . '/partials/collections.php';
+        include FRONTEND_VIEWS . '/partials/shopTheLook.php';
         include FRONTEND_VIEWS. '/partials/topProducts.php';
         include FRONTEND_VIEWS . '/partials/newProducts.php';
         include FRONTEND_VIEWS . '/partials/homeContact.php';

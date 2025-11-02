@@ -6,13 +6,22 @@ import Products from "./modules/products.js";
 import Shipping from "./modules/shipping.js";
 import Coupons from "./modules/coupons.js";
 import ProductManage from "./modules/manageProducts.js";
-
-console.log("✅ main.js loaded");
+import Newsletter from "./modules/newsletter.js";
+import ContactMessages from "./modules/contact-messages.js";
+import Orders from "./modules/orders.js";
+import Dashboard from "./modules/dashboard.js";
+import AdminAuth from "./modules/adminAuth.js";
 
 $(document).ready(() => {
   const page = $("body").data("page");
 
   switch (page) {
+    case "admin-login":
+      AdminAuth.init();
+      break;
+    case "dashboard":
+      Dashboard.init();
+      break;
     case "addProduct":
       Products.init();
       break;
@@ -35,7 +44,15 @@ $(document).ready(() => {
     case "Coupons":
       Coupons.init();
       break;
+    case "Newsletter":
+      Newsletter.init();
+      break;
+    case "ContactMessages":
+      ContactMessages.init();
+      break;
+    case "orderManagement":
+      Orders.init();
+      break;
     default:
-      console.log("No module loaded for this page.");
   }
 });

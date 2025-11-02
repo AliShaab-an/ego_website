@@ -1,15 +1,15 @@
 <?php 
-    require_once __DIR__ . '/../../config/path.php';
 ?>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="<?= CSS_PATH ?>/style.css">
+    <link rel="icon" type="image/png" href="<?= IMG_PATH ?>egologo.png">
+    <link rel="stylesheet" href="<?= CSS_PATH ?>style.css">
     <title>Ego Clothing - Admin Login</title>
 </head>
-<body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300">
+<body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300" data-page="admin-login">
 
     <div class="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
         <div class="text-center mb-6">
@@ -17,13 +17,9 @@
             <p class="text-gray-500 text-sm mt-1">Admin Panel</p>
         </div>
 
-        <?php if (!empty($error)): ?>
-            <div class="mb-4 p-3 rounded bg-red-100 text-red-700 text-sm">
-                <?= htmlspecialchars($error) ?>
-            </div>
-        <?php endif; ?>
+        <div id="login-message" class="hidden mb-4 p-3 rounded text-sm"></div>
 
-        <form method="POST" action="">
+        <form id="admin-login-form" method="post" action="#">
             <div class="mb-5">
                 <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
                 <input type="email" id="email" name="email" required
@@ -36,9 +32,9 @@
                     class="w-full rounded border border-gray-300 focus:border-brand outline-none focus:ring-1 focus:ring-brand p-2">
             </div>
 
-            <button type="submit"
+            <button type="submit" id="login-btn"
                 class="w-full bg-[rgba(183,146,103,1)] hover:bg-[rgba(160,120,80,1)]
-                        text-white font-semibold py-2 rounded-lg shadow transition">
+                        text-white font-semibold py-2 rounded-lg shadow transition disabled:opacity-50 disabled:cursor-not-allowed">
                 Sign in
             </button>
         </form>
@@ -46,5 +42,14 @@
             &copy; <?= date('Y') ?> Ego Clothing. All rights reserved.
         </p>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="<?= ADMIN_JS_PATH ?>main.js" type="module"></script>
+    <script>
+        // Fallback to prevent form submission if module doesn't load
+        document.getElementById('admin-login-form')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+        });
+    </script>
 </body>
 </html>

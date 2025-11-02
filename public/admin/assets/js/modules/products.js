@@ -2,6 +2,7 @@ import { ajaxRequest } from "../utils/ajax.js";
 import { showToast } from "../utils/messages.js";
 import { openModal, closeModal } from "../utils/modal.js";
 import { Loader } from "../utils/loader.js";
+import Config from "../../../../assets/js/config.js";
 
 const Products = {
   productId: null,
@@ -46,8 +47,6 @@ const Products = {
       // If this is an existing image (has database ID), track it for deletion
       if (imageId) {
         this.deletedImages.push(imageId);
-        console.log("🗑️ Marked image for deletion:", imageId);
-        console.log("📝 Deleted images list:", this.deletedImages);
       }
 
       // Remove the corresponding file input using the unique ID
@@ -87,7 +86,7 @@ const Products = {
 
   loadColors() {
     ajaxRequest({
-      url: "api/list-colors.php",
+      url: "api/list-colors.php?all=true",
       type: "GET",
       beforeSend: () => {
         // Show global loader for initial data loading
@@ -114,7 +113,7 @@ const Products = {
 
   loadSizes() {
     ajaxRequest({
-      url: "api/list-sizes.php",
+      url: "api/list-sizes.php?all=true",
       type: "GET",
       beforeSend: () => {
         // Show global loader for initial data loading
@@ -214,7 +213,6 @@ const Products = {
   submitProduct(e) {
     e.preventDefault();
     const form = e.currentTarget;
-    const formData = new FormData(form);
     const isEdit = !!this.productId;
     const submitBtn = $("#publishBtn");
 
@@ -236,6 +234,38 @@ const Products = {
       return;
     }
 
+    // ===== COLLECT FORM DATA =====
+    const formData = new FormData();
+
+    // Add basic product data
+    formData.append("name", $("#name").val());
+    formData.append("description", $("[name='description']").val());
+    formData.append("base_price", $("[name='base_price']").val());
+    formData.append("weight", $("[name='weight']").val() || "");
+    formData.append("category_id", $("[name='category_id']").val());
+    formData.append("discount", discountPercentage);
+
+    if ($("#is_top").is(":checked")) formData.append("is_top", 1);
+    if ($("#is_active").is(":checked")) formData.append("is_active", 1);
+
+    // Collect and flatten variants
+    const variants = this.collectVariants();
+
+    formData.append("variants", JSON.stringify(variants));
+
+    // Collect variant images
+    $("input[type='file'][name^='variants']").each(function () {
+      const match = $(this)
+        .attr("name")
+        .match(/variants\[(\d+)\]/);
+      if (match) {
+        const variantIndex = match[1];
+        for (let file of this.files) {
+          formData.append(`variant_images[${variantIndex}][]`, file);
+        }
+      }
+    });
+
     // Add product ID for edit mode
     if (isEdit) {
       formData.append("id", this.productId);
@@ -245,13 +275,11 @@ const Products = {
         this.deletedImages.forEach((imageId) => {
           formData.append("deleted_images[]", imageId);
         });
-        console.log("🗑️ Sending deleted images:", this.deletedImages);
       }
     }
 
     console.group("🧾 Product FormData Debug");
     for (let [key, value] of formData.entries()) {
-      console.log(`${key}:`, value);
     }
     console.groupEnd();
 
@@ -283,6 +311,30 @@ const Products = {
     });
   },
 
+  // ---------- Collect and flatten variants ----------
+  collectVariants() {
+    const variants = [];
+
+    $(".color-block").each(function (colorIndex) {
+      const color_id = $(this).find(".colorDropdown").val();
+
+      // Flatten: Create a separate variant for each size within this color block
+      $(this)
+        .find(".size-row")
+        .each(function () {
+          variants.push({
+            color_id: color_id,
+            color_block_index: colorIndex, // Track which color block this variant belongs to
+            size_id: $(this).find(".sizesDropdown").val(),
+            quantity: $(this).find("input[name*='quantity']").val(),
+            price: $(this).find("input[name*='price']").val() || "",
+          });
+        });
+    });
+
+    return variants;
+  },
+
   // ---------- Load existing product ----------
   loadProduct(id) {
     // Reset deleted images array when loading a product
@@ -297,9 +349,6 @@ const Products = {
         Loader.hideGlobal();
         if (res.status === "success") {
           const { product, variants, images, discount } = res.data;
-          console.log("🖼️ Images data:", images);
-          console.log("📦 Variants data:", variants);
-          console.log("💰 Discount data:", discount);
 
           $("#name").val(product.name);
           $("textarea[name='description']").val(product.description);
@@ -364,14 +413,8 @@ const Products = {
 
       // Add images for this color
       const colorImages = images.filter((img) => img.color_id == colorId);
-      console.log(`🎨 Color ${colorId} images:`, colorImages);
+
       colorImages.forEach((image) => {
-        console.log(
-          `➕ Adding image preview for:`,
-          image.image_path,
-          "ID:",
-          image.id
-        );
         this.addImagePreview(block, image.image_path, image.id);
       });
 
@@ -380,16 +423,16 @@ const Products = {
   },
 
   addImagePreview(colorBlock, imagePath, imageId = null) {
-    console.log("🖼️ Adding image preview:", imagePath, "ID:", imageId);
     const container = colorBlock.find(".extraImagesContainer");
-    console.log("📦 Image container found:", container.length);
 
     const fileId = Date.now() + Math.random();
     const previewHtml = `
       <div class="relative w-20 h-20 border rounded-lg overflow-hidden" data-file-id="${fileId}" ${
       imageId ? `data-image-id="${imageId}"` : ""
     }>
-        <img src="/Ego_website/public/${imagePath}" class="w-full h-full object-cover">
+        <img src="${Config.getAssetUrl(
+          imagePath
+        )}" class="w-full h-full object-cover">
         <button type="button" class="removeExtra absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">×</button>
         <input type="hidden" name="existing_images[]" value="${imagePath}">
       </div>

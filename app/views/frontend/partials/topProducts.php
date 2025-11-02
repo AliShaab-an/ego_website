@@ -17,7 +17,7 @@ if (!isset($topProducts) || !is_array($topProducts)) {
               <a href="product.php?id=<?= $product['id']?>" 
                  class="block group bg-white overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300">
                 <div class="w-full h-64 sm:h-72 md:h-80 overflow-hidden">
-                  <img src="/Ego_website/public/<?= $product['image_path'] ?>" 
+                  <img src="<?= PUBLIC_URL ?><?= $product['image_path'] ?>" 
                        alt="<?= htmlspecialchars($product['name']) ?>" 
                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                 </div>
@@ -71,8 +71,8 @@ if (!isset($topProducts) || !is_array($topProducts)) {
           </button>
         </div>
         
-        <!-- Pagination: visible only on mobile -->
-        <div class="swiper-pagination mt-6 flex justify-center md:hidden"></div>
+        <!-- Pagination: hidden -->
+        <div class="swiper-pagination mt-6 hidden"></div>
       </div>
     </div>
   </div>

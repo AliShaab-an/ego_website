@@ -2,6 +2,7 @@ import { ajaxRequest } from "../utils/ajax.js";
 import { showToast } from "../utils/messages.js";
 import { openModal, closeModal } from "../utils/modal.js";
 import { Loader } from "../utils/loader.js";
+import Config from "../../../../assets/js/config.js";
 
 const ManageProducts = {
   currentPage: 1,
@@ -181,9 +182,9 @@ const ManageProducts = {
               <tr class="text-center border-b border-gray-300">
                 <td>${(page - 1) * this.limit + (i + 1)}</td>
                 <td class="flex items-center justify-center gap-2 py-2">
-                  <img src="/Ego_website/public/${
+                  <img src="${Config.getAssetUrl(
                     p.main_image || "admin/assets/no-image.png"
-                  }" 
+                  )}" 
                       alt="${p.name}" 
                       class="w-12 h-12 object-cover rounded border border-gray-300"/>
                   <span>${p.name}</span>

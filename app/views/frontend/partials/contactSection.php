@@ -15,29 +15,33 @@
     </div>
 
     <div class="space-y-2 w-full md:w-1/2 flex flex-col items-start ">
-      <button class="w-full border border-brand px-4 py-2 text-brand"><a href="https://www.google.com/maps/place/33%C2%B053'43.9%22N+35%C2%B029'27.6%22E/@33.8955154,35.488411,17z/data=!3m1!4b1!4m4!3m3!8m2!3d33.8955154!4d35.4909859?entry=ttu&g_ep=EgoyMDI1MDkyMi4wIKXMDSoASAFQAw%3D%3D">Find Us</a></button>
+      <button class="w-full border border-brand px-4 py-2 text-brand"><a target="_blank" href="https://www.google.com/maps/place/33%C2%B053'43.9%22N+35%C2%B029'27.6%22E/@33.8955154,35.488411,17z/data=!3m1!4b1!4m4!3m3!8m2!3d33.8955154!4d35.4909859?entry=ttu&g_ep=EgoyMDI1MDkyMi4wIKXMDSoASAFQAw%3D%3D">Find Us</a></button>
       <button class="w-full bg-brand text-white px-4 py-2">Contact Us</button>
     </div>
   </div>
 
   <!-- Right column (Form) - shows first on mobile -->
   <div class="order-1 md:order-2 space-y-4">
-    <form class="space-y-4">
+    <form id="contactForm" class="space-y-4">
       <div class="text-start">
         <label class="block mb-1 text-sm font-medium text-gray-700">Name</label>
-        <input type="text" class="w-full border border-gray-300 px-3 py-2 outline-none focus:border-brand focus:ring-1 focus:ring-brand" placeholder="Name">
+        <input type="text" id="contactName" name="name" class="w-full border border-gray-300 px-3 py-2 outline-none focus:border-brand focus:ring-1 focus:ring-brand" placeholder="Name" required>
       </div>
       
       <div class="text-start">
         <label class="block text-sm font-medium text-gray-700">Email</label>
-        <input type="email" class="w-full border border-gray-300 px-3 py-2 outline-none focus:border-brand placeholder:text-gray-400" placeholder="Enter your email">
+        <input type="email" id="contactEmail" name="email" class="w-full border border-gray-300 px-3 py-2 outline-none focus:border-brand placeholder:text-gray-400" placeholder="Enter your email" required>
       </div>
       <div class="text-start">
         <label class="block text-sm font-medium text-gray-700">How can we help?</label>
-        <textarea class="w-full border border-gray-300 px-3 py-2 outline-none focus:border-brand placeholder:text-gray-400" rows="6" placeholder="Your message..."></textarea>
+        <textarea id="contactMessage" name="message" class="w-full border border-gray-300 px-3 py-2 outline-none focus:border-brand placeholder:text-gray-400" rows="6" placeholder="Your message..." required></textarea>
       </div>
+      
+      <!-- Success/Error Message Container -->
+      <div id="contactMessageContainer" class="hidden"></div>
+      
       <div class="flex items-start">
-        <button type="submit" class="w-1/3  bg-brand text-white px-4 py-2">Submit</button>
+        <button type="submit" id="contactSubmitBtn" class="w-1/3 bg-brand text-white px-4 py-2 hover:bg-opacity-90 transition-all">Submit</button>
       </div>
       
     </form>

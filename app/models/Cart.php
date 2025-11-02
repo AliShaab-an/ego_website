@@ -1,6 +1,6 @@
 <?php 
-
-    require_once __DIR__ . '/../core/DB.php';
+    require_once __DIR__ . '/../config/path.php';
+    require_once CORE . 'DB.php';
 
     class Cart{
 

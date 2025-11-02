@@ -1,6 +1,7 @@
 <?php 
-
-    require_once __DIR__ . '/../../../app/controllers/shippingController.php';
+    require_once __DIR__ . '/../../../app/config/path.php';
+    require_once CONT . 'ShippingController.php';
+    
     header('Content-Type: application/json');
 
 

@@ -250,3 +250,227 @@ Array
     [is_active] => 1
 )
 
+After insert, fetched product #80:
+Array
+(
+    [id] => 80
+    [name] => Blazer
+    [description] => test
+    [base_price] => 100.00
+    [weight] => 
+    [category_id] => 11
+    [created_at] => 2025-10-30 21:07:39
+    [is_top] => 1
+    [is_active] => 1
+)
+
+After insert, fetched product #81:
+Array
+(
+    [id] => 81
+    [name] => Blazer
+    [description] => test
+    [base_price] => 100.00
+    [weight] => 
+    [category_id] => 11
+    [created_at] => 2025-10-30 21:34:03
+    [is_top] => 1
+    [is_active] => 1
+)
+
+After insert, fetched product #82:
+Array
+(
+    [id] => 82
+    [name] => Blazer
+    [description] => test
+    [base_price] => 100.00
+    [weight] => 
+    [category_id] => 11
+    [created_at] => 2025-10-30 21:46:00
+    [is_top] => 1
+    [is_active] => 1
+)
+
+After insert, fetched product #83:
+Array
+(
+    [id] => 83
+    [name] => Jacket
+    [description] => test
+    [base_price] => 200.00
+    [weight] => 
+    [category_id] => 10
+    [created_at] => 2025-10-30 22:30:26
+    [is_top] => 1
+    [is_active] => 1
+)
+
+After insert, fetched product #84:
+Array
+(
+    [id] => 84
+    [name] => Jacket
+    [description] => test
+    [base_price] => 300.00
+    [weight] => 
+    [category_id] => 10
+    [created_at] => 2025-10-30 22:31:31
+    [is_top] => 1
+    [is_active] => 1
+)
+
+After insert, fetched product #85:
+Array
+(
+    [id] => 85
+    [name] => Jacket
+    [description] => test
+    [base_price] => 400.00
+    [weight] => 
+    [category_id] => 10
+    [created_at] => 2025-10-30 22:33:15
+    [is_top] => 1
+    [is_active] => 1
+)
+
+After insert, fetched product #86:
+Array
+(
+    [id] => 86
+    [name] => Blazer
+    [description] => test
+    [base_price] => 600.00
+    [weight] => 
+    [category_id] => 11
+    [created_at] => 2025-11-01 10:57:09
+    [is_top] => 0
+    [is_active] => 1
+)
+
+After insert, fetched product #87:
+Array
+(
+    [id] => 87
+    [name] => Test1
+    [description] => test
+    [base_price] => 700.00
+    [weight] => 
+    [category_id] => 11
+    [created_at] => 2025-11-01 11:20:31
+    [is_top] => 0
+    [is_active] => 1
+)
+
+After insert, fetched product #88:
+Array
+(
+    [id] => 88
+    [name] => Test1
+    [description] => test
+    [base_price] => 700.00
+    [weight] => 
+    [category_id] => 11
+    [created_at] => 2025-11-01 11:20:38
+    [is_top] => 0
+    [is_active] => 1
+)
+
+After insert, fetched product #89:
+Array
+(
+    [id] => 89
+    [name] => Test1
+    [description] => test
+    [base_price] => 700.00
+    [weight] => 
+    [category_id] => 11
+    [created_at] => 2025-11-01 11:20:45
+    [is_top] => 0
+    [is_active] => 1
+)
+
+After insert, fetched product #90:
+Array
+(
+    [id] => 90
+    [name] => Test1
+    [description] => test
+    [base_price] => 700.00
+    [weight] => 
+    [category_id] => 11
+    [created_at] => 2025-11-01 11:20:52
+    [is_top] => 0
+    [is_active] => 1
+)
+
+After insert, fetched product #91:
+Array
+(
+    [id] => 91
+    [name] => Test1
+    [description] => test
+    [base_price] => 700.00
+    [weight] => 
+    [category_id] => 11
+    [created_at] => 2025-11-01 11:21:01
+    [is_top] => 0
+    [is_active] => 1
+)
+
+After insert, fetched product #92:
+Array
+(
+    [id] => 92
+    [name] => Test1
+    [description] => test
+    [base_price] => 700.00
+    [weight] => 
+    [category_id] => 11
+    [created_at] => 2025-11-01 11:21:06
+    [is_top] => 0
+    [is_active] => 1
+)
+
+After insert, fetched product #93:
+Array
+(
+    [id] => 93
+    [name] => Test1
+    [description] => test
+    [base_price] => 700.00
+    [weight] => 
+    [category_id] => 11
+    [created_at] => 2025-11-01 11:21:12
+    [is_top] => 0
+    [is_active] => 1
+)
+
+After insert, fetched product #94:
+Array
+(
+    [id] => 94
+    [name] => Test1
+    [description] => test
+    [base_price] => 700.00
+    [weight] => 
+    [category_id] => 11
+    [created_at] => 2025-11-01 11:25:36
+    [is_top] => 0
+    [is_active] => 1
+)
+
+After insert, fetched product #95:
+Array
+(
+    [id] => 95
+    [name] => Test2
+    [description] => test
+    [base_price] => 800.00
+    [weight] => 
+    [category_id] => 11
+    [created_at] => 2025-11-01 17:47:11
+    [is_top] => 0
+    [is_active] => 1
+)
+

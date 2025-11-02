@@ -1,7 +1,6 @@
 <?php
-
-    require_once __DIR__ . '/../core/Session.php';
-    include __DIR__ . '/../config/path.php';
+    require_once __DIR__ . '/../config/path.php';
+    require_once CORE . 'Session.php';
     require_once  CORE . 'Helper.php';
     
     class Auth{

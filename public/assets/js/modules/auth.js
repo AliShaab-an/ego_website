@@ -1,4 +1,7 @@
 import { ajaxRequest } from "../utils/ajax.js";
+import { showToast } from "../utils/messages.js";
+import { showLoader, hideLoader } from "../utils/loader.js";
+import Config from "../config.js";
 
 const Auth = {
   init() {
@@ -13,16 +16,19 @@ const Auth = {
       let $form = $(this);
       let $messageBox = $("#registerMessage");
 
-      $.ajax({
-        url: "/Ego_website/public/api/register-user.php",
+      showLoader();
+      ajaxRequest({
+        url: Config.getApiUrl("register-user.php"),
         type: "POST",
         data: $form.serialize(),
-        dataType: "json",
         success: function (res) {
+          hideLoader();
           if (res.status === "success") {
             $messageBox
               .removeClass("hidden text-red-600 bg-red-100 border-red-300")
-              .addClass("text-black")
+              .addClass(
+                "text-green-600 bg-green-100 border border-green-300 p-3 rounded"
+              )
               .text("✅ Account created successfully! You can now log in.");
 
             $form[0].reset();
@@ -31,15 +37,30 @@ const Auth = {
               .removeClass(
                 "hidden text-green-600 bg-green-100 border-green-300"
               )
-              .addClass("text-red-600 bg-red-100 border border-red-300")
+              .addClass(
+                "text-red-600 bg-red-100 border border-red-300 p-3 rounded"
+              )
               .text("❌ " + (res.message || "Error creating account."));
           }
         },
-        error: function () {
+        error: function (xhr) {
+          hideLoader();
+          let errorMsg = "Server error. Please try again.";
+          try {
+            const response = JSON.parse(xhr.responseText);
+            if (response.error) {
+              errorMsg = response.error;
+            }
+          } catch (e) {
+            console.error("Parse error:", e, "Response:", xhr.responseText);
+          }
+
           $messageBox
             .removeClass("hidden text-green-600 bg-green-100 border-green-300")
-            .addClass("text-red-600 bg-red-100 border border-red-300")
-            .text("❌ Server error. Please try again again.");
+            .addClass(
+              "text-red-600 bg-red-100 border border-red-300 p-3 rounded"
+            )
+            .text("❌ " + errorMsg);
         },
       });
     });
@@ -48,23 +69,30 @@ const Auth = {
   handleLogin() {
     $("#customerLogin").on("submit", function (e) {
       e.preventDefault();
-      console.log("clicked");
 
       let $form = $(this);
       let $messageBox = $("#loginMessage");
 
-      $.ajax({
-        url: "/Ego_website/public/api/login-user.php",
+      showLoader();
+      ajaxRequest({
+        url: Config.getApiUrl("login-user.php"),
         type: "POST",
         data: $form.serialize(),
-        dataType: "json",
         success: function (res) {
+          hideLoader();
           if (res.status === "success") {
             $messageBox
               .removeClass("hidden text-red-600 bg-red-100 border-red-300")
               .addClass("text-black")
               .text("✅ You Logged In Successfully.");
+
+            showToast("You Logged In Successfully.", "success");
             $form[0].reset();
+
+            // Reload page to update header
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
           } else {
             $messageBox
               .removeClass(
@@ -72,13 +100,28 @@ const Auth = {
               )
               .addClass("text-red-600 bg-red-100 border border-red-300")
               .text("❌ " + (res.message || "Error logging in."));
+
+            showToast(res.message || "Error logging in.", "error");
           }
         },
-        error: function () {
+        error: function (xhr) {
+          hideLoader();
+          let errorMsg = "Server error. Please try again.";
+          try {
+            const response = JSON.parse(xhr.responseText);
+            if (response.error) {
+              errorMsg = response.error;
+            }
+          } catch (e) {
+            console.error("Parse error:", e, "Response:", xhr.responseText);
+          }
+
           $messageBox
             .removeClass("hidden text-green-600 bg-green-100 border-green-300")
             .addClass("text-red-600 bg-red-100 border border-red-300")
-            .text("❌ Server error. Please try again again.");
+            .text("❌ " + errorMsg);
+
+          showToast(errorMsg, "error");
         },
       });
     });
