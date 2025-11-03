@@ -18,7 +18,7 @@ if (!isset($products) || !is_array($products)) {
       <?php foreach($products['products'] as $product): ?>
         <a href="product.php?id=<?= $product['id'] ?>" 
             class="flex flex-col group">
-          <div class="md:w-full md:h-96 overflow-hidden">
+          <div class="w-full h-64 md:h-96 overflow-hidden">
             <img src="<?= PUBLIC_URL ?><?= $product['image_path'] ?>" 
                   alt="<?= htmlspecialchars($product['name']) ?>" 
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
