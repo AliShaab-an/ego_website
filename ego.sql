@@ -682,6 +682,45 @@ ALTER TABLE `product_variants`
   ADD CONSTRAINT `fk_variant_color` FOREIGN KEY (`color_id`) REFERENCES `colors` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_variant_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_variant_size` FOREIGN KEY (`size_id`) REFERENCES `sizes` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `website_settings`
+--
+
+CREATE TABLE IF NOT EXISTS `website_settings` (
+  `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `setting_key` varchar(255) NOT NULL UNIQUE,
+  `setting_value` longtext,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `website_settings`
+--
+
+INSERT INTO `website_settings` (`setting_key`, `setting_value`) VALUES
+('website_name', 'Ego Clothing'),
+('website_url', 'http://localhost:8080'),
+('contact_email', 'contact@egoclothing.com'),
+('phone_number', '+1 (555) 000-0000'),
+('company_description', 'Premium fashion clothing for everyone'),
+('primary_color', '#b7926f'),
+('secondary_color', '#9e7e59'),
+('accent_color', '#88663d'),
+('meta_title', 'Ego Clothing - Premium Fashion'),
+('meta_description', 'Discover our exclusive collection of premium clothing'),
+('meta_keywords', 'clothing, fashion, style, ego'),
+('google_analytics_id', ''),
+('instagram_url', ''),
+('facebook_url', ''),
+('twitter_url', ''),
+('tiktok_url', ''),
+('linkedin_url', ''),
+('youtube_url', '');
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

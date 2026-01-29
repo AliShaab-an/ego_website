@@ -291,3 +291,11 @@ Response: Array
     [message] => Product with variants and images added successfully
 )
 
+Inserted Variant: Product #96 | Color 23 | Size 5 | Price 0 | Qty 10
+Response: Array
+(
+    [status] => success
+    [product_id] => 96
+    [message] => Product with variants and images added successfully
+)
+

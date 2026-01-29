@@ -58,6 +58,10 @@
             include BACKEND_VIEWS . 'contact-messages.php';
         }
 
+        public function settingsPage(){
+            include BACKEND_VIEWS . 'settings.php';
+        }
+
         /**
          * Get dashboard statistics
          */

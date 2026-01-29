@@ -159,6 +159,7 @@
 
                             if($error === UPLOAD_ERR_OK && is_uploaded_file($tmpName)){
                                 $uniqueName = uniqid("p{$productId}_") . "_" . basename($fileName);
+                                // Use absolute path from document root
                                 $uploadDir  = __DIR__ . '/../../../public/admin/uploads/products/';
 
                                 if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);

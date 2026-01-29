@@ -4,9 +4,15 @@
     require_once  CORE . 'Helper.php';
 ?>
 
-        <aside class="w-64 h-full bg-white text-black flex flex-col p-4 shadow-[0_0_18px_-4px_rgba(0,0,0,0.25)] space-y-2">
-            <div class="flex flex-col flex-grow">
-                <nav class="flex flex-col gap-2">
+        <aside class="w-64 h-screen bg-white text-black flex flex-col shadow-lg border-r border-gray-200">
+            <!-- Header -->
+            <div class="p-4 border-b border-gray-200 flex-shrink-0">
+                <h1 class="text-xl font-bold text-gray-800">Ego Admin</h1>
+            </div>
+            
+            <!-- Navigation - Scrollable -->
+            <nav class="flex-1 overflow-y-auto p-2">
+                <div class="flex flex-col gap-1">
                     <?php
                         Helper::sidebarLink("dashboard",$action,"Dashboard","fa-house");
                         Helper::sidebarLink("orderManagement", $action, "Order Management", "fa-cart-shopping");
@@ -19,16 +25,19 @@
                         Helper::sidebarLink("Coupons", $action, "Coupons","fa-ticket");
                         Helper::sidebarLink("Newsletter", $action, "Newsletter","fa-envelope");
                         Helper::sidebarLink("ContactMessages", $action, "Contact Messages","fa-message");
+                        Helper::sidebarLink("Settings", $action, "Settings","fa-gear");
                     ?>
-                </nav>
-                
-            </div>
-            <!-- Logout button at bottom -->
-            <div class="mt-auto pt-4">
-                <p class="font-bold"><?= $_SESSION['user_name'] ?></p>
-                <div class="flex items-center gap-2  rounded">
-                    <p class="truncate"><?= $_SESSION['user_email'] ?></p>
-                    <a href="index.php?action=logout"><i class="fa-solid fa-right-from-bracket hover:text-red-500 text-lg"></i></a>
+                </div>
+            </nav>
+            
+            <!-- User Info - Fixed at bottom -->
+            <div class="p-4 border-t border-gray-200 flex-shrink-0">
+                <p class="font-semibold text-gray-800 text-sm truncate"><?= $_SESSION['user_name'] ?></p>
+                <div class="flex items-center gap-2 mt-2">
+                    <p class="truncate text-xs text-gray-600"><?= $_SESSION['user_email'] ?></p>
+                    <a href="index.php?action=logout" class="text-gray-500 hover:text-red-500 transition text-lg ml-auto">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </a>
                 </div>
             </div>
         </aside>

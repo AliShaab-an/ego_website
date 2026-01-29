@@ -37,11 +37,12 @@
         <script src="https://kit.fontawesome.com/7f6ab6587f.js" crossorigin="anonymous"></script>
         <title>Admin Panel - Ego Clothing</title>
     </head>
-    <body class="flex justify-center bg-white h-screen overflow-hidden" data-page="<?= htmlspecialchars($action) ?>">
+    <body class="flex bg-white h-screen overflow-hidden" data-page="<?= htmlspecialchars($action) ?>">
     
-        <div class="  h-9/10 flex mt-6">
+        <div class="h-screen flex w-full">
             <?php include( BACKEND_VIEWS .'sidebar.php');?>
-            <main class="flex-1 ml-10 w-5xl h-full overflow-y-auto">    
+            <main class="flex-1 h-full  overflow-y-auto bg-gray-50">    
+                <div class="px-8 py-6">
                 
                 <?php 
                     switch($action){
@@ -80,10 +81,15 @@
                         case 'ContactMessages':
                             $adminController->contactMessagesPage();
                             break;
+                        case 'Settings':
+                            Auth::checkRoles(['super_admin']); 
+                            $adminController->settingsPage();
+                            break;
                         default:
                             echo "<h1 class='text-2xl font-bold'>404 - Page not found</h1>";
                     }
                 ?>
+                </div>
             </main>
             
         </div>
@@ -91,7 +97,5 @@
         <script type="module" src="assets/js/main.js"></script>
     </body>
     </html>
-
-    
 
 

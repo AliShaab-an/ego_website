@@ -474,3 +474,17 @@ Array
     [is_active] => 1
 )
 
+After insert, fetched product #96:
+Array
+(
+    [id] => 96
+    [name] => Test3
+    [description] => test
+    [base_price] => 75.00
+    [weight] => 
+    [category_id] => 11
+    [created_at] => 2025-11-20 13:39:16
+    [is_top] => 1
+    [is_active] => 1
+)
+

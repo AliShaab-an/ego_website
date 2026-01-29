@@ -138,6 +138,27 @@
         }
 
         public static function deleteAdmin($id) {
+            // First, delete related cart items if any exist
+            $carts = DB::query("SELECT cart_id FROM cart WHERE user_id = ?", [$id]);
+            if ($carts) {
+                foreach ($carts as $cart) {
+                    DB::query("DELETE FROM cart_item WHERE cart_id = ?", [$cart['cart_id']]);
+                }
+                DB::query("DELETE FROM cart WHERE user_id = ?", [$id]);
+            }
+            
+            // Delete orders and their items
+            $orders = DB::query("SELECT id FROM orders WHERE user_id = ?", [$id]);
+            if ($orders) {
+                foreach ($orders as $order) {
+                    DB::query("DELETE FROM order_items WHERE order_id = ?", [$order['id']]);
+                }
+                DB::query("DELETE FROM orders WHERE user_id = ?", [$id]);
+            }
+            
+            // Contact messages will be set to NULL automatically due to ON DELETE SET NULL
+            
+            // Finally, delete the user
             DB::query("DELETE FROM users WHERE id = ?", [$id]);
         }
 

@@ -11,6 +11,7 @@ import ContactMessages from "./modules/contact-messages.js";
 import Orders from "./modules/orders.js";
 import Dashboard from "./modules/dashboard.js";
 import AdminAuth from "./modules/adminAuth.js";
+import Settings from "./modules/settings.js";
 
 $(document).ready(() => {
   const page = $("body").data("page");
@@ -52,6 +53,9 @@ $(document).ready(() => {
       break;
     case "orderManagement":
       Orders.init();
+      break;
+    case "Settings":
+      Settings.init();
       break;
     default:
   }

@@ -35,6 +35,7 @@
             try{
                 $filename = null;
                 if(!empty($_FILES['image']['name'])){
+                    // Use absolute path from document root
                     $uploadDir = __DIR__ . '/../../public/admin/uploads/categories/'; 
                     if(!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
                     
@@ -75,7 +76,8 @@
             try{
                 $imagePath = null;
                 if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-                    $uploadDir = __DIR__ . '/../../public/admin/uploads/categories/';
+                    // Use absolute path from document root
+                    $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/admin/uploads/categories/';
                     if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
 
                     $uniqueName = uniqid() . '-' . basename($_FILES['image']['name']);

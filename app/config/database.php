@@ -6,3 +6,5 @@ try {
 } catch (PDOException $e) {
     echo "DB Error: " . $e->getMessage();
 }
+
+// $pdo = new PDO("mysql:host=localhost;dbname=ego", "root", "");
