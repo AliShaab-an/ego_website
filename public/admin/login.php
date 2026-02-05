@@ -11,5 +11,5 @@
         exit;
     }
 
-    include BACKEND_VIEWS . 'login.php';
+    include ADMIN_VIEWS . 'login.php';
 ?>

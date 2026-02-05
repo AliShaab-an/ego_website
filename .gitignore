@@ -2,3 +2,7 @@ node_modules/
 .vscode/
 .htaccess
 New/
+.env
+vendor/
+logs/
+cache/

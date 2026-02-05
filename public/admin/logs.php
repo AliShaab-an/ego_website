@@ -77,7 +77,7 @@ if ($selectedLog) {
 </head>
 <body class="bg-gray-100">
     <div class="flex h-screen overflow-hidden">
-        <?php include BACKEND_VIEWS . 'sidebar.php'; ?>
+        <?php include VIEWS . 'partials/admin/sidebar.php'; ?>
 
         <div class="flex-1 overflow-auto">
             <!-- Header -->

@@ -64,12 +64,25 @@ if (!defined('CORE')) {
 if (!defined('CONFIG')) {
     define('CONFIG', ROOT_PATH . 'app/config/');
 }
-if (!defined('BACKEND_VIEWS')) {
-    define('BACKEND_VIEWS', ROOT_PATH . 'app/views/backend/');
+
+if(!defined('VIEWS')){
+    define('VIEWS', ROOT_PATH . 'app/views/');
+}
+
+if(!defined('ADMIN_VIEWS')){
+    define('ADMIN_VIEWS', VIEWS . 'admin/');
 }
 
 if (!defined('FRONTEND_VIEWS')) {
-    define('FRONTEND_VIEWS', ROOT_PATH . 'app/views/frontend/');
+    define('FRONTEND_VIEWS', VIEWS . 'frontend/');
+}
+
+if(!defined('LAYOUTS')){
+    define('LAYOUTS', VIEWS . 'layouts/');
+}
+
+if(!defined('PARTIALS')){
+    define('PARTIALS', VIEWS . 'partials/');
 }
 
 if (!defined('CONT')) {
@@ -79,6 +92,8 @@ if (!defined('CONT')) {
 if (!defined('MODELS')) {
     define('MODELS', ROOT_PATH . 'app/models/');
 }
+
+
 
 // Function to get full URL path (useful for redirects and links)
 if (!function_exists('url')) {

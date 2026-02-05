@@ -1,7 +1,7 @@
 
 <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 hidden z-40"></div>
 <aside id="mobileSidebar" 
-       class="fixed left-0 top-0 h-full w-64 bg-white shadow-lg transform -translate-x-full transition-transform duration-300 z-50">
+        class="fixed left-0 top-0 h-full w-64 bg-white shadow-lg transform -translate-x-full transition-transform duration-300 z-50">
   
   <!-- Close button -->
   <div class="flex justify-end p-4">
