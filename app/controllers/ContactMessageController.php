@@ -1,16 +1,11 @@
 <?php
-require_once __DIR__ . '/../config/path.php';
-require_once MODELS . 'ContactMessage.php';
-require_once CORE . 'Session.php';
-require_once CORE . 'Helper.php';
 
-class ContactMessageController {
-    
-    /**
-     * Submit a contact message
-     */
-    public function submit() {
-        try {
+    class ContactMessageController {
+        
+        /**
+         * Submit a contact message
+         */
+        public function submit() {
             if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
                 throw new Exception('Invalid request method');
             }
@@ -45,20 +40,12 @@ class ContactMessageController {
                 'message' => 'Your message has been sent successfully! We will get back to you soon.',
                 'message_id' => $messageId
             ];
-            
-        } catch (Exception $e) {
-            return [
-                'success' => false,
-                'message' => $e->getMessage()
-            ];
         }
-    }
 
-    /**
-     * Get all contact messages (admin only)
-     */
-    public function getMessages() {
-        try {
+        /**
+         * Get all contact messages (admin only)
+         */
+        public function getMessages() {
             $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
             $limit = isset($_GET['limit']) ? max(1, min(100, (int)$_GET['limit'])) : 20;
             $status = isset($_GET['status']) ? $_GET['status'] : 'all';
@@ -86,20 +73,12 @@ class ContactMessageController {
                     'unread' => ContactMessage::countUnread()
                 ]
             ];
-            
-        } catch (Exception $e) {
-            return [
-                'success' => false,
-                'message' => $e->getMessage()
-            ];
         }
-    }
 
-    /**
-     * Update message status (admin only)
-     */
-    public function updateStatus() {
-        try {
+        /**
+         * Update message status (admin only)
+         */
+        public function updateStatus() {
             if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
                 throw new Exception('Invalid request method');
             }
@@ -136,20 +115,12 @@ class ContactMessageController {
                 'success' => true,
                 'message' => $responseMessage
             ];
-            
-        } catch (Exception $e) {
-            return [
-                'success' => false,
-                'message' => $e->getMessage()
-            ];
         }
-    }
 
-    /**
-     * Delete a message (admin only)
-     */
-    public function deleteMessage() {
-        try {
+        /**
+         * Delete a message (admin only)
+         */
+        public function deleteMessage() {
             if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
                 throw new Exception('Invalid request method');
             }
@@ -174,20 +145,12 @@ class ContactMessageController {
                 'success' => true,
                 'message' => 'Message has been deleted successfully'
             ];
-            
-        } catch (Exception $e) {
-            return [
-                'success' => false,
-                'message' => $e->getMessage()
-            ];
         }
-    }
 
-    /**
-     * Export messages to CSV (admin only)
-     */
-    public function exportCSV() {
-        try {
+        /**
+         * Export messages to CSV (admin only)
+         */
+        public function exportCSV() {
             $status = isset($_GET['status']) ? $_GET['status'] : 'all';
             $data = ContactMessage::getAllForExport($status);
             
@@ -198,20 +161,12 @@ class ContactMessageController {
                 'csv' => $csv,
                 'filename' => 'contact_messages_' . date('Y-m-d_H-i-s') . '.csv'
             ];
-            
-        } catch (Exception $e) {
-            return [
-                'success' => false,
-                'message' => $e->getMessage()
-            ];
         }
-    }
 
-    /**
-     * Get a single message by ID (admin only)
-     */
-    public function getMessage() {
-        try {
+        /**
+         * Get a single message by ID (admin only)
+         */
+        public function getMessage() {
             if (!isset($_GET['id'])) {
                 throw new Exception('Message ID is required');
             }
@@ -227,12 +182,5 @@ class ContactMessageController {
                 'success' => true,
                 'data' => $message
             ];
-            
-        } catch (Exception $e) {
-            return [
-                'success' => false,
-                'message' => $e->getMessage()
-            ];
         }
     }
-}

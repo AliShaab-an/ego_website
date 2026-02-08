@@ -299,3 +299,7 @@ Response: Array
     [message] => Product with variants and images added successfully
 )
 
+Updating product #96 to status=0
+Inserted Variant: Product #97 | Color 23 | Size 6 | Price 0 | Qty 2
+Inserted Variant: Product #98 | Color 23 | Size 5 | Price 0 | Qty 7
+Inserted Variant: Product #99 | Color 24 | Size 4 | Price 0 | Qty 12

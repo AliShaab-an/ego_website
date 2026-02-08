@@ -1,6 +1,4 @@
 <?php
-
-    require_once __DIR__ . '/../core/DB.php';
     class Category{
         
         public static function getPaginated($limit, $offset) {

@@ -1,12 +1,4 @@
 <?php
-    require_once __DIR__ . '/../config/path.php';
-    require_once MODELS . 'Dashboard.php';
-    require_once MODELS . 'User.php';
-    require_once CORE . 'Session.php';
-    require_once CORE . 'Auth.php';
-    require_once CORE . 'Helper.php';
-    require_once CORE . 'View.php';
-
     class AdminController {
 
         private function renderAdmin(string $view, array $data = []): void {
@@ -16,7 +8,7 @@
 
         public function logout() {
             Session::destroySession();
-            Helper::redirect('login.php?action=logout');
+            redirect('login.php?action=logout');
             exit;
         }
 
@@ -27,7 +19,7 @@
         }
 
         public function categoryPage(){
-            $this->renderAdmin('Categories', ['pageTitle' => $this->ego.' Categories']);
+            $this->renderAdmin('category', ['pageTitle' => $this->ego.' Categories']);
         }
 
         public function ordersPage() {

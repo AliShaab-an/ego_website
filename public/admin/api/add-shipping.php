@@ -1,16 +1,12 @@
-<?php 
-    require_once __DIR__ . '/../../../app/config/path.php';
-    require_once CONT . 'ShippingController.php';
-    
-    header('Content-Type: application/json');
+<?php
+require_once __DIR__ . '/../../../app/bootstrap.php';
 
-
-    try{
-        $controller = new ShippingController();
-        echo json_encode($controller->addShipping()); 
-    }catch(Exception $e){
-        echo json_encode(['success' => false, 'message' => 'Server error']);
-    }
+ApiRunner::run(function () {
+    Authorization::requireRoles(['admin', 'super_admin', 'editor']);
+    $controller = new ShippingController();
+    $result = $controller->addShipping();
+    Response::json($result);
+});
 
 
 

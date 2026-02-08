@@ -122,7 +122,7 @@ const Products = {
             }
 
             container.append(`
-              <a href="product.php?id=${p.id}" class="flex flex-col group">
+              <a href="index.php?page=product&id=${p.id}" class="flex flex-col group">
                 <div class="w-full h-64 md:h-96 overflow-hidden">
                   <img src="${Config.getAssetUrl(p.image_path)}" 
                        alt="${p.name}" 
@@ -251,7 +251,7 @@ const Products = {
             }
 
             container.append(`
-              <a href="product.php?id=${p.id}" class="flex flex-col group">
+              <a href="index.php?page=product&id=${p.id}" class="flex flex-col group">
                 <div class="w-full h-64 md:h-96 overflow-hidden">
                   <img src="${Config.getAssetUrl(p.image_path)}" 
                        alt="${p.name}" 

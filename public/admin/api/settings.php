@@ -1,46 +1,39 @@
 <?php
-header('Content-Type: application/json');
+require_once __DIR__ . '/../../../app/bootstrap.php';
 
-try {
-    require_once __DIR__ . '/../../../app/config/path.php';
-    require_once CONT . 'SettingsController.php';
+ApiRunner::run(function () {
+    Authorization::requireRoles(['admin', 'super_admin', 'editor']);
     
     $controller = new SettingsController();
     $action = $_GET['action'] ?? $_POST['action'] ?? 'getSettings';
 
-    $response = [];
-
     switch ($action) {
         case 'getSettings':
-            $response = $controller->getSettings();
+            $result = $controller->getSettings();
+            Response::json($result);
             break;
 
         case 'saveSettings':
-            $response = $controller->saveSettings();
+            $result = $controller->saveSettings();
+            Response::json($result);
             break;
 
         case 'getSetting':
-            $response = $controller->getSetting();
+            $result = $controller->getSetting();
+            Response::json($result);
             break;
 
         case 'saveSetting':
-            $response = $controller->saveSetting();
+            $result = $controller->saveSetting();
+            Response::json($result);
             break;
 
         case 'validateSmtp':
-            $response = $controller->validateSmtp();
+            $result = $controller->validateSmtp();
+            Response::json($result);
             break;
 
         default:
-            $response = ['status' => 'error', 'message' => 'Unknown action'];
+            Response::error('Unknown action', null, 400);
     }
-} catch (Throwable $e) {
-    error_log("Settings API Error: " . $e->getMessage() . "\n" . $e->getTraceAsString());
-    $response = [
-        'status' => 'error',
-        'message' => 'An error occurred',
-        'debug' => (defined('IS_LOCAL') && IS_LOCAL ? $e->getMessage() : null)
-    ];
-}
-
-echo json_encode($response);
+});

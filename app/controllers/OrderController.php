@@ -1,19 +1,11 @@
 <?php
 
-require_once __DIR__ . '/../config/path.php';
-require_once MODELS . 'Order.php';
-require_once MODELS . 'Cart.php';
-require_once MODELS . 'User.php';
-require_once MODELS . 'Coupon.php';
-require_once CORE . 'Session.php';
-
-class OrderController {
-    
-    /**
-     * Create a new order (Frontend - Checkout)
-     */
-    public function create() {
-        try {
+    class OrderController {
+        
+        /**
+         * Create a new order (Frontend - Checkout)
+         */
+        public function create() {
             if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
                 throw new Exception('Invalid request method');
             }
@@ -66,20 +58,12 @@ class OrderController {
                 'message' => 'Order placed successfully!',
                 'order_id' => $orderId
             ];
-            
-        } catch (Exception $e) {
-            return [
-                'success' => false,
-                'message' => $e->getMessage()
-            ];
         }
-    }
-    
-    /**
-     * Get order details
-     */
-    public function getOrder() {
-        try {
+        
+        /**
+         * Get order details
+         */
+        public function getOrder() {
             $orderId = $_GET['order_id'] ?? null;
             
             if (!$orderId) {
@@ -103,20 +87,12 @@ class OrderController {
                 'success' => true,
                 'order' => $order
             ];
-            
-        } catch (Exception $e) {
-            return [
-                'success' => false,
-                'message' => $e->getMessage()
-            ];
         }
-    }
-    
-    /**
-     * Get user's orders (Frontend)
-     */
-    public function getUserOrders() {
-        try {
+        
+        /**
+         * Get user's orders (Frontend)
+         */
+        public function getUserOrders() {
             if (!isset($_SESSION['user_id'])) {
                 throw new Exception('Please log in to view your orders');
             }
@@ -143,20 +119,12 @@ class OrderController {
                     'has_prev' => $page > 1
                 ]
             ];
-            
-        } catch (Exception $e) {
-            return [
-                'success' => false,
-                'message' => $e->getMessage()
-            ];
         }
-    }
-    
-    /**
-     * Get all orders (Admin)
-     */
-    public function getAllOrders() {
-        try {
+        
+        /**
+         * Get all orders (Admin)
+         */
+        public function getAllOrders() {
             $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
             $limit = isset($_GET['limit']) ? max(1, min(100, (int)$_GET['limit'])) : 20;
             $status = isset($_GET['status']) ? $_GET['status'] : 'all';
@@ -181,20 +149,12 @@ class OrderController {
                 ],
                 'statistics' => $stats
             ];
-            
-        } catch (Exception $e) {
-            return [
-                'success' => false,
-                'message' => $e->getMessage()
-            ];
         }
-    }
-    
-    /**
-     * Update order status (Admin)
-     */
-    public function updateStatus() {
-        try {
+        
+        /**
+         * Update order status (Admin)
+         */
+        public function updateStatus() {
             if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
                 throw new Exception('Invalid request method');
             }
@@ -214,20 +174,12 @@ class OrderController {
                 'success' => true,
                 'message' => 'Order status updated successfully'
             ];
-            
-        } catch (Exception $e) {
-            return [
-                'success' => false,
-                'message' => $e->getMessage()
-            ];
         }
-    }
-    
-    /**
-     * Update payment status (Admin)
-     */
-    public function updatePaymentStatus() {
-        try {
+        
+        /**
+         * Update payment status (Admin)
+         */
+        public function updatePaymentStatus() {
             if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
                 throw new Exception('Invalid request method');
             }
@@ -247,20 +199,12 @@ class OrderController {
                 'success' => true,
                 'message' => 'Payment status updated successfully'
             ];
-            
-        } catch (Exception $e) {
-            return [
-                'success' => false,
-                'message' => $e->getMessage()
-            ];
         }
-    }
-    
-    /**
-     * Cancel order
-     */
-    public function cancelOrder() {
-        try {
+        
+        /**
+         * Cancel order
+         */
+        public function cancelOrder() {
             if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
                 throw new Exception('Invalid request method');
             }
@@ -298,12 +242,5 @@ class OrderController {
                 'success' => true,
                 'message' => 'Order cancelled successfully'
             ];
-            
-        } catch (Exception $e) {
-            return [
-                'success' => false,
-                'message' => $e->getMessage()
-            ];
         }
     }
-}

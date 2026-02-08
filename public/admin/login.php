@@ -1,6 +1,5 @@
 <?php
-    require_once __DIR__ . '/../../app/config/path.php';
-    require_once CORE . 'Session.php';
+    require_once __DIR__ . '/../../app/bootstrap.php';
 
     Session::configure(1800, url('admin/login.php'), true);
     Session::startSession();

@@ -1,54 +1,38 @@
 <?php
-    require_once __DIR__ . '/../../app/config/path.php';
-    require_once CORE . 'Session.php';
-    require_once MODELS . 'Coupon.php';
+require_once __DIR__ . '/../../app/bootstrap.php';
 
-    Session::configure(1800, url('index.php'), true);
-    Session::startSession();
-
-    header('Content-Type: application/json');
-
+ApiRunner::run(function () {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        echo json_encode(['success' => false, 'message' => 'Invalid request method']);
-        exit;
+        Response::error('Invalid request method', null, 405);
     }
 
-    try {
-        $data = json_decode(file_get_contents('php://input'), true);
-        
-        $code = $data['code'] ?? '';
-        $orderTotal = $data['orderTotal'] ?? 0;
+    $data = json_decode(file_get_contents('php://input'), true);
+    
+    $code = $data['code'] ?? '';
+    $orderTotal = $data['orderTotal'] ?? 0;
 
-        if (empty($code)) {
-            echo json_encode(['success' => false, 'message' => 'Coupon code is required']);
-            exit;
-        }
+    if (empty($code)) {
+        Response::error('Coupon code is required', null, 400);
+    }
 
-        if ($orderTotal <= 0) {
-            echo json_encode(['success' => false, 'message' => 'Invalid order total']);
-            exit;
-        }
+    if ($orderTotal <= 0) {
+        Response::error('Invalid order total', null, 400);
+    }
 
-        $result = Coupon::validateCoupon($code, $orderTotal);
+    $result = Coupon::validateCoupon($code, $orderTotal);
 
-        if ($result['valid']) {
-            echo json_encode([
-                'success' => true,
-                'message' => $result['message'],
-                'discount' => $result['discount'],
-                'discount_type' => $result['discount_type'],
-                'discount_value' => $result['discount_value']
-            ]);
-        } else {
-            echo json_encode([
-                'success' => false,
-                'message' => $result['message']
-            ]);
-        }
-
-    } catch (Exception $e) {
-        echo json_encode([
+    if ($result['valid']) {
+        Response::json([
+            'success' => true,
+            'message' => $result['message'],
+            'discount' => $result['discount'],
+            'discount_type' => $result['discount_type'],
+            'discount_value' => $result['discount_value']
+        ]);
+    } else {
+        Response::json([
             'success' => false,
-            'message' => 'Error validating coupon: ' . $e->getMessage()
+            'message' => $result['message']
         ]);
     }
+});

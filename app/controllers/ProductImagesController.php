@@ -1,9 +1,4 @@
 <?php 
-    require_once __DIR__ . '/../config/path.php';
-    require_once CORE . 'Logger.php';
-    require_once __DIR__ . '/../models/ProductImages.php';
-
-
     class ProductImagesController{
 
         public function deleteImage($id){

@@ -1,7 +1,5 @@
 <?php 
 
-    require_once __DIR__ . '/../core/DB.php';
-
     class ProductImages{
 
         public static function addImage($data){

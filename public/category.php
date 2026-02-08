@@ -1,11 +1,11 @@
 <?php 
     require_once __DIR__ . '/../app/config/path.php';
     require_once CORE . 'Session.php';
+    require_once CORE . 'View.php';
     require_once MODELS . 'Category.php';
     
     Session::configure(1800, url('index.php'), true);
     Session::startSession();
-    $userId = Session::getCurrentUser();
     
     // Get category ID and details
     $categoryId = $_GET['id'] ?? null;
@@ -45,14 +45,14 @@
 </head>
 <body class="text-center" data-page="category" data-category-id="<?= $categoryId ?>">
     <?php 
-        include FRONTEND_VIEWS . 'header.php';
-        include FRONTEND_VIEWS . 'login.php'; 
-        include FRONTEND_VIEWS . 'signup.php';
-        include FRONTEND_VIEWS. '/partials/sidebar.php';
+        include PARTIALS . 'frontend/header.php';
+        include PARTIALS . 'frontend/login-model.php'; 
+        include PARTIALS . 'frontend/signup-model.php';
+        include PARTIALS . 'frontend/sidebar.php';
 
-        include FRONTEND_VIEWS . 'categoryProducts.php';
+        View::partial('frontend/sections/category-products');
 
-        include FRONTEND_VIEWS . 'footer.php';
+        include PARTIALS . 'frontend/footer.php';
     ?>
 
     <script src="<?= JS_PATH ?>jquery-3.7.1.min.js"></script>

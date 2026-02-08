@@ -1,10 +1,4 @@
 <?php
-    require_once __DIR__ . '/../../config/path.php';
-    require_once MODELS . 'Product.php';
-    require_once MODELS . "ProductVariant.php";
-    require_once MODELS . "ProductImages.php";
-    require_once MODELS . "ProductDiscount.php";
-
 
     class ProductAdminController{
 
@@ -142,6 +136,8 @@
                     }
 
                     if($fileNames && is_array($fileNames)){
+                        $uploadDir = __DIR__ . '/../../../public/admin/uploads/products/';
+                        
                         for($i = 0; $i < count($fileNames); $i++){
                             $fileName = $fileNames[$i];
                             $tmpName  = $tmpNames[$i];
@@ -158,33 +154,33 @@
                             );
 
                             if($error === UPLOAD_ERR_OK && is_uploaded_file($tmpName)){
-                                $uniqueName = uniqid("p{$productId}_") . "_" . basename($fileName);
-                                // Use absolute path from document root
-                                $uploadDir  = __DIR__ . '/../../../public/admin/uploads/products/';
-
-                                if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
-
-                                $destination = $uploadDir . $uniqueName;
-
-                                if(move_uploaded_file($tmpName, $destination)){
-                                    $relativePath = "admin/uploads/products/" . $uniqueName;
-
-                                    $isMain = $isFirstImage ? 1 : 0;
-                                    $isFirstImage = false;
-
-
-                                    ProductImages::addImage([
-                                        'product_id'    => $productId,
-                                        'variant_id'    => $variantId,
-                                        'color_id'      => $variant['color_id'] ?? null,
-                                        'image_path'    => $relativePath,
-                                        'is_main'       => $isMain,
-                                        'display_order' => $i + 1
-                                    ]);
-                                }else{
-                                    Logger::error("ProductController::addProduct", "Failed to save image: $fileName");
-                                    return ['status' => 'error', 'message' => "Failed to save image: $fileName"];
+                                try {
+                                    // Construct file array for ImageService (only include fields it uses)
+                                    $fileArray = [
+                                        'tmp_name' => $tmpName,
+                                        'error' => $error
+                                    ];
+                                    
+                                    // Use ImageService to process and resize
+                                    $saved = ImageService::processUpload($fileArray, $uploadDir, [300, 600, 1200], 82);
+                                    $imageName = $saved[1200] ?? end($saved);
+                                    $relativePath = "admin/uploads/products/" . $imageName;
+                                } catch (Exception $e) {
+                                    error_log("Product image upload error for $fileName: " . $e->getMessage());
+                                    return ['status' => 'error', 'message' => "Failed to process image $fileName: " . $e->getMessage()];
                                 }
+
+                                $isMain = $isFirstImage ? 1 : 0;
+                                $isFirstImage = false;
+
+                                ProductImages::addImage([
+                                    'product_id'    => $productId,
+                                    'variant_id'    => $variantId,
+                                    'color_id'      => $variant['color_id'] ?? null,
+                                    'image_path'    => $relativePath,
+                                    'is_main'       => $isMain,
+                                    'display_order' => $i + 1
+                                ]);
                             }else{
                                 $errorMessages = [
                                     UPLOAD_ERR_INI_SIZE => 'File exceeds upload_max_filesize',

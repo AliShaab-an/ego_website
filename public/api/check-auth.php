@@ -1,24 +1,12 @@
 <?php
-    session_start();
-    header('Content-Type: application/json');
+require_once __DIR__ . '/../../app/bootstrap.php';
 
-    try {
-        $isLoggedIn = isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
-        
-        echo json_encode([
-            'success' => true,
-            'isLoggedIn' => $isLoggedIn,
-            'user' => $isLoggedIn ? [
-                'id' => $_SESSION['user_id'],
-                'name' => $_SESSION['username'] ?? '',
-                'email' => $_SESSION['email'] ?? ''
-            ] : null
-        ]);
-        
-    } catch (Exception $e) {
-        http_response_code(500);
-        echo json_encode([
-            'success' => false,
-            'message' => $e->getMessage()
-        ]);
-    }
+ApiRunner::run(function () {
+    $isLoggedIn = Auth::check();
+    
+    Response::json([
+        'success' => true,
+        'isLoggedIn' => $isLoggedIn,
+        'user' => $isLoggedIn ? Auth::user() : null
+    ]);
+});

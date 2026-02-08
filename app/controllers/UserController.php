@@ -1,221 +1,187 @@
-<?php 
-    require_once __DIR__ . '/../config/path.php';
-    require_once MODELS . 'User.php';
-    class UserController{
+<?php
+class UserController
+{
 
-        public function listUsers(){
-            try{
-                $customers = User::countAll();
-                return ['status' => 'success', 'data' => $customers];
-            }catch(Throwable $e){
-                return ['status' => 'error', 'message' => $e->getMessage()];
-            } 
+    public function listUsers()
+    {
+        $customers = User::countAll();
+        return ['status' => 'success', 'data' => $customers];
+    }
+
+    public function listCustomersCountLast7Days()
+    {
+        $customersCount = User::getCustomersCountLast7Days();
+        return ['status' => 'success', 'data' => $customersCount];
+    }
+
+    public function listAdmins()
+    {
+        $admins = User::getAllAdmins();
+        return ['status' => 'success', 'data' => $admins];
+    }
+
+    public function register()
+    {
+        require_once __DIR__ . '/CartController.php';
+
+        $name = htmlspecialchars(trim($_POST['name'] ?? ''), ENT_QUOTES, 'UTF-8');
+        $email = htmlspecialchars(trim($_POST['email'] ?? ''), ENT_QUOTES, 'UTF-8');
+        $password = trim($_POST['password'] ?? '');
+        $role = $_POST['role'] ?? 'customer';
+
+        if ($name === '' || $email === '' || $password === '') {
+            return ['status' => 'error', 'message' => 'All fields are required'];
+        }
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return ['status' => 'error', 'message' => 'Invalid email address'];
+        }
+        $existingUser = User::getByEmail($email);
+        if ($existingUser) {
+            return ['status' => 'error', 'message' => 'Email already registered'];
         }
 
-        public function listCustomersCountLast7Days(){
-            try{
-                $customersCount = User::getCustomersCountLast7Days();
-                return ['status' => 'success', 'data' => $customersCount];
-            }catch(Throwable $e){
-                return ['status' => 'error', 'message' => $e->getMessage()];
-            }
+        $userId = User::createUser([
+            'name' => $name,
+            'email' => $email,
+            'password' => $password,
+            'role' => $role
+        ]);
+
+        // Set user session using Auth
+        Auth::login([
+            'id' => $userId,
+            'name' => $name,
+            'email' => $email,
+            'role' => $role
+        ]);
+
+        // Migrate guest cart to user if exists
+        $cartController = new CartController();
+        $cartController->migrateSessionCartToUser($userId);
+
+        return ['status' => 'success', 'id' => $userId, 'message' => 'User registered successfully'];
+    }
+
+    public function login()
+    {
+        require_once __DIR__ . '/CartController.php';
+
+        $email = trim($_POST['email']);
+        $password = trim($_POST['password']);
+
+        if ($email === '' || $password === '') {
+            return ['status' => 'error', 'message' => 'All fields are required'];
         }
 
-        public function listAdmins() {
-            try {
-                $admins = User::getAllAdmins();
-                return ['status' => 'success', 'data' => $admins];
-            } catch (Exception $e) {
-                return ['status' => 'error', 'message' => 'Failed to fetch admins: ' . $e->getMessage()];
-            }
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return ['status' => 'error', 'message' => 'Invalid email address'];
         }
 
-        public function register(){
-            require_once __DIR__ . '/CartController.php';
-            
-            $name = htmlspecialchars(trim($_POST['name'] ?? ''), ENT_QUOTES, 'UTF-8');
-            $email = htmlspecialchars(trim($_POST['email'] ?? ''), ENT_QUOTES, 'UTF-8');
-            $password = trim($_POST['password'] ?? '');
-            $role = $_POST['role'] ?? 'customer';
+        $user = User::verifyLogin($email, $password);
+        if ($user) {
+            // Set user session using Auth
+            Auth::login($user);
 
-            if ($name === '' || $email === '' || $password === '') {
-                return ['status' => 'error', 'message' => 'All fields are required'];
-            }
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                return ['status' => 'error', 'message' => 'Invalid email address'];
-            }
-            $existingUser = User::getByEmail($email);
-            if($existingUser){
-                return ['status' => 'error', 'message' => 'Email already registered'];
-            }
+            // Migrate guest cart to user if exists
+            $cartController = new CartController();
+            $cartController->migrateSessionCartToUser($user['id']);
 
-            try{
-                $userId = User::createUser([
-                    'name' => $name,
-                    'email' => $email,
-                    'password' => $password,
-                    'role' => $role
-                ]);
-                
-                // Set user session
-                $_SESSION['user_id'] = $userId;
-                $_SESSION['user_name'] = $name;
-                $_SESSION['user_email'] = $email;
-                $_SESSION['user_role'] = $role;
-                
-                // Migrate guest cart to user if exists
-                $cartController = new CartController();
-                $cartController->migrateSessionCartToUser($userId);
-                
-                return ['status' => 'success', 'id' => $userId, 'message' => 'User registered successfully'];
-            }catch(Exception $e){
-                return ['status' => 'error', 'message' => 'Server error: ' . $e->getMessage()];
-            }
-        }
-
-        public function login(){
-            require_once __DIR__ . '/CartController.php';
-            
-            $email = trim($_POST['email']);
-            $password = trim($_POST['password']);
-
-            if($email === '' || $password === ''){
-                return ['status' => 'error', 'message' => 'All fields are required'];
-            }
-
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                return ['status' => 'error', 'message' => 'Invalid email address'];
-            }
-
-            try{
-                $user = User::verifyLogin($email,$password);
-                if($user) {
-                    // Set user session
-                    $_SESSION['user_id'] = $user['id'];
-                    $_SESSION['user_name'] = $user['name'];
-                    $_SESSION['user_email'] = $user['email'];
-                    $_SESSION['user_role'] = $user['role'];
-                    
-                    // Migrate guest cart to user if exists
-                    $cartController = new CartController();
-                    $cartController->migrateSessionCartToUser($user['id']);
-                    
-                    return ['status' => 'success', 'id' => $user['id'], 'message' => 'Login successful'];
-                } else {
-                    return ['status' => 'error', 'message' => 'Invalid email or password'];
-                }
-            }catch(Exception $e){
-                return ['status' => 'error', 'message' => 'Server error: ' . $e->getMessage()];
-            }
-        }
-
-        public function addAdmin() {
-            try {
-                $name = trim($_POST['name'] ?? '');
-                $email = trim($_POST['email'] ?? '');
-                $password = trim($_POST['password'] ?? '');
-                $role = $_POST['role'] ?? 'admin';
-
-                if ($name === '' || $email === '' || $password === '') {
-                    return ['status' => 'error', 'message' => 'All fields are required.'];
-                }
-
-                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                    return ['status' => 'error', 'message' => 'Invalid email format.'];
-                }
-
-                // Check if email already exists
-                $existing = User::getAdminByEmail($email);
-                if ($existing) {
-                    return ['status' => 'error', 'message' => 'An admin with this email already exists.'];
-                }
-
-                $id = User::createAdmin($name, $email, $password, $role);
-                return ['status' => 'success', 'id' => $id, 'message' => 'Admin added successfully.'];
-
-            } catch (Exception $e) {
-                return ['status' => 'error', 'message' => 'Error adding admin: ' . $e->getMessage()];
-            }
-        }
-
-        public function updateAdmin() {
-            try {
-                $id = intval($_POST['id'] ?? 0);
-                $name = trim($_POST['name'] ?? '');
-                $email = trim($_POST['email'] ?? '');
-                $role = trim($_POST['role'] ?? '');
-                $password = trim($_POST['password'] ?? '');
-
-                if ($id <= 0 || $name === '' || $email === '') {
-                    return ['status' => 'error', 'message' => 'Missing or invalid data.'];
-                }
-
-                User::updateAdmin($id, $name, $email, $role, $password ?: null);
-                return ['status' => 'success', 'message' => 'Admin updated successfully.'];
-
-            } catch (Exception $e) {
-                return ['status' => 'error', 'message' => 'Error updating admin: ' . $e->getMessage()];
-            }
-        }
-
-        public function deleteAdmin() {
-            try {
-                $id = intval($_POST['id'] ?? 0);
-                if ($id <= 0) {
-                    return ['status' => 'error', 'message' => 'Invalid admin ID.'];
-                }
-
-                User::deleteAdmin($id);
-                return ['status' => 'success', 'message' => 'Admin deleted successfully.'];
-
-            } catch (Exception $e) {
-                return ['status' => 'error', 'message' => 'Error deleting admin: ' . $e->getMessage()];
-            }
-        }
-
-        public function logout() {
-            try {
-                // For guest users, clear session cart when logging out
-                if(!isset($_SESSION['user_id'])) {
-                    unset($_SESSION['cart']);
-                }
-                
-                // Clear all session data
-                session_destroy();
-                
-                return ['status' => 'success', 'message' => 'Logged out successfully'];
-            } catch(Exception $e) {
-                return ['status' => 'error', 'message' => 'Server error: ' . $e->getMessage()];
-            }
-        }
-
-        public function adminLogin() {
-            $email = trim($_POST['email'] ?? '');
-            $password = trim($_POST['password'] ?? '');
-
-            if ($email === '' || $password === '') {
-                return ['status' => 'error', 'message' => 'All fields are required'];
-            }
-
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                return ['status' => 'error', 'message' => 'Invalid email address'];
-            }
-
-            try {
-                $user = User::verifyLogin($email, $password);
-
-                if ($user && in_array($user['role'], ['admin', 'super_admin'])) {
-                    $_SESSION['user_id'] = $user['id'];
-                    $_SESSION['user_name'] = $user['name'];
-                    $_SESSION['user_email'] = $user['email'];
-                    $_SESSION['role'] = $user['role'];
-                    
-                    return ['status' => 'success', 'message' => 'Login successful', 'redirect' => 'index.php?action=dashboard'];
-                } else {
-                    return ['status' => 'error', 'message' => 'Invalid credentials or insufficient permissions'];
-                }
-            } catch (Exception $e) {
-                return ['status' => 'error', 'message' => 'Server error: ' . $e->getMessage()];
-            }
+            return ['status' => 'success', 'id' => $user['id'], 'message' => 'Login successful'];
+        } else {
+            return ['status' => 'error', 'message' => 'Invalid email or password'];
         }
     }
+
+    public function addAdmin()
+    {
+        $name = trim($_POST['name'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+        $password = trim($_POST['password'] ?? '');
+        $role = $_POST['role'] ?? 'admin';
+
+        if ($name === '' || $email === '' || $password === '') {
+            return ['status' => 'error', 'message' => 'All fields are required.'];
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return ['status' => 'error', 'message' => 'Invalid email format.'];
+        }
+        $allowedRoles = ['admin', 'editor'];
+        if (!in_array($role, $allowedRoles, true)) {
+            return ['status' => 'error', 'message' => 'Invalid role.'];
+        }
+        // Check if email already exists
+        $existing = User::getAdminByEmail($email);
+        if ($existing) {
+            return ['status' => 'error', 'message' => 'An admin with this email already exists.'];
+        }
+
+        $id = User::createAdmin($name, $email, $password, $role);
+        return ['status' => 'success', 'id' => $id, 'message' => 'Admin added successfully.'];
+    }
+
+    public function updateAdmin()
+    {
+        $id = intval($_POST['id'] ?? 0);
+        $name = trim($_POST['name'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+        $role = trim($_POST['role'] ?? '');
+        $password = trim($_POST['password'] ?? '');
+
+        if ($id <= 0 || $name === '' || $email === '') {
+            return ['status' => 'error', 'message' => 'Missing or invalid data.'];
+        }
+
+        User::updateAdmin($id, $name, $email, $role, $password ?: null);
+        return ['status' => 'success', 'message' => 'Admin updated successfully.'];
+    }
+
+    public function deleteAdmin()
+    {
+        $id = intval($_POST['id'] ?? 0);
+        if ($id <= 0) {
+            return ['status' => 'error', 'message' => 'Invalid admin ID.'];
+        }
+
+        User::deleteAdmin($id);
+        return ['status' => 'success', 'message' => 'Admin deleted successfully.'];
+    }
+
+    public function logout()
+    {
+        // For guest users, clear session cart when logging out
+        if (!isset($_SESSION['user_id'])) {
+            unset($_SESSION['cart']);
+        }
+
+        // Clear all session data
+        session_destroy();
+
+        return ['status' => 'success', 'message' => 'Logged out successfully'];
+    }
+
+    public function adminLogin()
+    {
+        $email = trim($_POST['email'] ?? '');
+        $password = trim($_POST['password'] ?? '');
+
+        if ($email === '' || $password === '') {
+            return ['status' => 'error', 'message' => 'All fields are required'];
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return ['status' => 'error', 'message' => 'Invalid email address'];
+        }
+
+        $user = User::verifyLogin($email, $password);
+
+        if ($user && in_array($user['role'], ['admin', 'super_admin'])) {
+            // Set user session using Auth
+            Auth::login($user);
+
+            return ['status' => 'success', 'message' => 'Login successful', 'redirect' => 'index.php?action=dashboard'];
+        } else {
+            return ['status' => 'error', 'message' => 'Invalid credentials or insufficient permissions'];
+        }
+    }
+}

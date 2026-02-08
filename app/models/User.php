@@ -1,7 +1,4 @@
 <?php
-
-    require_once __DIR__ . '/../core/DB.php';
-
     class User{
 
         public static function findUserByEmail($email){
@@ -23,18 +20,13 @@
 
         public static function createUser($data){
             $hashedPassword = password_hash($data['password'],PASSWORD_BCRYPT);
-            try{
-                DB::query("INSERT INTO users (name,email,password,role) VALUES (?,?,?,?)", [
-                    $data['name'],
-                    $data['email'],
-                    $hashedPassword,
-                    $data['role'] ?? 'customer'
-                ]);
+            DB::query("INSERT INTO users (name,email,password,role) VALUES (?,?,?,?)", [
+                $data['name'],
+                $data['email'],
+                $hashedPassword,
+                $data['role'] ?? 'customer'
+            ]);
             return DB::getConnection()->lastInsertId();
-            }catch(Exception $e){
-                error_log("User register error: " . $e->getMessage());
-            }
-            
         }
 
         public static function verifyLogin($email, $password){
@@ -44,7 +36,6 @@
             }
             return false;
         }
-
 
         public static function updateUser($id, $data){
             DB::query("UPDATE users SET name = ?, email = ?, role = ? WHERE id = ?", [
@@ -56,20 +47,14 @@
         }
 
         public static function updateContactInfo($id, $phone, $address = null, $city = null, $state = null, $zip = null) {
-            try {
-                $sql = "UPDATE users SET phone = ?, address = ?, city = ?, state = ?, zip_code = ? WHERE id = ?";
-                DB::query($sql, [$phone, $address, $city, $state, $zip, $id]);
-                return true;
-            } catch (Exception $e) {
-                error_log("User update contact info error: " . $e->getMessage());
-                return false;
-            }
+            $sql = "UPDATE users SET phone = ?, address = ?, city = ?, state = ?, zip_code = ? WHERE id = ?";
+            DB::query($sql, [$phone, $address, $city, $state, $zip, $id]);
+            return true;
         }
 
         public static function delete($id){
             DB::query("DELETE FROM users WHERE id = ?", [$id]);
         }
-
 
         public static function getCustomersCountLast7Days(){
             $stmt = DB::query("
@@ -79,36 +64,23 @@
         }
 
         public static function getAllAdmins(){
-            try{
-                $stmt = DB::query("SELECT id,name,email,role FROM users WHERE role IN ('admin','super_admin') ORDER By name ASC");
-                return $stmt->fetchAll(PDO::FETCH_ASSOC);
-            }catch(Exception $e){
-                throw new Exception("Failed to fetch admins: " . $e->getMessage());
-            }
+            $stmt = DB::query("SELECT id,name,email,role FROM users WHERE role IN ('admin','super_admin') ORDER By name ASC");
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         public static function countAll() {
-            try{
-                $stmt = DB::query("SELECT COUNT(*) AS count FROM users");
-                $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                return (int)$row['count'];
-            }catch(PDOException $e){
-                throw new Exception("Failed to count admins: " . $e->getMessage());
-            }
+            $stmt = DB::query("SELECT COUNT(*) AS count FROM users");
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            return (int)$row['count'];
         }
 
         public static function createAdmin($name, $email, $password, $role = 'admin') {
             $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-            try{
-                DB::query(
-                    "INSERT INTO users (name, email, password, role, created_at) VALUES (?, ?, ?, ?, NOW())",
-                    [$name, $email, $hashedPassword, $role]
-                );
-                return DB::getConnection()->lastInsertId();
-            }catch(PDOException $e){
-                throw new Exception("Failed to create admin: " . $e->getMessage());
-            
-            }
+            DB::query(
+                "INSERT INTO users (name, email, password, role, created_at) VALUES (?, ?, ?, ?, NOW())",
+                [$name, $email, $hashedPassword, $role]
+            );
+            return DB::getConnection()->lastInsertId();
         }
 
         public static function getAdminById($id) {

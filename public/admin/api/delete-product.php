@@ -1,12 +1,9 @@
 <?php
+require_once __DIR__ . '/../../../app/bootstrap.php';
 
-    require_once __DIR__ . '/../../../app/config/path.php';
-    require_once CONT . '/admin/ProductAdminController.php';
-    header('Content-Type: application/json');
-
-    try {
-        $controller = new ProductAdminController();
-        echo json_encode($controller->deleteProduct());
-    } catch (Exception $e) {
-        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
-    }
+ApiRunner::run(function () {
+    Authorization::requireRoles(['admin', 'super_admin', 'editor']);
+    $controller = new ProductAdminController();
+    $result = $controller->deleteProduct();
+    Response::json($result);
+});

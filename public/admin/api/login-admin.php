@@ -1,23 +1,12 @@
 <?php
+require_once __DIR__ . '/../../../app/bootstrap.php';
 
-    require_once __DIR__ . '/../../../app/config/path.php';
-    require_once CORE . 'Session.php';
-    require_once CONT . 'UserController.php';
-
-    Session::configure(1800, url('admin/login.php'), true);
-    Session::startSession();
-
-    header('Content-Type: application/json');
-
+ApiRunner::run(function () {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        echo json_encode(['status' => 'error', 'message' => 'Invalid request method']);
-        exit;
+        Response::error('Invalid request method', null, 405);
     }
 
-    try {
-        $controller = new UserController();
-        $result = $controller->adminLogin();
-        echo json_encode($result);
-    } catch (Exception $e) {
-        echo json_encode(['status' => 'error', 'message' => 'Server error: ' . $e->getMessage()]);
-    }
+    $controller = new UserController();
+    $result = $controller->adminLogin();
+    Response::json($result);
+});

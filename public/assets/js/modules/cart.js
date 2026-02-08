@@ -309,7 +309,7 @@ const Cart = {
                   <i class="fi fi-rr-shopping-cart text-6xl text-gray-300 mb-4"></i>
                   <h2 class="text-2xl font-semibold text-gray-600 mb-2">Your cart is empty</h2>
                   <p class="text-gray-500 mb-6">Add some products to get started!</p>
-                  <a href="shop.php" class="bg-brand text-white px-8 py-3 rounded-lg hover:bg-brand-dark transition-colors">
+                  <a href="index.php?page=shop" class="bg-brand text-white px-8 py-3 rounded-lg hover:bg-brand-dark transition-colors">
                     Continue Shopping
                   </a>
                 </div>

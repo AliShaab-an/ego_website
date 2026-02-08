@@ -1,17 +1,10 @@
-<?php 
+<?php
+require_once __DIR__ . '/../../../app/bootstrap.php';
 
-    require_once __DIR__ . '/../../../app/config/path.php';
-    require_once CONT . 'CategoryController.php';
-
-    header('Content-Type: application/json');
-    try{
-        $controller = new CategoryController();
-        echo json_encode($controller->deleteCategory());
-    }catch(Throwable $e){
-        echo json_encode([
-            'status' => 'error',
-            'message' => 'Internal server error: ' . $e->getMessage(),
-            'trace'   => $e->getTraceAsString()
-        ]);
-    }
+ApiRunner::run(function () {
+    Authorization::requireRoles(['admin', 'super_admin', 'editor']);
+    $controller = new CategoryController();
+    $result = $controller->deleteCategory();
+    Response::json($result);
+});
     

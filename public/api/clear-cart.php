@@ -1,17 +1,8 @@
 <?php
+require_once __DIR__ . '/../../app/bootstrap.php';
 
-    require_once __DIR__ . "/../../app/config/path.php";
-    require_once CORE . 'Session.php';
-    require_once CONT . "CartController.php";
-    
-    Session::configure(1800, url('index.php'));
-    Session::startSession();
-
-    header('Content-Type: application/json');
-
-    try{
-        $controller = new CartController();
-        echo json_encode($controller->clearCart());
-    }catch(Exception $e){
-        echo json_encode(['success' => false, 'message' => 'Server error']);
-    }
+ApiRunner::run(function () {
+    $controller = new CartController();
+    $result = $controller->clearCart();
+    Response::json($result);
+});

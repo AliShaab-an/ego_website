@@ -42,11 +42,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex items-center gap-2 mt-2">
-                    <input type="checkbox" id="is_active" name="is_active" value="1" 
-                    class="w-5 h-5 border-gray-400 rounded">
-                    <label for="is_active" class="font-bold">Mark Discount as active</label>
-                </div>
             </div>
 
             <div class="col-span-1 bg-white rounded-lg shadow-md p-6 space-y-6">

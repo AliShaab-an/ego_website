@@ -8,3 +8,8 @@ Array
     [id] => 79
     [action] => activate
 )
+Array
+(
+    [id] => 96
+    [action] => inactive
+)

@@ -1,33 +1,19 @@
 <?php
+require_once __DIR__ . '/../../app/bootstrap.php';
 
-    require_once __DIR__ . "/../../app/config/path.php";
-    require_once CORE . 'Session.php';
-    require_once CONT . "shippingController.php";
-
-    Session::configure(1800, url('index.php'));
-    Session::startSession();
-
-    header('Content-Type: application/json');
-
-    try {
-        $controller = new shippingController();
-        $result = $controller->listShipping();
-        
-        if ($result['status'] === 'success') {
-            echo json_encode([
-                'success' => true,
-                'regions' => $result['data']
-            ]);
-        } else {
-            echo json_encode([
-                'success' => false,
-                'message' => $result['message']
-            ]);
-        }
-    } catch (Exception $e) {
-        echo json_encode([
+ApiRunner::run(function () {
+    $controller = new shippingController();
+    $result = $controller->listShipping();
+    
+    if ($result['status'] === 'success') {
+        Response::json([
+            'success' => true,
+            'regions' => $result['data']
+        ]);
+    } else {
+        Response::json([
             'success' => false,
-            'message' => 'Server error: ' . $e->getMessage()
+            'message' => $result['message']
         ]);
     }
-    ?>
+});

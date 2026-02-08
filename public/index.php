@@ -1,65 +1,99 @@
 <?php
-    require_once __DIR__ . '/../app/config/path.php';
-    require_once CORE . 'Session.php';
-    require_once CONT . 'frontend/ProductController.php';
+    require_once __DIR__ . '/../app/bootstrap.php';
     
-    Session::configure(1800, url('index.php'), true);
-    Session::startSession();
-    $userId = Session::getCurrentUser();
-    $header_bg = "assets/images/header2.png";
-    $header_title = "EGO Luxury";
-    $header_subtitle = "Modern Chick &amp; Timeless Elegance";
-    $nav_logo = "assets/images/egologo2.png";
 
-    // Fetch products data
-    $productController = new ProductController();
-    $topProducts = $productController->getTopProducts();
-    $newProducts = $productController->getNewProducts();
-    $shopTheLookProducts = $productController->getProductsByCategoryName('Shop the Look', 8);
+    $frontend = new FrontendController();
+
+
+    $page = $_GET['page'] ?? 'home';
+
+    $routes = [
+        'home' => [
+            'roles' => null, // public
+            'run' => fn() => $frontend->home(),
+        ],
+        'shop' => [
+            'roles' => null,
+            'run' => fn() => $frontend->shop(),
+        ],
+        'product' => [
+            'roles' => null,
+            'run' => fn() => $frontend->product(),
+        ],
+        'category' => [
+            'roles' => null,
+            'run' => fn() => $frontend->category(),
+        ],
+        'contact' => [
+            'roles' => null,
+            'run' => fn() => $frontend->contact(),
+        ],
+
+        // Customer-only pages
+        'cart' => [
+            'roles' => ['customer'],
+            'run' => fn() => $frontend->cart(),
+        ],
+        'checkout' => [
+            'roles' => ['customer'],
+            'run' => fn() => $frontend->checkout(),
+        ],
+    ];
+
+    if(!isset($routes[$page])) {
+        View::render('errors/404', ['pageKey' => '404'], 'layouts/frontend');
+        exit;
+    }
+
+    if (!empty($routes[$page]['roles'])) {
+        Authorization::requireRoles($routes[$page]['roles']);
+    }
+
+    if (Auth::check() && in_array(Auth::role(), ['admin','super_admin','editor'], true)) {
+        // allow them to access public pages, but block cart/checkout
+        if (in_array($page, ['cart','checkout'], true)) {
+            View::render('errors/403', ['pageKey' => '403'], 'layouts/frontend');
+            exit;
+        }
+    }
+
+    $routes[$page]['run']();
+    exit;
+
+    // $header_bg = "assets/images/header2.png";
+    // $header_title = "EGO Luxury";
+    // $header_subtitle = "Modern Chick &amp; Timeless Elegance";
+    // $nav_logo = "assets/images/egologo2.png";
+
+    // $productController = new ProductController();
+    // $topProducts = $productController->getTopProducts();
+    // $newProducts = $productController->getNewProducts();
+    // $shopTheLookProducts = $productController->getProductsByCategoryName('Shop the Look', 8);
     
-    // Fetch categories with products for collections section
-    require_once MODELS . 'Category.php';
-    $categoriesWithProducts = Category::getCategoriesWithProducts(4);
+    // $categoriesWithProducts = Category::getCategoriesWithProducts(4);
+    // $settings = $settingController->getSettings();
+    // $data = [
+    //     'pageKey' => 'home',
+    //     'header_bg' => "assets/images/header2.png",
+    //     'header_title' => "EGO Luxury",
+    //     'header_subtitle' => "Modern Chick &amp; Timeless Elegance",
+    //     'nav_logo' => "assets/images/egologo2.png",
+
+    //     // data needed in partials
+    //     'topProducts' => $topProducts,
+    //     'newProducts' => $newProducts,
+    //     'shopTheLookProducts' => $shopTheLookProducts,
+    //     'categoriesWithProducts' => $categoriesWithProducts,
+
+    //     // SEO (optional)
+    //     'metaTitle' => $settings('meta_title') ?: 'Ego Clothing',
+    //     'metaDescription' => $settings('meta_description') ?: '',
+    //     'metaKeywords' => $settings('meta_keywords') ?: '',
+    // ];
+
+    // View::render('frontend/home', $data, 'layouts/frontend');
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="assets/images/egologo.png">
-    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css'>
-    <script src="https://kit.fontawesome.com/7f6ab6587f.js" crossorigin="anonymous"></script>
-    <!-- Swiper CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
-    <link rel="stylesheet" href="assets/css/style.css">
-    <title>Ego Clothing</title>
-</head>
-<body class="text-center" data-page="home">
-    <?php 
 
-        include FRONTEND_VIEWS . 'header.php';
-        include FRONTEND_VIEWS . 'login.php'; 
-        include FRONTEND_VIEWS . 'signup.php';
-        include FRONTEND_VIEWS . '/partials/sidebar.php';
-        
-        // Collections section
-        include FRONTEND_VIEWS . '/partials/collections.php';
-        include FRONTEND_VIEWS . '/partials/shopTheLook.php';
-        include FRONTEND_VIEWS. '/partials/topProducts.php';
-        include FRONTEND_VIEWS . '/partials/newProducts.php';
-        include FRONTEND_VIEWS . '/partials/homeContact.php';
-        include FRONTEND_VIEWS . 'footer.php';
-    ?>
-    <div id="loaderOverlay"
-    class="fixed inset-0 bg-white/80 flex items-center justify-center z-[9999] hidden">
-        <div class="loader border-4 border-gray-200 border-t-brand rounded-full w-10 h-10 animate-spin"></div>
-    </div>
-    <script src="<?= JS_PATH ?>jquery-3.7.1.min.js"></script>
-    <!-- Swiper JS -->
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script type="module" src="<?= JS_PATH ?>main.js"></script>
-</body>
-</html>
 
 

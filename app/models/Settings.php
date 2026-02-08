@@ -1,11 +1,9 @@
 <?php
 
-require_once __DIR__ . '/../core/DB.php';
 
-class Settings {
+    class Settings {
 
-    public static function getAll() {
-        try {
+        public static function getAll() {
             $stmt = DB::query("SELECT * FROM settings LIMIT 1");
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             
@@ -14,25 +12,17 @@ class Settings {
             }
             
             return $result;
-        } catch (PDOException $e) {
-            throw new Exception("Failed to fetch settings: " . $e->getMessage());
         }
-    }
 
-    /**
-     * Get a single setting by key
-     */
-    public static function get($key, $default = null) {
-        try {
+        /**
+         * Get a single setting by key
+         */
+        public static function get($key, $default = null) {
             $settings = self::getAll();
             return $settings[$key] ?? $default;
-        } catch (Exception $e) {
-            return $default;
         }
-    }
 
-    public static function update($data) {
-        try {
+        public static function update($data) {
             // Get ID of the settings row
             $stmt = DB::query("SELECT id FROM settings LIMIT 1");
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -71,39 +61,27 @@ class Settings {
             DB::query($query, $values);
             
             return true;
-        } catch (PDOException $e) {
-            throw new Exception("Failed to update settings: " . $e->getMessage());
         }
-    }
 
-    /**
-     * Save a single setting
-     */
-    public static function save($key, $value) {
-        try {
+        /**
+         * Save a single setting
+         */
+        public static function save($key, $value) {
             $data = [$key => $value];
             return self::update($data);
-        } catch (Exception $e) {
-            throw new Exception("Failed to save setting '{$key}': " . $e->getMessage());
         }
-    }
 
-    /**
-     * Save multiple settings at once
-     */
-    public static function saveMultiple($settings) {
-        try {
+        /**
+         * Save multiple settings at once
+         */
+        public static function saveMultiple($settings) {
             return self::update($settings);
-        } catch (Exception $e) {
-            throw new Exception("Failed to save multiple settings: " . $e->getMessage());
         }
-    }
 
-    /**
-     * Get settings by array of keys
-     */
-    public static function getMultiple($keys) {
-        try {
+        /**
+         * Get settings by array of keys
+         */
+        public static function getMultiple($keys) {
             $settings = self::getAll();
             $result = [];
             
@@ -112,9 +90,6 @@ class Settings {
             }
             
             return $result;
-        } catch (Exception $e) {
-            throw new Exception("Failed to fetch multiple settings: " . $e->getMessage());
         }
     }
-}
 

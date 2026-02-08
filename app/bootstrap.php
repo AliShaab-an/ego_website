@@ -1,0 +1,82 @@
+<?php
+
+    require_once __DIR__ . '/config/path.php';
+    require_once HELPER . 'SettingsHelper.php';
+    require_once HELPER . 'UrlHelper.php';
+    require_once HELPER . 'ViewHelper.php';
+    require_once HELPER . 'PriceHelper.php';
+
+    if (!function_exists('getSetting')) {
+        function getSetting(string $key, $default = null) {
+            return SettingsHelper::get($key, $default);
+        }
+    }
+
+    if (!function_exists('asset')) {
+        function asset(string $path = ''): string {
+            return UrlHelper::asset($path);
+        }
+    }
+
+    if (!function_exists('redirect')) {
+        function redirect(string $url): void {
+            UrlHelper::redirect($url);
+        }
+    }
+
+    if (!function_exists('sidebarLink')) {
+        function sidebarLink($action, $currentAction, $label, $icon): void {
+            ViewHelper::sidebarLink($action, $currentAction, $label, $icon);
+        }
+    }
+
+    if (!function_exists('formatPrice')) {
+        function formatPrice($amount): string {
+            return PriceHelper::format($amount);
+        }
+    }
+
+    if(defined('IS_LOCAL') && IS_LOCAL){
+        ini_set('display_errors', '1');
+        ini_set('display-startup_errors', '1');
+        error_reporting(E_ALL);
+
+    }else{
+        ini_set('display_errors', '0');
+        error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED);
+    }
+
+    require_once CORE . 'Session.php';
+    require_once CORE . 'DB.php';
+    require_once CORE . 'View.php';
+    require_once CORE . 'Response.php';
+    require_once CORE . 'ApiRunner.php';
+    require_once CORE . 'Authorization.php';
+
+    if (file_exists(CORE . 'Auth.php'))    require_once CORE . 'Auth.php';
+
+    // Initialize session for all requests
+    $isAdminRequest = strpos($_SERVER['REQUEST_URI'] ?? '', '/admin/') !== false;
+    $redirectUrl = $isAdminRequest ? url('admin/login.php') : url('index.php');
+    Session::configure(1800, $redirectUrl, $isAdminRequest);
+    Session::startSession();
+
+
+    spl_autoload_register(function ($class) {
+    $path = [
+        CORE . $class . '.php',
+        MODELS . $class . '.php',
+        CONT . $class . '.php',
+        CONT . 'frontend/' . $class . '.php',
+        CONT . 'admin/' . $class . '.php',
+        HELPER . $class . '.php',
+        ROOT_PATH . 'app/services/' . $class . '.php',
+    ];
+
+    foreach ($path as $file) {
+        if (file_exists($file)) {
+            require_once $file;
+            return;
+        }
+    }
+});

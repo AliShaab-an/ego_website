@@ -1,8 +1,5 @@
 <?php 
 
-    require_once __DIR__ . '/../core/DB.php';
-
-
     class ProductVariant{
 
         public static function create($productId,$data){
@@ -41,25 +38,6 @@
                 return ['status' => 'error', 'message' => 'Failed to add variant: ' . $e->getMessage()]; 
             } 
         }
-
-        // public static function create($productId, $data){
-        //     try {
-        //         $sql = "INSERT INTO product_variants (product_id, color_id, size_id, price, quantity, is_active, created_at, updated_at)
-        //                 VALUES (?, ?, ?, ?, ?, 1, NOW(), NOW())";
-        //         DB::query($sql, [
-        //             intval($productId),
-        //             intval($data['color_id'] ?? 0),
-        //             intval($data['size_id'] ?? 0),
-        //             floatval($data['price'] ?? 0),
-        //             intval($data['quantity'] ?? 0)
-        //         ]);
-        //         return DB::getConnection()->lastInsertId();
-        //     } catch (Exception $e) {
-        //         throw new Exception("Failed to create variant: " . $e->getMessage());
-        //     }
-        // }
-
-
 
         public static function getById($productId) {
             try{

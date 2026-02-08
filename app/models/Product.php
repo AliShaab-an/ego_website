@@ -1,7 +1,5 @@
 <?php 
 
-    require_once __DIR__ . '/../core/DB.php';
-
     class Product {
         //frontend functions
         public static function getAllProducts($limit, $offset,$filters=[]) {

@@ -1,26 +1,8 @@
 <?php
+require_once __DIR__ . '/../../app/bootstrap.php';
 
-    session_start();
-    header('Content-Type: application/json');
-
-    require_once __DIR__ . '/../../app/config/path.php';
-    require_once CONT . 'OrderController.php';
-
-    try {
-        $controller = new OrderController();
-        $result = $controller->cancelOrder();
-        
-        if ($result['success']) {
-            echo json_encode($result);
-        } else {
-            http_response_code(400);
-            echo json_encode($result);
-        }
-        
-    } catch (Exception $e) {
-        http_response_code(500);
-        echo json_encode([
-            'success' => false,
-            'message' => $e->getMessage()
-        ]);
-    }
+ApiRunner::run(function () {
+    $controller = new OrderController();
+    $result = $controller->cancelOrder();
+    Response::json($result);
+});

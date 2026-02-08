@@ -1,9 +1,5 @@
 <?php 
 
-    require_once __DIR__ . '/../config/path.php';
-    require_once MODELS . 'Coupon.php';
-
-
     class CouponController{
 
         public function addCoupon(){
@@ -23,26 +19,18 @@
                 return ['status' => 'error', 'message' => 'Invalid discount value.'];
             }
 
-            try {
-                $existing = Coupon::findByCode($code);
-                if ($existing) {
-                    return ['status' => 'error', 'message' => 'Coupon code already exists.'];
-                }
-
-                $id = Coupon::create($code, $discountType, $discountValue, $startDate, $endDate, $minOrderValue, $isActive);
-                return ['status' => 'success', 'id' => $id, 'message' => 'Coupon added successfully.'];
-            } catch (Exception $e) {
-                return ['status' => 'error', 'message' => $e->getMessage()];
+            $existing = Coupon::findByCode($code);
+            if ($existing) {
+                return ['status' => 'error', 'message' => 'Coupon code already exists.'];
             }
+
+            $id = Coupon::create($code, $discountType, $discountValue, $startDate, $endDate, $minOrderValue, $isActive);
+            return ['status' => 'success', 'id' => $id, 'message' => 'Coupon added successfully.'];
         }
 
         public function listCoupons(){    
-            try {
-                $data = Coupon::getAll();
-                return ['status' => 'success', 'data' => $data];
-            } catch (Exception $e) {
-                return ['status' => 'error', 'message' => $e->getMessage()];
-            }
+            $data = Coupon::getAll();
+            return ['status' => 'success', 'data' => $data];
         }
 
         public function getCoupon(){
@@ -51,15 +39,11 @@
                 return ['status' => 'error', 'message' => 'Missing coupon ID'];
             }
 
-            try {
-                $coupon = Coupon::findById($id);
-                if ($coupon) {
-                    return ['status' => 'success', 'data' => $coupon];
-                } else {
-                    return ['status' => 'error', 'message' => 'Coupon not found'];
-                }
-            } catch (Exception $e) {
-                return ['status' => 'error', 'message' => $e->getMessage()];
+            $coupon = Coupon::findById($id);
+            if ($coupon) {
+                return ['status' => 'success', 'data' => $coupon];
+            } else {
+                return ['status' => 'error', 'message' => 'Coupon not found'];
             }
         }
 
@@ -77,12 +61,8 @@
                 return ['status' => 'error', 'message' => 'Missing required fields.'];
             }
 
-            try {
-                Coupon::update($id, $code, $discountType, $discountValue, $startDate, $endDate, $minOrderValue, $isActive);
-                return ['status' => 'success', 'message' => 'Coupon updated successfully.'];
-            } catch (Exception $e) {
-                return ['status' => 'error', 'message' => $e->getMessage()];
-            }
+            Coupon::update($id, $code, $discountType, $discountValue, $startDate, $endDate, $minOrderValue, $isActive);
+            return ['status' => 'success', 'message' => 'Coupon updated successfully.'];
         }
 
     public function deleteCoupon(){
@@ -91,12 +71,8 @@
             return ['status' => 'error', 'message' => 'Invalid coupon ID'];
         }
 
-        try {
-            Coupon::delete($id);
-            return ['status' => 'success', 'message' => 'Coupon deleted successfully.'];
-        } catch (Exception $e) {
-            return ['status' => 'error', 'message' => $e->getMessage()];
-        }
+        Coupon::delete($id);
+        return ['status' => 'success', 'message' => 'Coupon deleted successfully.'];
     }
 }
 

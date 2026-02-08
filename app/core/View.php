@@ -1,8 +1,4 @@
 <?php
-
-    require_once __DIR__ . '/../../app/config/path.php';
-    
-
     class View{
 
         public static function render(string $view, array $data=[],string $layout= null) : void{
@@ -10,7 +6,7 @@
 
             $viewFile = VIEWS . $view . '.php';
             if(!file_exists($viewFile)){
-                $viewFile = VIEWS . '404.php';
+                $viewFile = VIEWS . 'errors/404.php';
             }
 
             if($layout){
@@ -23,5 +19,17 @@
             }
 
             require $viewFile;
+        }
+
+        public static function partial(string $relativePath, array $data = []): void
+        {
+            extract($data, EXTR_SKIP);
+
+            $file = VIEWS . trim($relativePath, '/') . '.php';
+            if (!file_exists($file)) {
+                throw new RuntimeException("Partial not found: {$file}");
+            }
+
+            require $file;
         }
     }

@@ -1,22 +1,11 @@
 <?php
+require_once __DIR__ . '/../../../app/bootstrap.php';
 
-    require_once __DIR__ . '/../../../app/config/path.php';
-    require_once CORE . 'Session.php';
-
-    Session::configure(1800, url('admin/login.php'), true);
-    Session::startSession();
-
-    header('Content-Type: application/json');
-
-    // Check if user is admin
-    if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'super_admin'])) {
-        echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-        exit;
-    }
+ApiRunner::run(function () {
+    Authorization::requireRoles(['admin', 'super_admin']);
 
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        echo json_encode(['success' => false, 'message' => 'Invalid request method']);
-        exit;
+        Response::error('Invalid request method', null, 405);
     }
 
     $data = json_decode(file_get_contents('php://input'), true);
@@ -24,8 +13,7 @@
     $location = $data['location'] ?? 'root';
 
     if (!$logName) {
-        echo json_encode(['success' => false, 'message' => 'Log file not specified']);
-        exit;
+        Response::error('Log file not specified', null, 400);
     }
 
     // Sanitize filename
@@ -39,13 +27,13 @@
     $logPath = $logDir . $logName;
 
     if (!file_exists($logPath)) {
-        echo json_encode(['success' => false, 'message' => 'Log file not found']);
-        exit;
+        Response::error('Log file not found', null, 404);
     }
 
     // Clear the log file
     if (file_put_contents($logPath, '') !== false) {
-        echo json_encode(['success' => true, 'message' => 'Log cleared successfully']);
+        Response::json(['success' => true, 'message' => 'Log cleared successfully']);
     } else {
-        echo json_encode(['success' => false, 'message' => 'Failed to clear log']);
+        Response::error('Failed to clear log', null, 500);
     }
+});

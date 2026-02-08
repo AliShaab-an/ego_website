@@ -1,8 +1,4 @@
 <?php
-    require_once __DIR__ . '/../config/path.php';
-    require_once MODELS . 'Shipping.php';
-
-
     class shippingController{
 
         public function addShipping(){
@@ -17,33 +13,24 @@
                 return ['status' => 'error', 'message' => 'Fee is required.'];
             }
 
-            try{
-                $existing = Shipping::findByName($name);
+            $existing = Shipping::findByName($name);
 
-                if ($existing) {
-                    return ['status' => 'error', 'message' => 'Region already exists.'];
-                }
-
-                $id = Shipping::createShipping($name,$fee);
-
-                return [
-                    'status'  => 'success',
-                    'id'      => $id,
-                    'message' => 'Region added successfully.'
-                ];
-            }catch(Exception $e){
-                return ['status' => 'error', 'message' => $e->getMessage()];
+            if ($existing) {
+                return ['status' => 'error', 'message' => 'Region already exists.'];
             }
+
+            $id = Shipping::createShipping($name,$fee);
+
+            return [
+                'status'  => 'success',
+                'id'      => $id,
+                'message' => 'Region added successfully.'
+            ];
         }
 
         public function listShipping(){
-
-            try{
-                $shipping = Shipping::getAll();
-                return ['status' => 'success', 'data' => $shipping];
-            }catch(Exception $e){
-                return ['status' => 'error', 'message' => $e->getMessage()];
-            }
+            $shipping = Shipping::getAll();
+            return ['status' => 'success', 'data' => $shipping];
         }
 
 
@@ -54,12 +41,8 @@
                 return ['status' => 'error', 'message' => 'Region ID is required.'];
             }
 
-            try {
-                Shipping::deleteShipping($id);
-                return ['status' => 'success', 'message' => 'Region deleted successfully.'];
-            } catch (Exception $e) {
-                return ['status' => 'error', 'message' => $e->getMessage()];
-            }
+            Shipping::deleteShipping($id);
+            return ['status' => 'success', 'message' => 'Region deleted successfully.'];
         }
 
         public function updateShipping(){
@@ -71,12 +54,8 @@
                 return ['status' => 'error', 'message' => 'All fields are required.'];
             }
 
-            try {
-                Shipping::updateShipping($id, $name, $fee);
-                return ['status' => 'success', 'message' => 'Region updated successfully.'];
-            } catch (Exception $e) {
-                return ['status' => 'error', 'message' => $e->getMessage()];
-            }
+            Shipping::updateShipping($id, $name, $fee);
+            return ['status' => 'success', 'message' => 'Region updated successfully.'];
         }
 
         public function toggleStatus(){
@@ -91,17 +70,13 @@
                 return ['status' => 'error', 'message' => 'Valid status is required'];
             }
 
-            try {
-                Shipping::toggleStatus($id, $status);
-                $statusText = $status == 1 ? 'activated' : 'deactivated';
-                return [
-                    'status' => 'success', 
-                    'message' => "Region {$statusText} successfully!",
-                    'new_status' => (int)$status
-                ];
-            } catch (Exception $e) {
-                return ['status' => 'error', 'message' => $e->getMessage()];
-            }
+            Shipping::toggleStatus($id, $status);
+            $statusText = $status == 1 ? 'activated' : 'deactivated';
+            return [
+                'status' => 'success', 
+                'message' => "Region {$statusText} successfully!",
+                'new_status' => (int)$status
+            ];
         }
 
     }

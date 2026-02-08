@@ -1,16 +1,12 @@
-<?php 
+<?php
+require_once __DIR__ . '/../../../app/bootstrap.php';
 
-    require_once __DIR__ . '/../../../app/config/path.php';
-    require_once CONT . 'ColorsController.php';
-
-    header('Content-Type: application/json');
-
-    try{
-        $controller = new ColorsController();
-        echo json_encode($controller->addColor());
-    }catch (Throwable $e) {
-        echo json_encode(['success' => false, 'message' => 'Server error']);
-    }
+ApiRunner::run(function () {
+    Authorization::requireRoles(['admin', 'super_admin', 'editor']);
+    $controller = new ColorsController();
+    $result = $controller->addColor();
+    Response::json($result);
+});
 
     
 

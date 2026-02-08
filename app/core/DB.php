@@ -1,30 +1,33 @@
 <?php
-    require_once __DIR__ . '/../config/database.php';
+class DB
+{
+    private static ?PDO $pdo = null;
 
-
-    class DB{
-        private static $instance = null;
-
-        public static function getConnection(){
-            global $pdo;
-            return $pdo;
+    public static function getConnection(): PDO
+    {
+        if (self::$pdo instanceof PDO) {
+            return self::$pdo;
         }
 
-        public static function query($sql, $params = []){
-            $stmt = self::getConnection()->prepare($sql);
-            
-            // Bind parameters with proper types
-            if (!empty($params)) {
-                foreach ($params as $index => $value) {
-                    $paramType = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
-                    $stmt->bindValue($index + 1, $value, $paramType);
-                }
-                $stmt->execute();
-            } else {
-                $stmt->execute($params);
-            }
-            
-            return $stmt;
-
+        $dbFile = CONFIG . 'database.php';
+        if (!file_exists($dbFile)) {
+            throw new Exception("Missing database config file: {$dbFile}");
         }
+
+        $pdo = require $dbFile;
+
+        if (!($pdo instanceof PDO)) {
+            throw new Exception("database.php must return a PDO instance");
+        }
+
+        self::$pdo = $pdo;
+        return self::$pdo;
     }
+
+    public static function query(string $sql, array $params = []): PDOStatement
+    {
+        $stmt = self::getConnection()->prepare($sql);
+        $stmt->execute($params);
+        return $stmt;
+    }
+}

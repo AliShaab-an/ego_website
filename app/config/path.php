@@ -65,6 +65,10 @@ if (!defined('CONFIG')) {
     define('CONFIG', ROOT_PATH . 'app/config/');
 }
 
+if(!defined('HELPER')){
+    define('HELPER', ROOT_PATH . 'app/helpers/' );
+}
+
 if(!defined('VIEWS')){
     define('VIEWS', ROOT_PATH . 'app/views/');
 }
@@ -99,13 +103,6 @@ if (!defined('MODELS')) {
 if (!function_exists('url')) {
     function url($path = '') {
         return PUBLIC_URL . ltrim($path, '/');
-    }
-}
-
-// Function to get asset path (images, css, js)
-if (!function_exists('asset')) {
-    function asset($path = '') {
-        return PUBLIC_URL . 'assets/' . ltrim($path, '/');
     }
 }
 

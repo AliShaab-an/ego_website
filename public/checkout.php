@@ -1,10 +1,19 @@
 <?php 
     require_once __DIR__ . '/../app/config/path.php';
     require_once CORE . 'Session.php';
+    require_once CORE . 'Helper.php';
+    require_once CORE . 'View.php';
+
     Session::configure(1800, url('index.php'), true);
     Session::startSession();
-    $userId = Session::getCurrentUser();
-    $nav_logo = "assets/images/egologo3.png";
+
+    $data = [
+        'pageKey' => 'checkout',
+        'nav_logo' => "assets/images/egologo3.png",
+    ];
+    
+
+    View::render('frontend/checkout', $data, 'layouts/frontend');
 ?>
 
 <!DOCTYPE html>
@@ -22,14 +31,14 @@
 </head>
 <body data-page="checkout">
     <div class="h-28 shadow-[0px_-7px_22.5px_0px_rgba(0,0,0,0.25)] py-4">
-        <?php include FRONTEND_VIEWS . '/partials/nav.php'; ?>
+        <?php include PARTIALS . 'frontend/nav.php'; ?>
     </div>
     <?php 
-        include FRONTEND_VIEWS . '/login.php'; 
-        include FRONTEND_VIEWS . '/signup.php';
-        include FRONTEND_VIEWS . '/partials/sidebar.php';
-        include FRONTEND_VIEWS . '/checkoutSection.php';
-        include FRONTEND_VIEWS . '/footer.php';
+        include PARTIALS . 'frontend/login-model.php'; 
+        include PARTIALS . 'frontend/signup-model.php';
+        include PARTIALS . 'frontend/sidebar.php';
+        View::partial('frontend/sections/checkout-section');
+        include PARTIALS . 'frontend/footer.php';
         
     ?>
 

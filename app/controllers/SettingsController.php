@@ -1,40 +1,31 @@
 <?php
-require_once __DIR__ . '/../config/path.php';
-require_once MODELS . 'Settings.php';
+    class SettingsController {
 
-class SettingsController {
+        private $uploadDir;
 
-    private $uploadDir;
-
-    public function __construct() {
-        $this->uploadDir = __DIR__ . '/../../public/admin/uploads/settings/';
-        if (!is_dir($this->uploadDir)) {
-            mkdir($this->uploadDir, 0777, true);
+        public function __construct() {
+            $this->uploadDir = __DIR__ . '/../../public/admin/uploads/settings/';
+            if (!is_dir($this->uploadDir)) {
+                mkdir($this->uploadDir, 0777, true);
+            }
         }
-    }
 
-    /**
-     * Get all settings
-     */
-    public function getSettings() {
-        try {
+        /**
+         * Get all settings
+         */
+        public function getSettings() {
             $settings = Settings::getAll();
             
             return [
                 'status' => 'success',
                 'data' => $settings
             ];
-        } catch (Exception $e) {
-            error_log("Error getting settings: " . $e->getMessage());
-            return ['status' => 'error', 'message' => $e->getMessage()];
         }
-    }
 
-    /**
-     * Save all settings
-     */
-    public function saveSettings() {
-        try {
+        /**
+         * Save all settings
+         */
+        public function saveSettings() {
             $data = [];
 
             // Handle text inputs
@@ -135,37 +126,33 @@ class SettingsController {
                     'message' => 'Failed to save settings'
                 ];
             }
-        } catch (Exception $e) {
-            error_log("Error saving settings: " . $e->getMessage());
-            return ['status' => 'error', 'message' => $e->getMessage()];
         }
-    }
 
-    /**
-     * Upload a file and return the relative path
-     */
-    private function uploadFile($file) {
-        try {
-            $filename = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '_', basename($file['name']));
-            $targetPath = $this->uploadDir . $filename;
-
-            if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+        /**
+         * Upload a file and return the relative path
+         */
+        private function uploadFile($file) {
+            try {
+                $outputDir = $this->uploadDir;
+                
+                // Use ImageService to process and resize the image
+                $saved = ImageService::processUpload($file, $outputDir, [600, 1200], 82);
+                
+                // Use the 1200px version, or fallback to the largest available
+                $filename = $saved[1200] ?? end($saved);
+                
                 // Return relative path from public folder
                 return 'admin/uploads/settings/' . $filename;
+            } catch (Exception $e) {
+                error_log("Image upload error in SettingsController: " . $e->getMessage());
+                throw new Exception("Failed to process image: " . $e->getMessage());
             }
-
-            return null;
-        } catch (Exception $e) {
-            error_log("Error uploading file: " . $e->getMessage());
-            return null;
         }
-    }
 
-    /**
-     * Get a specific setting
-     */
-    public function getSetting() {
-        try {
+        /**
+         * Get a specific setting
+         */
+        public function getSetting() {
             $key = $_GET['key'] ?? null;
 
             if (!$key) {
@@ -178,17 +165,12 @@ class SettingsController {
                 'status' => 'success',
                 'data' => $value
             ];
-        } catch (Exception $e) {
-            error_log("Error getting setting: " . $e->getMessage());
-            return ['status' => 'error', 'message' => $e->getMessage()];
         }
-    }
 
-    /**
-     * Save a single setting
-     */
-    public function saveSetting() {
-        try {
+        /**
+         * Save a single setting
+         */
+        public function saveSetting() {
             $key = $_POST['key'] ?? null;
             $value = $_POST['value'] ?? null;
 
@@ -197,27 +179,24 @@ class SettingsController {
             }
 
             if (Settings::save($key, $value)) {
+                SettingsHelper::forgetCache();
                 return [
                     'status' => 'success',
                     'message' => 'Setting saved successfully!'
                 ];
+                
             } else {
                 return [
                     'status' => 'error',
                     'message' => 'Failed to save setting'
                 ];
             }
-        } catch (Exception $e) {
-            error_log("Error saving setting: " . $e->getMessage());
-            return ['status' => 'error', 'message' => $e->getMessage()];
         }
-    }
 
-    /**
-     * Validate SMTP settings
-     */
-    public function validateSmtp() {
-        try {
+        /**
+         * Validate SMTP settings
+         */
+        public function validateSmtp() {
             $host = $_POST['smtp_host'] ?? null;
             $port = $_POST['smtp_port'] ?? null;
             $username = $_POST['smtp_username'] ?? null;
@@ -239,9 +218,5 @@ class SettingsController {
                     'message' => "SMTP connection failed: {$errstr}"
                 ];
             }
-        } catch (Exception $e) {
-            error_log("Error validating SMTP: " . $e->getMessage());
-            return ['status' => 'error', 'message' => $e->getMessage()];
         }
     }
-}

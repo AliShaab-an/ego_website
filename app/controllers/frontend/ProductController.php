@@ -1,8 +1,4 @@
 <?php 
-    require_once __DIR__ . '/../../config/path.php';
-    require_once MODELS . 'Product.php';
-    require_once MODELS .'ProductVariant.php';
-    require_once MODELS . 'ProductImages.php';
 
     class ProductController{
 
