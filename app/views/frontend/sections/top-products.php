@@ -14,7 +14,7 @@ if (!isset($topProducts) || !is_array($topProducts)) {
           <?php if (!empty($topProducts)): ?>
             <?php foreach($topProducts as $product): ?>
             <div class="swiper-slide">
-              <a href="index.php?page=product&id=<?= $product['id']?>" 
+              <a href="<?= page_url('product', ['id' => $product['id']]) ?>" 
                  class="block group bg-white overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300">
                 <div class="w-full h-64 sm:h-72 md:h-80 overflow-hidden">
                   <img src="<?= PUBLIC_URL ?><?= $product['image_path'] ?>" 

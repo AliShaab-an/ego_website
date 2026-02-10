@@ -5,8 +5,6 @@ if (!isset($categoriesWithProducts) || !is_array($categoriesWithProducts)) {
 }
 ?>
 
-
-
 <section class="collections py-20 bg-white">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Section Header -->
@@ -32,12 +30,12 @@ if (!isset($categoriesWithProducts) || !is_array($categoriesWithProducts)) {
                   ?>
                   <!-- Left: Category image -->
                   <div class="w-full lg:w-1/2 max-w-md mx-auto lg:mx-0 flex flex-col">
-                    <a href="index.php?page=category&id=<?= $category['id'] ?>" class="relative overflow-hidden bg-gray-100 group h-[320px] sm:h-[420px] lg:h-full block">
+                    <a href="<?= page_url('category', ['id' => $category['id']]) ?>" class="relative overflow-hidden bg-gray-100 group h-[320px] sm:h-[420px] lg:h-full block">
                       <img src="<?= $categoryImage ?>" 
                            alt="<?= htmlspecialchars($category['name']) ?>"
                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]">
                     </a>
-                    <a href="index.php?page=category&id=<?= $category['id'] ?>" class="mt-4 text-xl lg:text-3xl text-gray-900 tracking-wide text-start hover:text-brand transition-colors">
+                    <a href="<?= page_url('category', ['id' => $category['id']]) ?>" class="mt-4 text-xl lg:text-3xl text-gray-900 tracking-wide text-start hover:text-brand transition-colors">
                       <?= htmlspecialchars($category['name']) ?>
                     </a>
                   </div>
@@ -47,7 +45,7 @@ if (!isset($categoriesWithProducts) || !is_array($categoriesWithProducts)) {
                     <?php if (!empty($products)): ?>
                       <div class="grid grid-cols-2 grid-rows-2 gap-4 lg:gap-4 w-full">
                         <?php foreach ($products as $product): ?>
-                          <a href="index.php?page=product&id=<?= $product['id'] ?>" class="group flex flex-col h-full">
+                          <a href="<?= page_url('product', ['id' => $product['id']]) ?>" class="group flex flex-col h-full">
                             <div class="relative overflow-hidden bg-gray-100 w-full h-72 sm:h-72 md:h-80">
                               <img src="<?= PUBLIC_URL ?><?= $product['image_path'] ?>" 
                                    alt="<?= htmlspecialchars($product['name']) ?>"

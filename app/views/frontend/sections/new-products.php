@@ -10,7 +10,7 @@ if (!isset($newProducts) || !is_array($newProducts)) {
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
             <?php if (!empty($newProducts)): ?>
                 <?php foreach($newProducts as $product):?>
-                <a href="index.php?page=product&id=<?= $product['id'] ?>" 
+                <a href="<?= page_url('product', ['id' => $product['id']]) ?>" 
                    class="group block bg-white overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300">
                     <div class="w-full h-48 md:h-80 overflow-hidden">
                         <img src="<?= PUBLIC_URL ?><?= $product['image_path'] ?>" 

@@ -6,7 +6,7 @@
       
       <!-- Logo + Socials -->
       <div class="flex flex-col items-center  space-y-4 md:w-1/3">
-        <img src="assets/images/egologo.png" alt="EGO" class="h-32 w-auto md:h-60">
+        <img src="<?= IMG_PATH ?>egologo.png" alt="EGO" class="h-32 w-auto md:h-60">
         <div class="flex gap-4 text-brand">
           <a href="#"><i class="fa-brands fa-square-instagram text-2xl"></i></a>
           <a href="#"><i class="fa-brands fa-facebook-f text-2xl"></i></a>
@@ -17,10 +17,10 @@
       <!-- Navigation + Terms -->
       <div class="flex flex-col sm:flex-row justify-between gap-8 md:w-1/3 text-center sm:text-left">
         <ul class="space-y-2">
-          <li><a href="index.php" class="hover:text-brand">Home</a></li>
-          <li><a href="index.php?page=shop" class="hover:text-brand">Shop</a></li>
+          <li><a href="<?= page_url('home') ?>" class="hover:text-brand">Home</a></li>
+          <li><a href="<?= page_url('shop') ?>" class="hover:text-brand">Shop</a></li>
           <li><a href="#" class="hover:text-brand">Categories</a></li>
-          <li><a href="index.php?page=contact" class="hover:text-brand">Contact Us</a></li>
+          <li><a href="<?= page_url('contact') ?>" class="hover:text-brand">Contact Us</a></li>
         </ul>
         <ul class="space-y-2">
           <li><a href="#" class="hover:text-brand">Privacy Policy</a></li>

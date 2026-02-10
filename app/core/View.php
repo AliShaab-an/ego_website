@@ -27,7 +27,7 @@
 
             $file = VIEWS . trim($relativePath, '/') . '.php';
             if (!file_exists($file)) {
-                throw new RuntimeException("Partial not found: {$file}");
+                throw new Exception("Partial not found: {$file}");
             }
 
             require $file;

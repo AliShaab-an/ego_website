@@ -16,7 +16,7 @@ if (!isset($products) || !is_array($products)) {
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 p-8 text-start" id="productsContainer">
     <?php if (!empty($products['products'])): ?>
       <?php foreach($products['products'] as $product): ?>
-        <a href="index.php?page=product&id=<?= $product['id'] ?>" 
+        <a href="<?= page_url('product', ['id' => $product['id']]) ?>" 
             class="flex flex-col group">
           <div class="w-full h-64 md:h-96 overflow-hidden">
             <img src="<?= PUBLIC_URL ?><?= $product['image_path'] ?>" 

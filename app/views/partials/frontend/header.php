@@ -1,32 +1,24 @@
 <?php
-$headerTheme = $header_theme ?? 'dark';
-$textColorClass = $headerTheme === 'dark' ? 'text-white' : 'text-gray-900';
-$headerBgUrl = $header_bg ?? asset('assets/images/header2.png');
+// Determine header classes based on variant and theme
+$headerVariant = $headerVariant ?? 'solid';
+$headerTheme = $headerTheme ?? 'light';
+
+$headerClasses = [];
+$textColorClass = '';
+
+if ($headerVariant === 'transparent') {
+    $headerClasses[] = 'absolute top-0 left-0 w-full z-50 bg-transparent';
+    $textColorClass = 'text-white';
+} else {
+    $headerClasses[] = 'relative w-full bg-white shadow-sm';
+    $textColorClass = 'text-gray-900';
+}
+
+$headerClassString = implode(' ', $headerClasses);
 ?>
-
-<header class="hero relative isolate min-h-[50svh] md:min-h-[120svh]">
-    <a href="index.php?page=home" class="absolute inset-0 -z-10">
-        <img 
-            src="<?= htmlspecialchars($headerBgUrl) ?>" 
-            alt="Fashion header"
-            class="h-full w-full object-cover"
-            loading="eager"
-            fetchpriority="high"
-            />
-        <div class="pointer-events-none absolute inset-x-0 -bottom-1 h-18 bg-gradient-to-t from-white to-transparent"></div>
-    </a>
-
+<header class="<?= $headerClassString ?> <?= $textColorClass ?>">
     <!-- Nav -->
-    <div class="<?= $textColorClass ?> font-bold py-4">
+    <div class="font-bold py-4">
         <?php include PARTIALS . 'frontend/nav.php'; ?>
     </div>
-    
-
-  <!-- Hero text -->
-  <div class="absolute inset-0 flex flex-col items-center justify-center">
-    <h1 class="text-5xl md:text-8xl font-normal font-cor <?= $textColorClass ?> drop-shadow">
-      <?= htmlspecialchars($header_title ?? '') ?>
-    </h1>
-    <h3 class="text-sm md:text-3xl font-outfit font-thin <?= $textColorClass ?> drop-shadow mt-2"><?= htmlspecialchars($header_subtitle ?? '') ?></h3>
-  </div>
 </header>

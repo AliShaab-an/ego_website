@@ -54,7 +54,7 @@ const Categories = {
           ${this.categories
             .map(
               (cat) => `
-            <a href="index.php?page=category&id=${cat.id}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors">
+            <a href="category.php?id=${cat.id}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors">
               ${cat.name}
             </a>
           `
@@ -87,7 +87,7 @@ const Categories = {
 
       this.categories.forEach((cat) => {
         const link = $(
-          `<a href="index.php?page=category&id=${cat.id}" class="block py-2 pl-4 text-gray-700 hover:text-brand transition-colors border-b">${cat.name}</a>`
+          `<a href="category.php?id=${cat.id}" class="block py-2 pl-4 text-gray-700 hover:text-brand transition-colors border-b">${cat.name}</a>`
         );
         dropdown.append(link);
       });

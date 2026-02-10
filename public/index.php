@@ -7,56 +7,62 @@
 
     $page = $_GET['page'] ?? 'home';
 
+    // ============================================================================
+    // FRONTEND ROUTING with Authorization Guards
+    // ============================================================================
+    // PUBLIC: home, shop, product, category, contact (no guards)
+    // CART: guests + customers allowed, admins blocked (allowGuestOrCustomer)
+    // CHECKOUT: customers only, guests redirected to login, admins blocked (requireCustomer)
+    // ============================================================================
+
     $routes = [
+        // Public pages - accessible to everyone
         'home' => [
-            'roles' => null, // public
+            'guard' => null,
             'run' => fn() => $frontend->home(),
         ],
         'shop' => [
-            'roles' => null,
+            'guard' => null,
             'run' => fn() => $frontend->shop(),
         ],
         'product' => [
-            'roles' => null,
+            'guard' => null,
             'run' => fn() => $frontend->product(),
         ],
         'category' => [
-            'roles' => null,
+            'guard' => null,
             'run' => fn() => $frontend->category(),
         ],
         'contact' => [
-            'roles' => null,
+            'guard' => null,
             'run' => fn() => $frontend->contact(),
         ],
 
-        // Customer-only pages
+        // Cart - guests and customers only (admins blocked)
         'cart' => [
-            'roles' => ['customer'],
+            'guard' => fn() => Authorization::allowGuestOrCustomer(),
             'run' => fn() => $frontend->cart(),
         ],
+        
+        // Checkout - customers only (guests redirect to login, admins blocked)
         'checkout' => [
-            'roles' => ['customer'],
+            'guard' => fn() => Authorization::requireCustomer(),
             'run' => fn() => $frontend->checkout(),
         ],
     ];
 
+    // Route not found
     if(!isset($routes[$page])) {
         View::render('errors/404', ['pageKey' => '404'], 'layouts/frontend');
         exit;
     }
 
-    if (!empty($routes[$page]['roles'])) {
-        Authorization::requireRoles($routes[$page]['roles']);
+    // Apply authorization guard if defined
+    if (!empty($routes[$page]['guard'])) {
+        $routes[$page]['guard']();
     }
 
-    if (Auth::check() && in_array(Auth::role(), ['admin','super_admin','editor'], true)) {
-        // allow them to access public pages, but block cart/checkout
-        if (in_array($page, ['cart','checkout'], true)) {
-            View::render('errors/403', ['pageKey' => '403'], 'layouts/frontend');
-            exit;
-        }
-    }
-
+    // Execute route handler
     $routes[$page]['run']();
     exit;
 

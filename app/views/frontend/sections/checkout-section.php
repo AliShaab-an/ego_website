@@ -1,34 +1,11 @@
 <?php
-require_once __DIR__ . '/../../controllers/CartController.php';
-
-try {
-    $cartController = new CartController();
-    $cartData = $cartController->getCartItems();
-    
-    $cartItems = $cartData['items'] ?? [];
-    $cartTotal = $cartData['total'] ?? 0;
-    $cartCount = $cartData['count'] ?? 0;
-    
-} catch (Exception $e) {
-    error_log("Cart error: " . $e->getMessage());
-    $cartItems = [];
-    $cartTotal = 0;
-    $cartCount = 0;
-}
-
-// Get user info if logged in
-$userName = '';
-$userEmail = '';
-$userPhone = '';
-if (isset($_SESSION['user_id'])) {
-    require_once __DIR__ . '/../../models/User.php';
-    $user = User::findById($_SESSION['user_id']);
-    if ($user) {
-        $userName = $user['name'] ?? '';
-        $userEmail = $user['email'] ?? '';
-        $userPhone = $user['phone'] ?? '';
-    }
-}
+// Cart and user data passed from FrontendController
+$cartItems = $cartItems ?? [];
+$cartTotal = $cartTotal ?? 0;
+$cartCount = $cartCount ?? 0;
+$userName = $userName ?? '';
+$userEmail = $userEmail ?? '';
+$userPhone = $userPhone ?? '';
 ?>
 
 <section class="max-w-7xl mx-auto px-4 py-10">
@@ -40,7 +17,7 @@ if (isset($_SESSION['user_id'])) {
         <i class="fi fi-rr-shopping-cart text-6xl text-gray-300 mb-4"></i>
         <h2 class="text-2xl font-semibold text-gray-600 mb-2">Your cart is empty</h2>
         <p class="text-gray-500 mb-6">Add some products to checkout!</p>
-        <a href="index.php?page=shop" class="bg-brand text-white px-8 py-3 rounded-lg hover:bg-brand-dark transition-colors">
+        <a href="<?= page_url('shop') ?>" class="bg-brand text-white px-8 py-3 rounded-lg hover:bg-brand-dark transition-colors">
             Continue Shopping
         </a>
     </div>

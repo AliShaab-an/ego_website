@@ -1,6 +1,4 @@
 <?php
-// Category page - displays products in selected category
-// Expects: $categoryId (from URL)
+    // Category products page - products loaded via JavaScript API
+    View::partial('frontend/sections/category-products');
 ?>
-
-<?php View::partial('frontend/sections/category-products'); ?>

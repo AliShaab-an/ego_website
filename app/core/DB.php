@@ -26,8 +26,23 @@ class DB
 
     public static function query(string $sql, array $params = []): PDOStatement
     {
-        $stmt = self::getConnection()->prepare($sql);
-        $stmt->execute($params);
-        return $stmt;
+        try {
+            $stmt = self::getConnection()->prepare($sql);
+            if (!$stmt) {
+                throw new Exception("Failed to prepare statement: " . implode(", ", self::getConnection()->errorInfo()));
+            }
+            
+            $result = $stmt->execute($params);
+            if (!$result) {
+                throw new Exception("Failed to execute statement: " . implode(", ", $stmt->errorInfo()));
+            }
+            
+            return $stmt;
+        } catch (PDOException $e) {
+            error_log("Database query error: " . $e->getMessage());
+            error_log("SQL: " . $sql);
+            error_log("Params: " . json_encode($params));
+            throw $e;
+        }
     }
 }

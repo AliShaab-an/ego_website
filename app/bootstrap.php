@@ -12,6 +12,19 @@
         }
     }
 
+    if (!function_exists('url')) {
+        function url(string $path = ''): string {
+            return PUBLIC_URL . ltrim($path, '/');
+        }
+    }
+
+    if (!function_exists('page_url')) {
+        function page_url(string $page, array $params = []): string {
+            $params = array_merge(['page' => $page], $params);
+            return url('index.php?' . http_build_query($params));
+        }
+    }
+
     if (!function_exists('asset')) {
         function asset(string $path = ''): string {
             return UrlHelper::asset($path);

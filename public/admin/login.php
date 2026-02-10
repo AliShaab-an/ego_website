@@ -5,7 +5,7 @@
     Session::startSession();
 
     // If already logged in as admin, redirect to dashboard
-    if (isset($_SESSION['user_id']) && isset($_SESSION['role']) && in_array($_SESSION['role'], ['admin', 'super_admin'])) {
+    if (Auth::isAdmin()) {
         header('Location: index.php?action=dashboard');
         exit;
     }

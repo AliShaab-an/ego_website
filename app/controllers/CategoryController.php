@@ -111,8 +111,7 @@
         // Frontend Function
 
         public function listCategoriesWithProducts() {
-            $data = Category::getCategoriesWithProducts(4);
-            return ['status' => 'success', 'data' => $data];
+            return Category::getCategoriesWithProducts(4);
         }
 
     }

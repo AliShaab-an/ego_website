@@ -2,8 +2,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="icon" type="image/png" href="assets/images/egologo.png">
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="icon" type="image/png" href="<?= IMG_PATH ?>egologo.png">
+    <link rel="stylesheet" href="<?= CSS_PATH ?>style.css">
     <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
     <script src="https://kit.fontawesome.com/7f6ab6587f.js" crossorigin="anonymous"></script>
 

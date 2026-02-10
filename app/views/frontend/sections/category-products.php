@@ -1,7 +1,7 @@
 <section class="category-products py-8">
     <div class="flex justify-between items-center p-8">
         <div class="flex items-center gap-4">
-            <a href="index.php?page=shop" class="text-gray-600 hover:text-black transition-colors">
+            <a href="<?= page_url('shop') ?>" class="text-gray-600 hover:text-black transition-colors">
                 <i class="fas fa-arrow-left mr-2"></i>Back to Shop
             </a>
         </div>

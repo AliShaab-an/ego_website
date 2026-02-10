@@ -1,22 +1,8 @@
 <?php
-require_once __DIR__ . '/../../config/path.php';
-require_once CONT . 'CartController.php';
-
-try {
-    $cartController = new CartController();
-    $cartData = $cartController->getCartItems();
-    
-    $cartItems = $cartData['items'] ?? [];
-    $cartTotal = $cartData['total'] ?? 0;
-    $cartCount = $cartData['count'] ?? 0;
-    
-} catch (Exception $e) {
-    error_log("Cart error: " . $e->getMessage());
-    $cartItems = [];
-    $cartTotal = 0;
-    $cartCount = 0;
-}
-
+// Cart data passed from FrontendController
+$cartItems = $cartItems ?? [];
+$cartTotal = $cartTotal ?? 0;
+$cartCount = $cartCount ?? 0;
 ?>
 
 <section class="max-w-7xl mx-auto px-4 py-10">
@@ -28,7 +14,7 @@ try {
       <i class="fi fi-rr-shopping-cart text-6xl text-gray-300 mb-4"></i>
       <h2 class="text-2xl font-semibold text-gray-600 mb-2">Your cart is empty</h2>
       <p class="text-gray-500 mb-6">Add some products to get started!</p>
-      <a href="shop.php" class="bg-brand text-white px-8 py-3 rounded-lg hover:bg-brand-dark transition-colors">
+      <a href="<?= page_url('shop') ?>" class="bg-brand text-white px-8 py-3 rounded-lg hover:bg-brand-dark transition-colors">
         Continue Shopping
       </a>
     </div>

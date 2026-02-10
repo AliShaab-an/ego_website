@@ -1,31 +1,13 @@
-<?php 
-    require_once __DIR__ . '/../app/config/path.php';
-    require_once CORE . 'Session.php';
-    require_once CORE . 'View.php';
-    require_once MODELS . 'Category.php';
-    
-    Session::configure(1800, url('index.php'), true);
-    Session::startSession();
-    
-    // Get category ID and details
-    $categoryId = $_GET['id'] ?? null;
-    if (!$categoryId) {
-        header("Location: shop.php");
-        exit;
-    }
-    
-    try {
-        $category = Category::getById($categoryId);
-        if (!$category) {
-            header("Location: shop.php");
-            exit;
-        }
-    } catch (Exception $e) {
-        header("Location: shop.php");
-        exit;
-    }
-    
-    $header_bg = "assets/images/shop.png";
+<?php
+// Redirect to new front controller routing
+$id = $_GET['id'] ?? '';
+if ($id) {
+    header("Location: index.php?page=category&id=" . urlencode($id));
+} else {
+    header("Location: index.php?page=shop");
+}
+exit;
+?>
     
     $header_title = $category['name'];
     $header_subtitle = $category['description'] ?? "Discover our " . $category['name'] . " collection";

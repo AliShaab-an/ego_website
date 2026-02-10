@@ -19,7 +19,7 @@
       class="inline-block w-full md:w-auto text-center md:h-14 md:text-xl border border-brand px-6 py-3 bg-white text-brand hover:bg-brand hover:text-white transition">
       Find Us
       </a>
-        <a href="index.php?page=contact" 
+        <a href="<?= page_url('contact') ?>" 
         class="block w-full md:w-full md:h-14 md:text-xl bg-brand text-white px-6 py-3 text-center transition">
             Contact Us
         </a>
@@ -28,6 +28,6 @@
 
   <!-- Image (mobile first, desktop second) -->
   <div class="order-1 md:order-2 flex-shrink-0 w-full md:w-1/2 lg:w-[40%] mt-6 md:mt-0">
-    <img src="assets/images/contact-image.png" alt="Store Image" class="w-full h-full object-cover">
+    <img src="<?= IMG_PATH ?>contact-image.png" alt="Store Image" class="w-full h-full object-cover">
   </div>
 </section>

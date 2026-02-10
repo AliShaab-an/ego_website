@@ -1,14 +1,9 @@
 <?php
-    require_once __DIR__ . '/../../config/path.php';
-    include CONT  . '/frontend/ProductController.php';
-    $productController = new ProductController();
-    $id = $_GET['id'] ?? null;
-    if($id){
-      $product = $productController->getProductById($id);
-    }else{
-      header("Location: shop.php");
-      exit;
-    }
+// Product detail component - expects $product array from controller
+if (!isset($product) || empty($product)) {
+    echo '<p class="text-center text-red-500">Product not found</p>';
+    return;
+}
 ?>
 
 

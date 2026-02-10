@@ -7,7 +7,8 @@
         }
 
         public function logout() {
-            Session::destroySession();
+            // Admin logout - preserves cart session
+            Auth::logoutAdmin();
             redirect('login.php?action=logout');
             exit;
         }

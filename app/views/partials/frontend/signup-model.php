@@ -65,7 +65,7 @@
 
     <!-- Right: Image -->
     <div class="hidden md:block relative">
-      <img src="assets/images/signup-image.png"
+      <img src="<?= IMG_PATH ?>signup-image.png"
            alt="Sign Up Visual"
            class="w-full h-full object-cover">
       <div class="absolute inset-0 bg-gradient-to-tr from-black/30 to-transparent"></div>

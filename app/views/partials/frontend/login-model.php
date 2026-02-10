@@ -54,7 +54,7 @@
 
     <!-- Right: Image -->
     <div class="hidden md:block">
-      <img src="assets/images/login-image.png"
+      <img src="<?= IMG_PATH ?>login-image.png"
            alt="Login Visual"
            class="w-full h-full object-cover">
     </div>

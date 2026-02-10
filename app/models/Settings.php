@@ -23,6 +23,7 @@
         }
 
         public static function update($data) {
+        try {
             // Get ID of the settings row
             $stmt = DB::query("SELECT id FROM settings LIMIT 1");
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -48,7 +49,8 @@
                 if (in_array($key, ['id', 'created_at', 'updated_at'])) {
                     continue;
                 }
-                $fields[] = "`{$key}` = ?";
+                // Use proper escaping for field names
+                $fields[] = "`" . str_replace("`", "``", $key) . "` = ?";
                 $values[] = $value;
             }
             
@@ -58,15 +60,22 @@
             
             $values[] = $id;
             $query = "UPDATE settings SET " . implode(", ", $fields) . ", updated_at = NOW() WHERE id = ?";
+            
             DB::query($query, $values);
             
             return true;
+        } catch (Exception $e) {
+            error_log("Settings update error: " . $e->getMessage());
+            error_log("Query: " . ($query ?? 'N/A'));
+            error_log("Data: " . print_r($data, true));
+            return false;
         }
+    }
 
-        /**
-         * Save a single setting
-         */
-        public static function save($key, $value) {
+    /**
+     * Save a single setting
+     */
+    public static function save($key, $value) {
             $data = [$key => $value];
             return self::update($data);
         }
@@ -92,4 +101,4 @@
             return $result;
         }
     }
-
+    

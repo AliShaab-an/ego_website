@@ -27,10 +27,15 @@
             
     <!-- User Info - Fixed at bottom -->
     <div class="p-4 border-t border-gray-200 flex-shrink-0">
-        <p class="font-semibold text-gray-800 text-sm truncate"><?= $_SESSION['username'] ?? 'Admin' ?></p>
+        <?php $adminUser = Auth::user(); ?>
+        <p class="font-semibold text-gray-800 text-sm truncate" title="<?= htmlspecialchars($adminUser['name'] ?? 'Admin') ?>">
+            <?= htmlspecialchars($adminUser['name'] ?? 'Admin') ?>
+        </p>
         <div class="flex items-center gap-2 mt-2">
-            <p class="truncate text-xs text-gray-600"><?= $_SESSION['email'] ?? '' ?></p>
-            <a href="index.php?action=logout" class="text-gray-500 hover:text-red-500 transition text-lg ml-auto">
+            <p class="truncate text-xs text-gray-600" title="<?= htmlspecialchars($adminUser['email'] ?? '') ?>">
+                <?= htmlspecialchars($adminUser['email'] ?? '') ?>
+            </p>
+            <a href="index.php?action=logout" class="text-gray-500 hover:text-red-500 transition text-lg ml-auto" title="Logout">
                 <i class="fa-solid fa-right-from-bracket"></i>
             </a>
         </div>

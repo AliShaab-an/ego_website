@@ -122,7 +122,7 @@ const Products = {
             }
 
             container.append(`
-              <a href="index.php?page=product&id=${p.id}" class="flex flex-col group">
+              <a href="product.php?id=${p.id}" class="flex flex-col group">
                 <div class="w-full h-64 md:h-96 overflow-hidden">
                   <img src="${Config.getAssetUrl(p.image_path)}" 
                        alt="${p.name}" 
@@ -251,7 +251,7 @@ const Products = {
             }
 
             container.append(`
-              <a href="index.php?page=product&id=${p.id}" class="flex flex-col group">
+              <a href="product.php?id=${p.id}" class="flex flex-col group">
                 <div class="w-full h-64 md:h-96 overflow-hidden">
                   <img src="${Config.getAssetUrl(p.image_path)}" 
                        alt="${p.name}" 
@@ -354,7 +354,7 @@ const Products = {
 
     // Load colors
     ajaxRequest({
-      url: Config.getAdminApiUrl("list-colors.php"),
+      url: Config.getApiUrl("list-colors.php"),
       type: "GET",
       success: (res) => {
         const container = $("#colorFilters").empty();
@@ -379,7 +379,7 @@ const Products = {
 
     // Load sizes
     ajaxRequest({
-      url: Config.getAdminApiUrl("list-sizes.php"),
+      url: Config.getApiUrl("list-sizes.php"),
       type: "GET",
       success: (res) => {
         const container = $("#sizeFilters").empty();

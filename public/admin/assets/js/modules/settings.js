@@ -6,16 +6,12 @@ const Settings = {
   init() {
     this.bindEvents();
     this.loadSettings();
-    this.setupImagePreviews();
     this.setupColorSync();
   },
 
   bindEvents() {
     // ======= Tab Navigation =======
     $(document).on("click", ".settings-tab", (e) => this.switchTab(e));
-
-    // ======= File Preview =======
-    $(document).on("change", "#logo_file", (e) => this.previewLogo(e));
 
     // ======= Payment Method Toggles =======
     $(document).on("change", "#enable_wish_money", () =>
@@ -85,23 +81,6 @@ const Settings = {
   },
 
   /**
-   * Preview logo image
-   */
-  previewLogo(e) {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const preview = $("#logo-preview");
-        preview.html(
-          `<img src="${event.target.result}" class="w-full h-full object-contain">`,
-        );
-      };
-      reader.readAsDataURL(file);
-    }
-  },
-
-  /**
    * Toggle payment method fields visibility
    */
   togglePaymentFields(methodName) {
@@ -109,10 +88,6 @@ const Settings = {
     const fieldsId = `${methodName}-fields`;
     const isChecked = $(`#${checkboxId}`).is(":checked");
     const $fields = $(`#${fieldsId}`);
-
-    console.log(
-      `Payment method ${methodName}: checkbox=${isChecked}, setting fields to ${isChecked ? "visible" : "hidden"}`,
-    );
 
     if (isChecked) {
       $fields.removeClass("hidden");
@@ -158,44 +133,13 @@ const Settings = {
   },
 
   /**
-   * Setup image preview for all file inputs
-   */
-  setupImagePreviews() {
-    const imagePairs = [
-      { input: "logo_file", preview: "logo-preview" },
-      { input: "logo_light_file", preview: "logo_light-preview" },
-      { input: "logo_dark_file", preview: "logo_dark-preview" },
-      { input: "favicon_file", preview: "favicon-preview" },
-      { input: "homepage_bg", preview: "homepage_bg-preview" },
-      { input: "shop_bg", preview: "shop_bg-preview" },
-      { input: "contact_bg", preview: "contact_bg-preview" },
-      { input: "login_bg", preview: "login_bg-preview" },
-      { input: "signup_bg", preview: "signup_bg-preview" },
-      { input: "og_image", preview: "og_image-preview" },
-    ];
-
-    imagePairs.forEach((pair) => {
-      $(`#${pair.input}`).on("change", (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = (event) => {
-            $(`#${pair.preview}`).html(
-              `<img src="${event.target.result}" class="w-full h-full object-cover rounded-lg">`,
-            );
-          };
-          reader.readAsDataURL(file);
-        }
-      });
-    });
-  },
-
-  /**
    * Generic image preview handler
    */
   handleImagePreview(e) {
     const inputId = $(e.target).attr("id");
-    const previewId = `${inputId}-preview`;
+    // Remove _file suffix if present (e.g., logo_file -> logo)
+    const baseId = inputId.replace(/_file$/, "");
+    const previewId = `${baseId}-preview`;
     const file = e.target.files[0];
 
     if (file && $(`#${previewId}`).length) {
@@ -271,22 +215,12 @@ const Settings = {
       dataType: "json",
       success: (data) => {
         Loader.hide("#settings-form");
-        console.log("Settings API Response:", data);
         if (data.status === "success" && data.data) {
-          console.log("Settings data received:", data.data);
           this.populateSettings(data.data);
-        } else {
-          console.warn("No data in settings response or error status", data);
         }
       },
       error: (xhr, status, error) => {
         Loader.hide("#settings-form");
-        console.error("Error loading settings:", {
-          status: xhr.status,
-          statusText: xhr.statusText,
-          responseText: xhr.responseText,
-          error: error,
-        });
       },
     });
   },
@@ -295,31 +229,92 @@ const Settings = {
    * Populate form with settings data
    */
   populateSettings(settings) {
-    console.log("Populating settings with data:", settings);
+    // Image fields that should show previews, not set input values
+    const imageFields = [
+      "logo",
+      "logo_light",
+      "logo_dark",
+      "favicon",
+      "homepage_bg",
+      "shop_bg",
+      "contact_bg",
+      "login_bg",
+      "signup_bg",
+      "og_image",
+    ];
 
-    // Populate text inputs
+    // Temporarily show ALL tab contents so jQuery can find all elements
+    const $hiddenTabs = $(".settings-content").not(".active");
+    $hiddenTabs.css("display", "block");
+
+    // Also temporarily show all hidden sub-fields (payment, smtp, etc.)
+    const $hiddenFields = $(
+      "#wish_money-fields, #bank_transfer-fields, #omt-fields, #smtp-fields, #maintenance-fields, #recaptcha-fields, #cod-fields",
+    );
+    $hiddenFields.removeClass("hidden");
+
+    // PASS 1: Set checkboxes first so toggle handlers work
     $.each(settings, (key, value) => {
-      const input = $(`#${key}`);
-      if (input.length) {
-        if (input.attr("type") === "checkbox") {
-          const isChecked = value == 1 || value === true || value === "1";
-          console.log(
-            `Setting checkbox #${key} to ${isChecked} (value: ${value})`,
+      const element = $(`#${key}`);
+      if (element.length && element.attr("type") === "checkbox") {
+        const isChecked = value == 1 || value === true || value === "1";
+        element.prop("checked", isChecked);
+      }
+    });
+
+    // PASS 2: Set all other form fields
+    $.each(settings, (key, value) => {
+      const element = $(`#${key}`);
+
+      if (!element.length) return; // skip if element not found
+
+      const tagName = element.prop("tagName")?.toLowerCase();
+      const inputType = element.attr("type");
+
+      // Skip file inputs and checkboxes (already done)
+      if (inputType === "file" || inputType === "checkbox") return;
+
+      if (inputType === "color") {
+        element.val(value || "#000000");
+        const hexInput = $(`#${key}_hex`);
+        if (hexInput.length && value) {
+          hexInput.val(value.replace("#", ""));
+        }
+      } else if (tagName === "select") {
+        if (value !== null && value !== undefined) {
+          element.val(value);
+        }
+      } else if (tagName === "textarea") {
+        element.val(value === null || value === undefined ? "" : value);
+      } else {
+        element.val(value === null || value === undefined ? "" : value);
+      }
+    });
+
+    // PASS 3: Show image previews
+    imageFields.forEach((key) => {
+      const value = settings[key];
+      if (value) {
+        const previewDiv = $(`#${key}-preview`);
+        if (previewDiv.length) {
+          const imageUrl = value.startsWith("http")
+            ? value
+            : `${Config.BASE_URL}/${value}`;
+          previewDiv.html(
+            `<img src="${imageUrl}" class="w-full h-full object-cover rounded-lg" alt="${key}">`,
           );
-          input.prop("checked", isChecked);
-          // Trigger change to show/hide related fields
-          input.trigger("change");
-        } else if (input.attr("type") === "color") {
-          input.val(value);
-          // Sync hex input
-          const hexInput = $(`#${key}_hex`);
-          if (hexInput.length && value) {
-            hexInput.val(value.substring(1));
-          }
-        } else {
-          input.val(value);
         }
       }
+    });
+
+    // Restore hidden tabs
+    $hiddenTabs.css("display", "");
+
+    // Now trigger checkbox change events to properly show/hide sub-fields
+    $(
+      "#enable_cod, #enable_wish_money, #enable_bank_transfer, #enable_omt, #enable_smtp, #enable_maintenance, #enable_recaptcha",
+    ).each(function () {
+      $(this).trigger("change");
     });
   },
 
@@ -355,21 +350,10 @@ const Settings = {
       },
       error: (xhr, status, error) => {
         Loader.hide("#settings-form");
-        console.error("Error saving settings:", {
-          status: xhr.status,
-          statusText: xhr.statusText,
-          responseText: xhr.responseText,
-          error: error,
-        });
         showToast("An error occurred while saving settings", "error");
       },
     });
   },
 };
-
-// Auto-initialize when DOM is ready
-$(document).ready(function () {
-  Settings.init();
-});
 
 export default Settings;

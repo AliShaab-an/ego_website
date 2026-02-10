@@ -47,8 +47,8 @@ class UserController
             'role' => $role
         ]);
 
-        // Set user session using Auth
-        Auth::login([
+        // Log customer into session using Auth
+        Auth::loginCustomer([
             'id' => $userId,
             'name' => $name,
             'email' => $email,
@@ -77,19 +77,18 @@ class UserController
             return ['status' => 'error', 'message' => 'Invalid email address'];
         }
 
-        $user = User::verifyLogin($email, $password);
-        if ($user) {
-            // Set user session using Auth
-            Auth::login($user);
-
-            // Migrate guest cart to user if exists
-            $cartController = new CartController();
-            $cartController->migrateSessionCartToUser($user['id']);
-
-            return ['status' => 'success', 'id' => $user['id'], 'message' => 'Login successful'];
-        } else {
+        // Attempt customer login (only customers allowed on frontend)
+        if (!Auth::attemptCustomer($email, $password)) {
             return ['status' => 'error', 'message' => 'Invalid email or password'];
         }
+
+        $user = Auth::user();
+        
+        // Migrate guest cart to user if exists
+        $cartController = new CartController();
+        $cartController->migrateSessionCartToUser($user['id']);
+
+        return ['status' => 'success', 'id' => $user['id'], 'message' => 'Login successful'];
     }
 
     public function addAdmin()
@@ -149,13 +148,8 @@ class UserController
 
     public function logout()
     {
-        // For guest users, clear session cart when logging out
-        if (!isset($_SESSION['user_id'])) {
-            unset($_SESSION['cart']);
-        }
-
-        // Clear all session data
-        session_destroy();
+        // Customer logout - preserves cart session
+        Auth::logoutCustomer();
 
         return ['status' => 'success', 'message' => 'Logged out successfully'];
     }
@@ -173,15 +167,11 @@ class UserController
             return ['status' => 'error', 'message' => 'Invalid email address'];
         }
 
-        $user = User::verifyLogin($email, $password);
-
-        if ($user && in_array($user['role'], ['admin', 'super_admin'])) {
-            // Set user session using Auth
-            Auth::login($user);
-
-            return ['status' => 'success', 'message' => 'Login successful', 'redirect' => 'index.php?action=dashboard'];
-        } else {
+        // Attempt admin login (only admin/super_admin allowed)
+        if (!Auth::attemptAdmin($email, $password)) {
             return ['status' => 'error', 'message' => 'Invalid credentials or insufficient permissions'];
         }
+
+        return ['status' => 'success', 'message' => 'Login successful', 'redirect' => 'index.php?action=dashboard'];
     }
 }

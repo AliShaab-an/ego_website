@@ -10,8 +10,8 @@
 
   <!-- Navigation -->
   <nav class="px-4 space-y-2 text-start" id="mobileNav">
-    <a href="index.php" class="block py-2 border-b font-semibold">Home</a>
-    <a href="index.php?page=shop" class="block py-2 border-b font-semibold">Shop</a>
+    <a href="<?= page_url('home') ?>" class="block py-2 border-b font-semibold">Home</a>
+    <a href="<?= page_url('shop') ?>" class="block py-2 border-b font-semibold">Shop</a>
 
     <!-- Categories with Arrow -->
     <div class="border-b">
@@ -24,6 +24,6 @@
     <!-- Categories Dropdown - Will be populated by JavaScript -->
     <div class="mobile-categories-dropdown hidden" id="mobileCategoriesDropdown"></div>
 
-    <a href="index.php?page=contact" class="block py-2 border-b font-semibold">Contact us</a>
+    <a href="<?= page_url('contact') ?>" class="block py-2 border-b font-semibold">Contact us</a>
   </nav>
 </aside>
