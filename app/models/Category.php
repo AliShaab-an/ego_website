@@ -23,6 +23,15 @@
             }
         }
 
+        public static function getAll() {
+            try{
+                $stmt = DB::query("SELECT * FROM categories ORDER BY name ASC");
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            }catch(PDOException $e){
+                throw new Exception("Failed to fetch all categories: " . $e->getMessage());
+            }
+        }
+
         public static function createCategory($name,$image = null){
             try{
                 DB::query("INSERT INTO categories (name,image) VALUES (?,?)", [$name,$image]);

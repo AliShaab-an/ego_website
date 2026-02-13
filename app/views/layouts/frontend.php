@@ -18,7 +18,7 @@
         if (!empty($hasHero) && $hasHero === true):
     ?>
     <!-- Hero Section -->
-    <section class="relative w-screen h-screen min-h-screen overflow-hidden">
+    <section class="relative w-full h-screen min-h-screen overflow-hidden">
         <!-- Background Image -->
         <div class="absolute inset-0 bg-cover bg-center bg-no-repeat" style="background-image: url('<?= htmlspecialchars($heroImage ?? '') ?>'); "></div>
         

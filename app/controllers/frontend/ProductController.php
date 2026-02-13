@@ -35,9 +35,6 @@
 
         public function listProducts() {
             try{
-                // Debug logging
-                error_log("ProductController::listProducts - GET parameters: " . print_r($_GET, true));
-                
                 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
                 $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 12;
                 $offset = ($page - 1) * $limit;
@@ -53,19 +50,33 @@
                 // Handle single category parameter (for category pages)
                 if (isset($_GET['category']) && !empty($_GET['category'])) {
                     $filters['categories'] = [(int)$_GET['category']];
-                    error_log("Single category filter applied: " . $_GET['category']);
                 }
-                
-                error_log("Final filters: " . print_r($filters, true));
 
-                $products = Product::getAllProducts($limit, $offset,$filters);
-                $total = Product::countAllProducts($filters);
+                // Build cache key with version for automatic invalidation
+                $shopVersion = Cache::get('shop:version') ?: 1;
+                $cacheKey = 'shop:v' . $shopVersion . ':products:' . md5(json_encode([
+                    'page' => $page,
+                    'limit' => $limit,
+                    'filters' => $filters
+                ]));
+
+                // Cache products and count for 2 minutes
+                $result = Cache::remember($cacheKey, 120, function() use ($limit, $offset, $filters) {
+                    $products = Product::getAllProducts($limit, $offset, $filters);
+                    $total = Product::countAllProducts($filters);
+                    
+                    return [
+                        'products' => $products,
+                        'total' => $total,
+                        'has_more' => count($products) === (int)$limit
+                    ];
+                });
 
                 return [
                     'status' => 'success',
-                    'data' => $products,
-                    'total' => $total,
-                    'has_more' => count($products) === (int)$limit
+                    'data' => $result['products'],
+                    'total' => $result['total'],
+                    'has_more' => $result['has_more']
                 ];
             }catch(Exception $e){
                 return ['status' => 'error', 'message' => $e->getMessage()];

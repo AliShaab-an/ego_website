@@ -4,7 +4,7 @@
             <!-- Desktop: nav left | Mobile: logo left -->
             <div class="flex-1 flex items-center">
                 <!-- Desktop nav -->
-                <nav class="hidden md:flex gap-6 font-semibold">
+                <nav class="hidden md:flex gap-6 font-semibold nav-links">
                     <a href="<?= page_url('home') ?>" class="hover:underline hover:font-bold cursor-pointer">Home</a>
                     <a href="<?= page_url('shop') ?>" class="hover:underline hover:font-bold cursor-pointer">Shop</a>
                     <div class="categories-container relative">
@@ -17,8 +17,8 @@
                 <div class="md:hidden">
                     <a href="<?= page_url('home') ?>">
                         <?php
-                            $logoFile = getSetting('site_logo', 'egologo3.png');
-                            $logo = asset('admin/uploads/settings/' . $logoFile);
+                            $logoFile = getSetting('logo', 'dnc-logo.png');
+                            $logo = asset('images/dnc-logo.png' . $logoFile);
                         ?>
                         <img src="<?= htmlspecialchars($logo) ?>" alt="EGO" class="h-10 w-auto cursor-pointer">
                     </a>
@@ -27,7 +27,7 @@
             <!-- Desktop logo (centered absolutely) -->
             <div class="hidden md:block absolute left-1/2 -translate-x-1/2">
                 <a href="<?= page_url('home') ?>">
-                    <?php $logo = getSetting('nav_logo', 'assets/images/egologo3.png'); ?>
+                    <?php $logo = getSetting('logo', asset('images/dnc-logo.png')); ?>
                     <img src="<?= htmlspecialchars($logo) ?>" alt="EGO" class="h-14 w-auto cursor-pointer">
                 </a>
             </div>

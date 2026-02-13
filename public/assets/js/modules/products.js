@@ -69,8 +69,12 @@ const Products = {
     $(document).on("click", "#prevPage", () => this.changeCategoryPage("prev"));
   },
 
-  loadProducts(page = 1) {
-    const filters = this.collectFilters();
+  loadProducts(page = 1, filters = null) {
+    // If no filters provided, collect them
+    if (!filters) {
+      filters = this.collectFilters();
+    }
+    
     const container = $("#productsContainer");
 
     // Show loader
@@ -83,12 +87,37 @@ const Products = {
       </div>
     `);
 
+    // Build query string with proper array handling
+    let queryParams = `page=${page}&limit=${this.limit}`;
+    
+    // Add array parameters manually to ensure proper format
+    if (filters.categories && filters.categories.length > 0) {
+      filters.categories.forEach(cat => {
+        queryParams += `&categories[]=${encodeURIComponent(cat)}`;
+      });
+    }
+    
+    if (filters.colors && filters.colors.length > 0) {
+      filters.colors.forEach(color => {
+        queryParams += `&colors[]=${encodeURIComponent(color)}`;
+      });
+    }
+    
+    if (filters.sizes && filters.sizes.length > 0) {
+      filters.sizes.forEach(size => {
+        queryParams += `&sizes[]=${encodeURIComponent(size)}`;
+      });
+    }
+    
+    // Add scalar parameters
+    queryParams += `&minPrice=${filters.minPrice || 0}`;
+    queryParams += `&maxPrice=${filters.maxPrice || 10000}`;
+    
+    const finalUrl = Config.getApiUrl(`list-products.php?${queryParams}`);
+
     ajaxRequest({
-      url: Config.getApiUrl(
-        `list-products.php?page=${page}&limit=${this.limit}`
-      ),
+      url: finalUrl,
       type: "GET",
-      data: filters,
       success: (res) => {
         container.empty();
         const pagination = $("#paginationNumbers").empty();
@@ -331,15 +360,16 @@ const Products = {
   loadFilters() {
     // Load categories
     ajaxRequest({
-      url: Config.getApiUrl("list-categories.php"),
+      url: Config.getApiUrl("list-categories.php?all=true"),
       type: "GET",
       success: (res) => {
         const container = $("#categoryFilters").empty();
+        
         if (res.status === "success" && res.data?.length) {
           res.data.forEach((cat) => {
             container.append(`
             <label class="flex items-center gap-2">
-              <input type="checkbox" name="category" value="${cat.id}" class="accent-brand">
+              <input type="checkbox" name="categories[]" value="${cat.id}" class="accent-brand">
               <span>${cat.name}</span>
             </label>
           `);
@@ -354,7 +384,7 @@ const Products = {
 
     // Load colors
     ajaxRequest({
-      url: Config.getApiUrl("list-colors.php"),
+      url: Config.getApiUrl("list-colors.php?all=true"),
       type: "GET",
       success: (res) => {
         const container = $("#colorFilters").empty();
@@ -362,7 +392,7 @@ const Products = {
           res.data.forEach((color) => {
             container.append(`
             <label class="flex items-center gap-2">
-              <input type="checkbox" name="color" value="${color.id}" class="accent-brand">
+              <input type="checkbox" name="colors[]" value="${color.id}" class="accent-brand">
               <span class="flex items-center gap-1">
                 ${color.name}
               </span>
@@ -379,7 +409,7 @@ const Products = {
 
     // Load sizes
     ajaxRequest({
-      url: Config.getApiUrl("list-sizes.php"),
+      url: Config.getApiUrl("list-sizes.php?all=true"),
       type: "GET",
       success: (res) => {
         const container = $("#sizeFilters").empty();
@@ -387,7 +417,7 @@ const Products = {
           res.data.forEach((size) => {
             container.append(`
             <label class="flex items-center gap-2">
-              <input type="checkbox" name="size" value="${
+              <input type="checkbox" name="sizes[]" value="${
                 size.id
               }" class="accent-brand">
               <span>${size.name} ${size.type ? `(${size.type})` : ""}</span>
@@ -429,13 +459,15 @@ const Products = {
     const minPrice = $("#minPrice").val() || 0;
     const maxPrice = $("#maxPrice").val() || 10000;
 
-    return {
+    const filters = {
       categories,
       colors,
       sizes,
       minPrice: parseInt(minPrice),
       maxPrice: parseInt(maxPrice),
     };
+
+    return filters;
   },
 
   clearFilters() {

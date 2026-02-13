@@ -7,6 +7,17 @@
             $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 5;
             $offset = ($page - 1) * $limit;
 
+            // For admin pagination, don't cache
+            // For frontend (all categories), cache it
+            if (isset($_GET['all']) && $_GET['all'] === 'true') {
+                $data = Cache::remember('shop:categories:all', 3600, fn() => Category::getAll());
+                return [
+                    'status' => 'success',
+                    'data' => $data,
+                    'total' => count($data)
+                ];
+            }
+
             $data = Category::getPaginated($limit, $offset);
             $total = Category::countAll();
             $hasMore = ($offset + $limit) < $total;
@@ -48,6 +59,9 @@
 
             $id = Category::createCategory($name,$filename);
 
+            // Invalidate cache by bumping versions
+            $this->invalidateCategoryCache();
+
             return [
                 'status'  => 'success',
                 'id'      => $id,
@@ -79,6 +93,10 @@
             }
 
             Category::updateCategory($id, $name, $imagePath);
+            
+            // Invalidate cache by bumping versions
+            $this->invalidateCategoryCache();
+            
             return ['status' => 'success', 'message' => 'Category updated successfully'];
         }
         
@@ -105,6 +123,10 @@
             }
 
             Category::deleteCategory($id);
+            
+            // Invalidate cache by bumping versions
+            $this->invalidateCategoryCache();
+            
             return ['status' => 'success', 'message' => 'Category deleted successfully'];
         }
 
@@ -112,6 +134,22 @@
 
         public function listCategoriesWithProducts() {
             return Category::getCategoriesWithProducts(4);
+        }
+
+        /**
+         * Invalidate category-related caches by bumping version numbers
+         */
+        private function invalidateCategoryCache() {
+            // Delete specific category cache
+            Cache::delete('shop:categories:all');
+            
+            // Bump shop version (categories affect product filtering)
+            $shopVersion = Cache::get('shop:version') ?: 1;
+            Cache::set('shop:version', $shopVersion + 1, 365 * 24 * 3600);
+            
+            // Bump home version (categories displayed on home page)
+            $homeVersion = Cache::get('home:version') ?: 1;
+            Cache::set('home:version', $homeVersion + 1, 365 * 24 * 3600);
         }
 
     }

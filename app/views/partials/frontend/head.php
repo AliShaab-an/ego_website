@@ -10,7 +10,7 @@
     <!-- Optional Swiper (you used it on home). Keep globally for now -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
 
-    <title><?= htmlspecialchars($metaTitle ?? getSetting('meta_title') ?? 'Ego Clothing') ?></title>
+    <title><?= htmlspecialchars($metaTitle ?? getSetting('meta_title') ?? 'Ego Luxury') ?></title>
     <meta name="description" content="<?= htmlspecialchars($metaDescription ?? getSetting('meta_description') ?? '') ?>">
     <meta name="keywords" content="<?= htmlspecialchars($metaKeywords ?? getSetting('meta_keywords') ?? '') ?>">
 

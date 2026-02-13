@@ -33,7 +33,7 @@
         </div>
 
         <div class="flex justify-end">
-          <a href="#" class="text-xs font-medium text-gray-600 hover:text-[#b38b5e]">Forgot Password?</a>
+          <a href="<?= page_url('forgotPassword') ?>" class="text-xs font-medium text-gray-600 hover:text-[#b38b5e]">Forgot Password?</a>
         </div>
 
         <button type="submit"

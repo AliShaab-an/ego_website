@@ -52,17 +52,31 @@ const UI = {
     const openMenu = document.getElementById("openSidebar");
     const closeMenu = document.getElementById("closeSidebar");
 
-    openMenu?.addEventListener("click", () => {
-      sidebar?.classList.remove("-translate-x-full");
-      overlay?.classList.remove("hidden");
-    });
+    if (openMenu) {
+      openMenu.addEventListener("click", () => {
+        if (sidebar) sidebar.classList.remove("-translate-x-full");
+        if (overlay) overlay.classList.remove("hidden");
+        document.body.classList.add("overflow-hidden");
+      });
+    }
 
-    [closeMenu, overlay].forEach((el) =>
-      el?.addEventListener("click", () => {
-        sidebar?.classList.add("-translate-x-full");
-        overlay?.classList.add("hidden");
-      })
-    );
+    if (closeMenu) {
+      closeMenu.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (sidebar) sidebar.classList.add("-translate-x-full");
+        if (overlay) overlay.classList.add("hidden");
+        document.body.classList.remove("overflow-hidden");
+      });
+    }
+
+    if (overlay) {
+      overlay.addEventListener("click", () => {
+        if (sidebar) sidebar.classList.add("-translate-x-full");
+        overlay.classList.add("hidden");
+        document.body.classList.remove("overflow-hidden");
+      });
+    }
   },
 
   initFilterSidebar() {

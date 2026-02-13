@@ -10,6 +10,14 @@
         }
 
         public static function asset(string $path):string {
-            return BASE_URL . '/assets/' . ltrim($path, '/');
+            // Remove leading slash if present
+            $path = ltrim($path, '/');
+            
+            // If path doesn't start with 'assets/', prepend it
+            if (strpos($path, 'assets/') !== 0) {
+                $path = 'assets/' . $path;
+            }
+            
+            return PUBLIC_URL . $path;
         }
     }

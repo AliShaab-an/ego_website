@@ -4,8 +4,11 @@
         class="fixed left-0 top-0 h-full w-64 bg-white shadow-lg transform -translate-x-full transition-transform duration-300 z-50">
   
   <!-- Close button -->
-  <div class="flex justify-end p-4">
-    <button id="closeSidebar" class="text-2xl">&times;</button>
+  <div class="flex justify-end p-4 border-b relative z-10">
+    <button id="closeSidebar" 
+            type="button"
+            class="inline-flex items-center justify-center text-gray-600 hover:text-gray-900 text-3xl font-light leading-none cursor-pointer" 
+            aria-label="Close">&times;</button>
   </div>
 
   <!-- Navigation -->

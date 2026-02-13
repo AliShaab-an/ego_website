@@ -221,6 +221,9 @@
                     }
                 }
                 
+                // Invalidate cache by bumping versions
+                $this->invalidateProductCache();
+                
                 return [
                     'status' => 'success',
                     'product_id' => $productId,
@@ -270,6 +273,10 @@
 
             try {
                 Product::delete($id);
+                
+                // Invalidate cache by bumping versions
+                $this->invalidateProductCache();
+                
                 return ['status' => 'success', 'message' => 'Product deleted successfully.'];
             } catch (Exception $e) {
                 return ['status' => 'error', 'message' => $e->getMessage()];
@@ -431,6 +438,9 @@
                     return ['status' => 'error', 'message' => 'Failed to update product discount: ' . $e->getMessage()];
                 }
 
+                // Invalidate cache by bumping versions
+                $this->invalidateProductCache();
+
                 return([
                     'status' => 'success',
                     'message' => 'Product updated successfully.'
@@ -458,10 +468,28 @@
                 ];
 
                 Product::quickUpdate($id,$data);
+                
+                // Invalidate cache by bumping versions
+                $this->invalidateProductCache();
+                
                 return ['status' => 'success', 'message' => 'Category updated successfully'];
             }catch(Exception $e){
                 return ['status' => 'error', 'message' => $e->getMessage()];
             }
+        }
+
+        /**
+         * Invalidate product-related caches by bumping version numbers
+         * This makes all cached product data stale without needing to know all cache keys
+         */
+        private function invalidateProductCache() {
+            // Bump shop version (for product listings)
+            $shopVersion = Cache::get('shop:version') ?: 1;
+            Cache::set('shop:version', $shopVersion + 1, 365 * 24 * 3600); // 1 year TTL
+            
+            // Bump home version (for featured/top/new products)
+            $homeVersion = Cache::get('home:version') ?: 1;
+            Cache::set('home:version', $homeVersion + 1, 365 * 24 * 3600); // 1 year TTL
         }
 
     }

@@ -5,7 +5,8 @@
         public function listColors(){
             // If 'all' parameter is set, return all colors without pagination (for dropdowns)
             if (isset($_GET['all']) && $_GET['all'] === 'true') {
-                $data = Colors::getAllColors();
+                // Cache all colors for 1 hour (used in shop filters)
+                $data = Cache::remember('shop:colors:all', 3600, fn() => Colors::getAllColors());
                 return [
                     'status' => 'success',
                     'data' => $data,
@@ -13,7 +14,7 @@
                 ];
             }
 
-            // Otherwise, use pagination (for table views)
+            // Otherwise, use pagination (for table views) - NOT cached as it's admin only
             $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
             $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 5;
             $offset = ($page - 1) * $limit;
@@ -53,6 +54,9 @@
 
             $id = Colors::createColor($name,$hex);
 
+            // Invalidate colors cache
+            Cache::delete('shop:colors:all');
+
             return [
                 'status'  => 'success',
                 'id'      => $id,
@@ -68,6 +72,10 @@
             }
 
             Colors::deleteColor($id);
+            
+            // Invalidate colors cache
+            Cache::delete('shop:colors:all');
+            
             return ['status' => 'success', 'message' => 'Color deleted successfully.'];
         }
 
@@ -81,6 +89,10 @@
             }
 
             Colors::updateColor($id, $name, $hex);
+            
+            // Invalidate colors cache
+            Cache::delete('shop:colors:all');
+            
             return ['status' => 'success', 'message' => 'Color updated successfully.'];
         }
 

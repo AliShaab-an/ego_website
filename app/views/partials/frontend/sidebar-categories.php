@@ -7,7 +7,7 @@
         <button id="closeFilter" class="text-gray-600 text-2xl cursor-pointer">&times;</button>
     </div>
 
-    <div class="p-4 overflow-y-auto h-full pb-32">
+    <div class="p-4 overflow-y-auto" style="height: calc(100% - 140px);">
         
         <!-- Categories Filter -->
         <div class="mb-6 text-start">
@@ -53,19 +53,19 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Apply Filters Button -->
-        <div class="fixed bottom-0 left-0 w-64 bg-white p-4 border-t border-gray-200 shadow-lg">
-            <div class="flex gap-2">
-                <button id="clearFilters" 
-                        class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition-colors">
-                    Clear
-                </button>
-                <button id="applyFilters" 
-                        class="flex-1 px-4 py-2 bg-brand text-white rounded hover:bg-brand-dark transition-colors">
-                    Apply
-                </button>
-            </div>
+    <!-- Apply Filters Button - Fixed to bottom of sidebar -->
+    <div class="absolute bottom-0 left-0 right-0 w-full bg-white p-4 border-t border-gray-200 shadow-lg">
+        <div class="flex gap-2">
+            <button id="clearFilters" 
+                    class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition-colors">
+                Clear
+            </button>
+            <button id="applyFilters" 
+                    class="flex-1 px-4 py-2 bg-brand text-white rounded hover:bg-brand-dark transition-colors">
+                Apply
+            </button>
         </div>
     </div>
 </aside>

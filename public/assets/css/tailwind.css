@@ -46,13 +46,21 @@
   .nav-icons i {
     @apply text-gray-800;
   }
+  
+  .nav-icons button i {
+    @apply text-gray-800;
+  }
 
-  /* When inside .hero */
-  .hero .nav-links a {
+  /* Dark theme header (white text/icons) */
+  .header-dark .nav-links a {
     @apply text-white/90 hover:text-white;
   }
 
-  .hero .nav-icons i {
+  .header-dark .nav-icons i {
+    @apply text-white;
+  }
+  
+  .header-dark .nav-icons button i {
     @apply text-white;
   }
 }

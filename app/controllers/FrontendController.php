@@ -21,28 +21,36 @@ class FrontendController
 
     public function home(): void
     {
+        // Get cache version for home page data
+        $homeVersion = Cache::get('home:version') ?: 1;
 
         $data = [
             // Hero configuration
             'hasHero' => true,
-            'heroImage' => getSetting('homepage_bg', asset('assets/images/header2.png')),
+            'heroImage' => getSetting('homepage_bg', asset('images/header2.png')),
             'heroTitle' => "EGO Luxury",
             'heroSubtitle' => "Modern Chick &amp; Timeless Elegance",
             'headerVariant' => 'transparent',
             'headerTheme' => 'dark', // white text/icons
 
-            'nav_logo' => asset('assets/images/egologo2.png'),
+            'nav_logo' => asset('images/egologo3.png'),
 
-            // Data needed by your home partials
-            'topProducts' => $this->productController->getTopProducts(),
-            'newProducts' => $this->productController->getNewProducts(),
-            'shopTheLookProducts' => $this->productController->getProductsByCategoryName('Shop the Look', 8),
-            'categoriesWithProducts' => $this->categories->listCategoriesWithProducts(),
+            // Data needed by your home partials - CACHED for 5 minutes
+            'topProducts' => Cache::remember("home:v{$homeVersion}:top_products", 300, 
+                fn() => $this->productController->getTopProducts()
+            ),
+            'newProducts' => Cache::remember("home:v{$homeVersion}:new_products", 300, 
+                fn() => $this->productController->getNewProducts()
+            ),
+            'shopTheLookProducts' => Cache::remember("home:v{$homeVersion}:shop_look", 300, 
+                fn() => $this->productController->getProductsByCategoryName('Shop the Look', 8)
+            ),
+            'categoriesWithProducts' => Cache::remember("home:v{$homeVersion}:categories", 3600, 
+                fn() => $this->categories->listCategoriesWithProducts()
+            ),
 
             // SEO (fallback to global settings in layout if null)
-            'metaTitle' => getSetting('meta_title') ?: 'Ego Clothing',
-            'metaDescription' => getSetting('meta_description') ?: '',
-            'metaKeywords' => getSetting('meta_keywords') ?: '',
+            'metaTitle' =>'Ego Clothing',
         ];
 
         $this->render('home', $data);
@@ -53,17 +61,16 @@ class FrontendController
         $data = [
             // Hero configuration
             'hasHero' => true,
-            'heroImage' => getSetting('shop_bg', asset('assets/images/header2.png')),
+            'heroImage' => getSetting('shop_bg', asset('images/header2.png')),
             'heroTitle' => "Shop",
             'heroSubtitle' => "",
             'headerVariant' => 'transparent',
             'headerTheme' => 'dark',
 
-            'nav_logo' => asset('assets/images/egologo2.png'),
+            'nav_logo' => asset('images/egologo2.png'),
 
             // Optional SEO overrides
-            'metaTitle' => getSetting('meta_title') ?: 'Shop Women’s Fashion | Ego Clothing',
-            'metaDescription' => getSetting('meta_description') ?: 'Browse our collection of trendy women’s clothing at Ego Clothing.',
+            'metaTitle' => 'Shop | Ego Clothing',
         ];
 
         $this->render('shop', $data);
@@ -75,16 +82,15 @@ class FrontendController
         $data = [
             // Hero configuration
             'hasHero' => true,
-            'heroImage' => getSetting('contact_bg', asset("assets/images/contactus.png")),
+            'heroImage' => getSetting('contact_bg', asset("images/contactus.png")),
             'heroTitle' => "Contact us",
             'heroSubtitle' => "",
             'headerVariant' => 'transparent',
             'headerTheme' => 'dark',
 
-            'nav_logo' => asset('assets/images/egologo2.png'),
+            'nav_logo' => asset('images/egologo2.png'),
 
             'metaTitle' => 'Contact Us | Ego Clothing',
-            'metaDescription' => 'Contact Ego Clothing for orders, support, and inquiries.',
         ];
 
         $this->render('contact', $data);
@@ -112,7 +118,7 @@ class FrontendController
             'hasHero' => false,
             'headerVariant' => 'solid',
             'headerTheme' => 'light', // dark text/icons
-            'nav_logo' => asset('assets/images/egologo2.png'),
+            'nav_logo' => asset('images/egologo2.png'),
             'metaTitle' => ($product['name'] ?? 'Product') . ' | ' . getSetting('meta_title', 'Ego Clothing'),
         ]);
     }
@@ -139,7 +145,7 @@ class FrontendController
             'categoryId' => $id,
             // Hero configuration
             'hasHero' => true,
-            'heroImage' => getSetting('shop_bg', asset('assets/images/header2.png')),
+            'heroImage' => getSetting('shop_bg', asset('images/header2.png')),
             'heroTitle' => $category['name'] ?? 'Category',
             'heroSubtitle' => '',
             'headerVariant' => 'transparent',
@@ -165,8 +171,8 @@ class FrontendController
             'hasHero' => false,
             'headerVariant' => 'solid',
             'headerTheme' => 'light',
-            'nav_logo' => asset('assets/images/egologo2.png'),
-            'metaTitle' => 'Cart | ' . getSetting('meta_title', 'Ego Clothing'),
+            'nav_logo' => asset('images/egologo2.png'),
+            'metaTitle' => 'Cart | Ego Clothing',
 
             // Cart data
             'cartItems' => $cartData['items'] ?? [],
@@ -207,8 +213,8 @@ class FrontendController
             'hasHero' => false,
             'headerVariant' => 'solid',
             'headerTheme' => 'light',
-            'nav_logo' => asset('assets/images/egologo2.png'),
-            'metaTitle' => 'Checkout | ' . getSetting('meta_title', 'Ego Clothing'),
+            'nav_logo' => asset('images/egologo2.png'),
+            'metaTitle' => 'Checkout | Ego Clothing',
 
             // Cart data
             'cartItems' => $cartData['items'] ?? [],
@@ -219,6 +225,52 @@ class FrontendController
             'userName' => $userName,
             'userEmail' => $userEmail,
             'userPhone' => $userPhone,
+        ]);
+    }
+
+    public function forgotPassword(): void
+    {
+        $this->render('forgot-password', [
+            // No hero for forgot password page
+            'hasHero' => false,
+            'headerVariant' => 'solid',
+            'headerTheme' => 'light',
+            'nav_logo' => asset('images/egologo2.png'),
+            'metaTitle' => 'Forgot Password | Ego Clothing',
+        ]);
+    }
+
+    public function privacyPolicy(): void
+    {
+        $content = getSetting('privacy_policy', '');
+        $title = getSetting('privacy_policy_title', 'Privacy Policy');
+        
+        $this->render('privacy-policy', [
+            'pageKey' => 'privacy-policy',
+            'hasHero' => false,
+            'headerVariant' => 'solid',
+            'headerTheme' => 'light',
+            'nav_logo' => asset('images/egologo2.png'),
+            'metaTitle' => $title . ' | Ego Clothing',
+            'privacyTitle' => $title,
+            'privacyContent' => $content,
+        ]);
+    }
+
+    public function termsOfService(): void
+    {
+        $content = getSetting('terms_conditions', '');
+        $title = getSetting('terms_of_service_title', 'Terms & Conditions');
+        
+        $this->render('terms-of-service', [
+            'pageKey' => 'terms-of-service',
+            'hasHero' => false,
+            'headerVariant' => 'solid',
+            'headerTheme' => 'light',
+            'nav_logo' => asset('images/egologo2.png'),
+            'metaTitle' => $title . ' | Ego Clothing',
+            'termsTitle' => $title,
+            'termsContent' => $content,
         ]);
     }
 }

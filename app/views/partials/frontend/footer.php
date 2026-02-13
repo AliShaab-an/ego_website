@@ -23,8 +23,8 @@
           <li><a href="<?= page_url('contact') ?>" class="hover:text-brand">Contact Us</a></li>
         </ul>
         <ul class="space-y-2">
-          <li><a href="#" class="hover:text-brand">Privacy Policy</a></li>
-          <li><a href="#" class="hover:text-brand">Terms &amp; Conditions</a></li>
+          <li><a href="<?= page_url('privacy-policy') ?>" class="hover:text-brand">Privacy Policy</a></li>
+          <li><a href="<?= page_url('terms-of-service') ?>" class="hover:text-brand">Terms &amp; Conditions</a></li>
         </ul>
       </div>
 
