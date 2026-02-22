@@ -45,4 +45,44 @@ class DB
             throw $e;
         }
     }
+
+    /**
+     * Begin a database transaction
+     * 
+     * @return bool True on success
+     */
+    public static function beginTransaction(): bool
+    {
+        return self::getConnection()->beginTransaction();
+    }
+
+    /**
+     * Commit the current transaction
+     * 
+     * @return bool True on success
+     */
+    public static function commit(): bool
+    {
+        return self::getConnection()->commit();
+    }
+
+    /**
+     * Rollback the current transaction
+     * 
+     * @return bool True on success
+     */
+    public static function rollback(): bool
+    {
+        return self::getConnection()->rollBack();
+    }
+
+    /**
+     * Check if currently in a transaction
+     * 
+     * @return bool True if in transaction
+     */
+    public static function inTransaction(): bool
+    {
+        return self::getConnection()->inTransaction();
+    }
 }

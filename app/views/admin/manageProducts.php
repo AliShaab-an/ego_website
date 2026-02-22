@@ -29,15 +29,25 @@
   <button id="addProductPageBtn" class="bg-brand text-white px-4 py-2 rounded">+ Add Product</button>
 </div>
 
-  <table class="table-auto w-full md:table-fixed">
+  <table class="table-fixed w-full">
+    <colgroup>
+      <col style="width:4%">
+      <col style="width:24%">
+      <col style="width:12%">
+      <col style="width:8%">
+      <col style="width:10%">
+      <col style="width:9%">
+      <col style="width:33%">
+    </colgroup>
     <thead class="bg-[rgba(240,215,186,0.2)]">
       <tr>
-        <th class="pt-4 pb-4">#</th>
-        <th>Name</th>
-        <th>Category</th>
-        <th>Price</th>
-        <th>Status</th>
-        <th>Actions</th>
+        <th class="pt-4 pb-4 text-center">#</th>
+        <th class="text-left pl-3">Name</th>
+        <th class="text-center">Category</th>
+        <th class="text-center">Price</th>
+        <th class="text-center">Stock</th>
+        <th class="text-center">Status</th>
+        <th class="text-center">Actions</th>
       </tr>
     </thead>
     <tbody id="productTableBody"></tbody>
@@ -94,6 +104,26 @@
               class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 cursor-pointer">
         Delete Permanently
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- VARIANTS MODAL -->
+<div id="variantsModal" class="hidden fixed inset-0 bg-white/20 backdrop-blur-md z-50">
+  <div class="flex items-center justify-center h-full">
+    <div class="bg-white p-6 rounded-lg shadow-xl w-[700px] max-h-[85vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-5">
+        <div>
+          <h2 class="text-xl font-bold text-gray-900">Product Variants</h2>
+          <p id="variantsModalTitle" class="text-sm text-gray-500 mt-0.5"></p>
+        </div>
+        <button id="closeVariantsModal" class="text-gray-400 hover:text-gray-700 transition">
+          <i class="fa-solid fa-times text-xl"></i>
+        </button>
+      </div>
+      <div id="variantsModalContent" class="space-y-3">
+        <!-- Variants loaded by JS -->
+      </div>
     </div>
   </div>
 </div>

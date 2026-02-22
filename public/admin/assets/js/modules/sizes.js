@@ -53,14 +53,14 @@ const Sizes = {
                 <td>${size.name}</td>
                 <td>${size.type}</td>
                 <td class="flex justify-center gap-2 py-4">
-                  <button class="text-blue-500 hover:underline editSizeBtn" data-id="${
+                  <button class="admin-icon-btn text-blue-500 hover:text-blue-700 hover:bg-blue-50 p-1.5 rounded transition editSizeBtn" data-id="${
                     size.id
                   }" data-name="${size.name}" data-type="${
               size.type
-            }">Edit</button>
-                  <button class="text-red-500 hover:underline deleteSizeBtn" data-id="${
+            }" title="Edit"><i class="fa-solid fa-pen text-sm"></i></button>
+                  <button class="admin-icon-btn text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded transition deleteSizeBtn" data-id="${
                     size.id
-                  }" data-name="${size.name}">Delete</button>
+                  }" data-name="${size.name}" title="Delete"><i class="fa-solid fa-trash text-sm"></i></button>
                 </td>
               </tr>
             `);

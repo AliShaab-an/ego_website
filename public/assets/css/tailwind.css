@@ -21,8 +21,10 @@
   --font-outfit: "Outfit", sans-serif;
   --font-cor: "Cormorant", serif;
 
-  /* custom color */
-  --color-brand: rgb(183, 146, 103);
+  /* Dynamic brand color from settings - will be overridden by inline styles in head.php */
+  --color-brand: var(--primary-color, rgb(183, 146, 103));
+  --color-brand-secondary: var(--secondary-color, rgb(158, 126, 89));
+  --color-brand-accent: var(--accent-color, rgb(136, 102, 61));
 }
 
 @layer components {

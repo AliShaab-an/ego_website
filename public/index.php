@@ -1,19 +1,20 @@
 <?php
     require_once __DIR__ . '/../app/bootstrap.php';
-    
+
+    // ============================================================================
+    // MAINTENANCE MODE — blocks all frontend pages, admins bypass it
+    // ============================================================================
+    if ((bool)getSetting('enable_maintenance', 0) && !Auth::isAdmin()) {
+        http_response_code(503);
+        $maintenanceMessage = getSetting('maintenance_message', '');
+        require_once __DIR__ . '/../app/views/errors/maintenance.php';
+        exit;
+    }
 
     $frontend = new FrontendController();
 
 
     $page = $_GET['page'] ?? 'home';
-
-    // ============================================================================
-    // FRONTEND ROUTING with Authorization Guards
-    // ============================================================================
-    // PUBLIC: home, shop, product, category, contact (no guards)
-    // CART: guests + customers allowed, admins blocked (allowGuestOrCustomer)
-    // CHECKOUT: customers only, guests redirected to login, admins blocked (requireCustomer)
-    // ============================================================================
 
     $routes = [
         // Public pages - accessible to everyone
@@ -62,10 +63,24 @@
             'run' => fn() => $frontend->cart(),
         ],
         
-        // Checkout - customers only (guests redirect to login, admins blocked)
+        // Checkout - guests and customers allowed (admins blocked) - supports guest checkout
         'checkout' => [
-            'guard' => fn() => Authorization::requireCustomer(),
+            'guard' => fn() => Authorization::allowGuestOrCustomer(),
             'run' => fn() => $frontend->checkout(),
+        ],
+
+        // Customer Account - customers only
+        'account' => [
+            'guard' => fn() => Authorization::requireCustomer(),
+            'run' => fn() => $frontend->account(),
+        ],
+        'order-history' => [
+            'guard' => fn() => Authorization::requireCustomer(),
+            'run' => fn() => $frontend->orderHistory(),
+        ],
+        'order-details' => [
+            'guard' => fn() => Authorization::requireCustomer(),
+            'run' => fn() => $frontend->orderDetails(),
         ],
     ];
 

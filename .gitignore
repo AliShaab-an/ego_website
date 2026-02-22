@@ -6,4 +6,12 @@ New/
 vendor/
 logs/
 cache/
+package-lock.json
+package.json
 test-image-support.php
+migrations/
+docker-compose.yml
+Dockerfile
+composer.json
+composer.lock
+.github/

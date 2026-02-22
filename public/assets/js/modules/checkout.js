@@ -1,4 +1,5 @@
-﻿import Config from "../config.js";
+﻿import { ajaxRequest } from "../utils/ajax.js";
+import Config from "../config.js";
 
 const Checkout = {
   selectedPaymentMethod: "cash",
@@ -6,6 +7,9 @@ const Checkout = {
   appliedCoupon: null,
   cartData: null,
   shippingRegions: [],
+  csrfRefreshInterval: null,
+  retryCount: 0,
+  maxRetries: 1,
 
   init() {
     this.loadCartSummary();
@@ -14,6 +18,51 @@ const Checkout = {
     this.initShippingHandler();
     this.initCouponHandlers();
     this.initPlaceOrderHandler();
+    this.startCsrfTokenRefresh();
+  },
+
+  /**
+   * Refresh CSRF token every 30 minutes to prevent expiration
+   */
+  startCsrfTokenRefresh() {
+    const self = this;
+    
+    // Refresh immediately on load
+    this.refreshCsrfToken();
+    
+    // Then refresh every 30 minutes (token lifetime is 2 hours)
+    this.csrfRefreshInterval = setInterval(() => {
+      self.refreshCsrfToken();
+    }, 30 * 60 * 1000); // 30 minutes
+  },
+
+  /**
+   * Fetch a fresh CSRF token from the server
+   */
+  refreshCsrfToken() {
+    $.ajax({
+      url: Config.getApiUrl("get-csrf-token.php"),
+      method: "GET",
+      dataType: "json",
+      success: function (response) {
+        if (response.success && response.token) {
+          // Update meta tag with new token
+          $('meta[name="csrf-token"]').attr('content', response.token);
+        }
+      },
+      error: function (xhr) {
+        console.warn('Failed to refresh CSRF token:', xhr);
+      }
+    });
+  },
+
+  /**
+   * Clean up intervals when leaving the page
+   */
+  destroy() {
+    if (this.csrfRefreshInterval) {
+      clearInterval(this.csrfRefreshInterval);
+    }
   },
 
   initPaymentMethods() {
@@ -38,26 +87,55 @@ const Checkout = {
       self.updatePaymentMethodUI();
     });
 
-    // Set initial payment method (cash by default)
-    if (this.selectedPaymentMethod) {
-      $(
-        `.payment-method-btn[data-method="${this.selectedPaymentMethod}"]`
-      ).trigger("click");
+    // Set initial payment method to first available button
+    const firstButton = $(".payment-method-btn").first();
+    if (firstButton.length) {
+      const defaultMethod = firstButton.data("method");
+      self.selectedPaymentMethod = defaultMethod;
+      firstButton.trigger("click");
     }
   },
 
   updatePaymentMethodUI() {
     const codFields = $("#cod-fields");
     const shippingContainer = $("#shipping-region-container");
+    const paymentProofSection = $("#payment-proof-section");
 
-    // Show all fields for both payment methods
+    // Hide all payment instructions first
+    $(".payment-instructions").slideUp();
+
+    // Show instructions for selected payment method
+    if (this.selectedPaymentMethod) {
+      $(`#payment-instructions-${this.selectedPaymentMethod}`).slideDown();
+    }
+
+    // Show all fields for all payment methods (all require shipping info)
     codFields.slideDown();
     shippingContainer.slideDown();
 
-    // Make all fields required for both payment methods
+    // Make all fields required for all payment methods
     $(
       "#customer-email, #customer-address, #customer-city, #checkout-shipping-region"
     ).prop("required", true);
+
+    // Show/hide payment proof section based on payment method
+    // COD doesn't need proof, but others might (based on settings)
+    if (this.selectedPaymentMethod === "cod") {
+      paymentProofSection.slideUp();
+      $("#payment-proof").prop("required", false);
+    } else {
+      // For other methods, check if they require proof via data attribute
+      const selectedBtn = $(`.payment-method-btn[data-method="${this.selectedPaymentMethod}"]`);
+      const requiresProof = selectedBtn.data("requires-proof");
+      
+      if (requiresProof) {
+        paymentProofSection.slideDown();
+        $("#payment-proof").prop("required", true);
+      } else {
+        paymentProofSection.slideUp();
+        $("#payment-proof").prop("required", false);
+      }
+    }
   },
 
   loadCartSummary() {
@@ -87,25 +165,30 @@ const Checkout = {
     const items = this.cartData.items;
     let html = "";
     items.forEach((item) => {
+      const productName = item.product_name || 'Product';
+      const imageUrl = item.image_url || 'assets/images/placeholder.jpg';
+      const price = parseFloat(item.price) || 0;
+      const quantity = parseInt(item.quantity) || 0;
+      const colorName = item.color_name || '';
+      const sizeName = item.size_name || '';
+      
       html += `
         <div class="flex items-center justify-between py-2 border-b">
           <div class="flex items-center gap-3">
-            <img src="${item.image_url || "assets/images/placeholder.jpg"}" 
-                 alt="${this.escapeHtml(item.product_name)}"
+            <img src="${this.escapeHtml(imageUrl)}" 
+                 alt="${this.escapeHtml(productName)}"
                  class="w-16 h-16 object-cover rounded">
             <div>
-              <h4 class="font-medium">${this.escapeHtml(item.product_name)}</h4>
+              <h4 class="font-medium">${this.escapeHtml(productName)}</h4>
               <p class="text-sm text-gray-600">
-                ${item.color_name ? `Color: ${item.color_name}` : ""} 
-                ${item.size_name ? `Size: ${item.size_name}` : ""}
+                ${colorName ? `Color: ${this.escapeHtml(colorName)}` : ""} 
+                ${sizeName ? `Size: ${this.escapeHtml(sizeName)}` : ""}
               </p>
-              <p class="text-sm text-gray-600">Qty: ${item.quantity}</p>
+              <p class="text-sm text-gray-600">Qty: ${quantity}</p>
             </div>
           </div>
           <div class="text-right">
-            <p class="font-semibold">$${(item.price * item.quantity).toFixed(
-              2
-            )}</p>
+            <p class="font-semibold">$${(price * quantity).toFixed(2)}</p>
           </div>
         </div>
       `;
@@ -222,7 +305,7 @@ const Checkout = {
 
     const btn = $("#apply-coupon-btn");
     btn.prop("disabled", true).text("Applying...");
-    $.ajax({
+    ajaxRequest({
       url: Config.getApiUrl("validate-coupon.php"),
       method: "POST",
       contentType: "application/json",
@@ -230,7 +313,6 @@ const Checkout = {
         code: couponCode,
         orderTotal: orderTotal,
       }),
-      dataType: "json",
       success: function (response) {
         if (response.success) {
           self.appliedCoupon = {
@@ -282,36 +364,6 @@ const Checkout = {
   placeOrder() {
     const self = this;
 
-    // Check authentication first
-    $.ajax({
-      url: Config.getApiUrl("check-auth.php"),
-      method: "GET",
-      dataType: "json",
-      success: function (response) {
-        if (!response.success || !response.isLoggedIn) {
-          self.showToast("Please login or register to place an order", "error");
-          // Optionally redirect to login page after a delay
-          setTimeout(() => {
-            window.location.href = Config.getBaseUrl() + "index.php#login";
-          }, 2000);
-          return;
-        }
-
-        // User is authenticated, proceed with order
-        self.proceedWithOrder();
-      },
-      error: function () {
-        self.showToast(
-          "Error checking authentication. Please try again.",
-          "error"
-        );
-      },
-    });
-  },
-
-  proceedWithOrder() {
-    const self = this;
-
     // Check if payment method is selected
     if (!this.selectedPaymentMethod) {
       this.showToast("Please select a payment method", "error");
@@ -322,25 +374,32 @@ const Checkout = {
     // Validate all fields for both payment methods
     if (!this.validatePaymentFields()) return;
 
+    this.proceedWithOrder();
+  },
+
+  proceedWithOrder() {
+    const self = this;
+
     const btn = $("#place-order-btn");
     btn.prop("disabled", true).text("Processing...");
 
-    // Collect all form data
+    // Collect all form data (using backend expected field names)
     const customerData = {
       payment_method: this.selectedPaymentMethod,
-      customer_name: $("#customer-name").val().trim(),
-      customer_phone: $("#customer-phone").val().trim(),
-      customer_email: $("#customer-email").val().trim(),
-      customer_address: $("#customer-address").val().trim(),
-      customer_city: $("#customer-city").val().trim(),
-      customer_state: $("#customer-state").val().trim(),
-      customer_zip: $("#customer-zip").val().trim(),
+      name: $("#customer-name").val().trim(),
+      phone: $("#customer-phone").val().trim(),
+      email: $("#customer-email").val().trim(),
+      address: $("#customer-address").val().trim(),
+      city: $("#customer-city").val().trim(),
+      state: $("#customer-state").val().trim(),
+      zip: $("#customer-zip").val().trim(),
       shipping_region_id: $("#checkout-shipping-region").val(),
       notes: $("#order-notes").val().trim(),
     };
 
     // Add coupon if applied
     if (this.appliedCoupon) {
+      customerData.coupon_code = this.appliedCoupon.code;
       customerData.coupon_id = this.appliedCoupon.id;
     }
 
@@ -351,17 +410,33 @@ const Checkout = {
       return;
     }
 
-    // Handle Cash on Delivery - create order in database
-    $.ajax({
+    // Handle Cash on Delivery and Bank Transfer (eCheck) - create order in database
+    ajaxRequest({
       url: Config.getApiUrl("create-order.php"),
       method: "POST",
       contentType: "application/json",
       data: JSON.stringify(customerData),
-      dataType: "json",
       success: function (response) {
         if (response.success) {
-          self.showSuccessModal(response.order_number, response.order_id);
-          // Don't auto-redirect - let user click "Continue Shopping"
+          // Reset retry count on success
+          self.retryCount = 0;
+          
+          // Check if this is a payment gateway redirect (eCheck/Bank Transfer)
+          if (response.payment_gateway && response.checkout_url && response.checkout_fields) {
+            // Show redirecting message
+            self.showToast("Redirecting to secure payment gateway...", "info");
+            
+            // Redirect to payment gateway
+            self.redirectToPaymentGateway(
+              response.checkout_url, 
+              response.checkout_fields,
+              response.order_number
+            );
+          } else {
+            // Regular order (COD, etc.) - show success modal
+            self.showSuccessModal(response.order_number, response.order_id);
+            // Don't auto-redirect - let user click "Continue Shopping"
+          }
         } else {
           self.showToast(response.message || "Failed to place order", "error");
           btn.prop("disabled", false).text("Place Order");
@@ -369,17 +444,66 @@ const Checkout = {
       },
       error: function (xhr) {
         console.error("Place order error:", xhr);
+        console.error("Response status:", xhr.status);
+        console.error("Response text:", xhr.responseText);
+        
         let errorMsg = "Error placing order. Please try again.";
-        try {
-          const response = JSON.parse(xhr.responseText);
-          if (response.error || response.message) {
-            errorMsg = response.error || response.message;
+        let shouldRetry = false;
+        
+        // Check if response is JSON
+        const contentType = xhr.getResponseHeader("content-type") || "";
+        const isJson = contentType.includes("application/json");
+        
+        if (isJson || xhr.responseText.trim().startsWith('{')) {
+          try {
+            const response = JSON.parse(xhr.responseText);
+            if (response.error || response.message) {
+              errorMsg = response.error || response.message;
+              
+              // Check if error is due to expired CSRF token
+              if (errorMsg.toLowerCase().includes('csrf') || 
+                  errorMsg.toLowerCase().includes('token') ||
+                  errorMsg.toLowerCase().includes('security token')) {
+                shouldRetry = true;
+              }
+            }
+          } catch (e) {
+            console.error("JSON parse error:", e);
+            // Response is not valid JSON - likely a PHP error
+            if (xhr.responseText.includes('Fatal error') || 
+                xhr.responseText.includes('Parse error') ||
+                xhr.responseText.includes('Warning:')) {
+              errorMsg = "Server error occurred. Please check the console and contact support.";
+              console.error("PHP Error detected in response:", xhr.responseText);
+            }
           }
-        } catch (e) {
-          console.error("Parse error:", e);
+        } else {
+          // Non-JSON response - likely a server error
+          console.error("Non-JSON response received:", xhr.responseText.substring(0, 500));
+          errorMsg = "Server error occurred. Please contact support.";
         }
-        self.showToast(errorMsg, "error");
-        btn.prop("disabled", false).text("Place Order");
+        
+        // If CSRF token error, refresh token and retry (only once)
+        if (shouldRetry && self.retryCount < self.maxRetries) {
+          self.retryCount++;
+          self.showToast("Refreshing security token, please wait...", "info");
+          self.refreshCsrfToken();
+          
+          // Wait a moment then retry
+          setTimeout(() => {
+            self.proceedWithOrder();
+          }, 1500);
+        } else {
+          // Reset retry count and show error
+          self.retryCount = 0;
+          
+          if (shouldRetry && self.retryCount >= self.maxRetries) {
+            errorMsg = "Your session has expired. Please refresh the page and try again.";
+          }
+          
+          self.showToast(errorMsg, "error");
+          btn.prop("disabled", false).text("Place Order");
+        }
       },
     });
   },
@@ -513,6 +637,94 @@ const Checkout = {
     return re.test(email);
   },
 
+  /**
+   * Redirect to payment gateway by creating and submitting a form
+   * @param {string} checkoutUrl - Payment gateway URL
+   * @param {object} checkoutFields - Form fields to submit
+   * @param {string} orderNumber - Order number for display
+   */
+  redirectToPaymentGateway(checkoutUrl, checkoutFields, orderNumber) {
+    console.log('Redirecting to payment gateway:', checkoutUrl);
+    
+    // Create a hidden form
+    const form = $('<form>', {
+      method: 'POST',
+      action: checkoutUrl,
+      style: 'display: none;'
+    });
+    
+    // Add all checkout fields as hidden inputs
+    $.each(checkoutFields, function(name, value) {
+      form.append($('<input>', {
+        type: 'hidden',
+        name: name,
+        value: value
+      }));
+    });
+    
+    // Append form to body
+    $('body').append(form);
+    
+    // Show a loading overlay
+    const overlay = $(`
+      <div id="payment-redirect-overlay" style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      ">
+        <div style="
+          background: white;
+          padding: 40px;
+          border-radius: 12px;
+          text-align: center;
+          max-width: 500px;
+        ">
+          <div class="spinner" style="
+            width: 60px;
+            height: 60px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+          "></div>
+          <h2 style="font-size: 24px; margin-bottom: 15px; color: #333;">
+            Redirecting to Secure Payment
+          </h2>
+          <p style="color: #666; margin-bottom: 10px;">
+            Order #${this.escapeHtml(orderNumber)}
+          </p>
+          <p style="color: #666;">
+            Please wait while we redirect you to our secure payment gateway...
+          </p>
+          <p style="color: #999; font-size: 14px; margin-top: 20px;">
+            <strong>Do not close this window</strong>
+          </p>
+        </div>
+      </div>
+    `);
+    
+    // Add spinner animation
+    const style = $('<style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>');
+    $('head').append(style);
+    
+    // Show overlay
+    $('body').append(overlay);
+    
+    // Submit form after short delay (for better UX)
+    setTimeout(function() {
+      console.log('Submitting payment form...');
+      form.submit();
+    }, 1500);
+  },
+
   showSuccessModal(orderNumber, orderId) {
     const self = this;
     $("#order-number").text(`Order #${orderNumber}`);
@@ -559,6 +771,14 @@ const Checkout = {
   },
 
   escapeHtml(text) {
+    // Handle undefined, null, or non-string values
+    if (text === undefined || text === null) {
+      return '';
+    }
+    
+    // Convert to string if not already
+    text = String(text);
+    
     const map = {
       "&": "&amp;",
       "<": "&lt;",
@@ -569,5 +789,12 @@ const Checkout = {
     return text.replace(/[&<>"']/g, (m) => map[m]);
   },
 };
+
+// Cleanup when leaving the page
+$(window).on('beforeunload', function() {
+  if (Checkout.destroy) {
+    Checkout.destroy();
+  }
+});
 
 export default Checkout;

@@ -2,6 +2,8 @@
 require_once __DIR__ . '/../../app/bootstrap.php';
 
 ApiRunner::run(function () {
+    Authorization::allowGuestOrCustomer();
+    
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         Response::error('Invalid request method', null, 405);
     }

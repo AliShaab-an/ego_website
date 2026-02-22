@@ -5,8 +5,9 @@
 // ============================================================================
 
 // Set to TRUE for localhost, FALSE for production
+// WARNING: Set to FALSE before deploying to production!
 if (!defined('IS_LOCAL')) {
-    define('IS_LOCAL', true);
+    define('IS_LOCAL', true); // Set to FALSE for production deployment
 }
 
 // Root directory (absolute path for PHP includes)

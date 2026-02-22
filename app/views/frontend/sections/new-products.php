@@ -19,6 +19,9 @@ if (!isset($newProducts) || !is_array($newProducts)) {
                     </div>
                     <div class="p-4 text-left">
                         <h3 class="text-gray-800 text-base md:text-lg font-medium mb-2 font-outfit"><?= htmlspecialchars($product['name']) ?></h3>
+                        <?php if (isset($product['total_stock']) && (int)$product['total_stock'] === 0): ?>
+                          <span class="inline-block text-xs font-semibold text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded mb-2">Out of Stock</span>
+                        <?php endif; ?>
                         <!-- Price with discount display -->
                         <?php if (isset($product['discount_active']) && $product['discount_active'] && isset($product['discount_percentage']) && $product['discount_percentage'] > 0): ?>
                           <!-- Product has active discount -->

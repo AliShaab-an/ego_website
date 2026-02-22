@@ -25,7 +25,11 @@
                         WHEN pd.is_active = 1 AND pd.discount_percentage > 0 THEN
                             p.base_price * (1 - pd.discount_percentage / 100)
                         ELSE NULL
-                    END AS discounted_price
+                    END AS discounted_price,
+                    (SELECT COALESCE(SUM(v2.quantity), 0)
+                     FROM product_variants v2
+                     WHERE v2.product_id = p.id
+                    ) AS total_stock
                 FROM products p
                 LEFT JOIN product_variants v ON v.product_id = p.id
                 LEFT JOIN product_discounts pd ON p.id = pd.product_id
@@ -205,7 +209,11 @@
                         WHEN pd.is_active = 1 AND pd.discount_percentage > 0 THEN
                             p.base_price * (1 - pd.discount_percentage / 100)
                         ELSE NULL
-                    END AS discounted_price
+                    END AS discounted_price,
+                    (SELECT COALESCE(SUM(pv.quantity), 0)
+                     FROM product_variants pv
+                     WHERE pv.product_id = p.id
+                    ) AS total_stock
                 FROM products p
                 LEFT JOIN product_images pi 
                     ON p.id = pi.product_id 
@@ -236,7 +244,11 @@
                         WHEN pd.is_active = 1 AND pd.discount_percentage > 0 THEN
                             p.base_price * (1 - pd.discount_percentage / 100)
                         ELSE NULL
-                    END AS discounted_price
+                    END AS discounted_price,
+                    (SELECT COALESCE(SUM(pv.quantity), 0)
+                     FROM product_variants pv
+                     WHERE pv.product_id = p.id
+                    ) AS total_stock
                 FROM products p
                 LEFT JOIN product_images pi 
                     ON p.id = pi.product_id 
@@ -281,7 +293,8 @@
                             WHEN pd.is_active = 1 AND pd.discount_percentage > 0 THEN
                                 p.base_price * (1 - pd.discount_percentage / 100)
                             ELSE NULL
-                        END AS discounted_price
+                    END AS discounted_price,
+                    (SELECT COALESCE(SUM(pv.quantity), 0) FROM product_variants pv WHERE pv.product_id = p.id) AS total_stock
                     FROM products p
                     LEFT JOIN product_discounts pd ON p.id = pd.product_id
                     WHERE p.is_active = 1
@@ -363,13 +376,17 @@
                                '|Size:', COALESCE(s.name, 'N/A'),
                                '|Qty:', v.quantity,
                                '|Price:', v.price)
-                        SEPARATOR '; '
+                        SEPARATOR ';'
                     )
                  FROM product_variants v
                  LEFT JOIN colors col ON v.color_id = col.id
                  LEFT JOIN sizes s ON v.size_id = s.id
                  WHERE v.product_id = p.id
-                ) AS variants_info
+                ) AS variants_info,
+                (SELECT COALESCE(SUM(v2.quantity), 0)
+                 FROM product_variants v2
+                 WHERE v2.product_id = p.id
+                ) AS total_stock
             FROM products p
             LEFT JOIN categories c ON p.category_id = c.id
             WHERE 1=1

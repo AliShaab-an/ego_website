@@ -147,8 +147,8 @@ const ContactMessages = {
 
       const actionButtons =
         message.is_read == 1
-          ? `<button class="action-btn unread-btn bg-gray-500 text-white px-2 py-1 rounded text-xs hover:bg-gray-600" data-id="${message.id}" data-action="unread">Mark Unread</button>`
-          : `<button class="action-btn read-btn bg-green-500 text-white px-2 py-1 rounded text-xs hover:bg-green-600" data-id="${message.id}" data-action="read">Mark Read</button>`;
+          ? `<button class="admin-icon-btn action-btn unread-btn text-gray-500 hover:text-gray-700 hover:bg-gray-100 p-1.5 rounded transition" data-id="${message.id}" data-action="unread" title="Mark Unread"><i class="fa-solid fa-envelope text-sm"></i></button>`
+          : `<button class="admin-icon-btn action-btn read-btn text-green-600 hover:text-green-800 hover:bg-green-50 p-1.5 rounded transition" data-id="${message.id}" data-action="read" title="Mark Read"><i class="fa-solid fa-envelope-open text-sm"></i></button>`;
 
       tbody.append(`
         <tr class="border-b hover:bg-gray-50 ${rowClass}">
@@ -162,13 +162,13 @@ const ContactMessages = {
           ).toLocaleDateString()}</td>
           <td class="py-3 text-center">
             <div class="flex gap-1 justify-center">
-              <button class="view-btn bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600" data-id="${
+              <button class="admin-icon-btn view-btn text-blue-500 hover:text-blue-700 hover:bg-blue-50 p-1.5 rounded transition" data-id="${
                 message.id
-              }">View</button>
+              }" title="View"><i class="fa-solid fa-eye text-sm"></i></button>
               ${actionButtons}
-              <button class="action-btn delete-btn bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600" data-id="${
+              <button class="admin-icon-btn action-btn delete-btn text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded transition" data-id="${
                 message.id
-              }" data-action="delete">Delete</button>
+              }" data-action="delete" title="Delete"><i class="fa-solid fa-trash text-sm"></i></button>
             </div>
           </td>
         </tr>
@@ -177,7 +177,7 @@ const ContactMessages = {
 
     // Attach event listeners to action buttons
     $(".action-btn").on("click", (e) => {
-      const button = $(e.target);
+      const button = $(e.currentTarget);
       const id = button.data("id");
       const action = button.data("action");
       this.showActionModal(id, action);

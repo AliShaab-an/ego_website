@@ -42,12 +42,12 @@ const Coupons = {
                 <td>${c.min_order_value}</td>
                 <td>${c.is_active ? "Active" : "Inactive"}</td>
                 <td class="flex justify-center gap-2 py-4">
-                  <button class="text-blue-500 hover:underline editCouponBtn" data-id="${
+                  <button class="admin-icon-btn text-blue-500 hover:text-blue-700 hover:bg-blue-50 p-1.5 rounded transition editCouponBtn" data-id="${
                     c.id
-                  }">Edit</button>
-                  <button class="text-red-500 hover:underline deleteCouponBtn" data-id="${
+                  }" title="Edit"><i class="fa-solid fa-pen text-sm"></i></button>
+                  <button class="admin-icon-btn text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded transition deleteCouponBtn" data-id="${
                     c.id
-                  }" data-code="${c.code}">Delete</button>
+                  }" data-code="${c.code}" title="Delete"><i class="fa-solid fa-trash text-sm"></i></button>
                 </td>
               </tr>
             `);

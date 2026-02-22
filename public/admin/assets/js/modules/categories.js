@@ -94,15 +94,15 @@ const Categories = {
                 <td>${cat.name}</td>
                 <td>${imageCell}</td>
                 <td class="flex justify-center gap-2 py-4">
-                  <button class="text-blue-500 hover:underline editCategoryBtn" 
+                  <button class="admin-icon-btn text-blue-500 hover:text-blue-700 hover:bg-blue-50 p-1.5 rounded transition editCategoryBtn" 
                     data-id="${cat.id}" data-name="${cat.name} " data-image="${
               cat.image || ""
-            }">
-                    Edit
+            }" title="Edit">
+                    <i class="fa-solid fa-pen text-sm"></i>
                   </button>
-                  <button class="text-red-500 hover:underline deleteCategoryBtn" 
-                    data-id="${cat.id}" data-name="${cat.name}">
-                    Delete
+                  <button class="admin-icon-btn text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded transition deleteCategoryBtn" 
+                    data-id="${cat.id}" data-name="${cat.name}" title="Delete">
+                    <i class="fa-solid fa-trash text-sm"></i>
                   </button>
                 </td>
               </tr>

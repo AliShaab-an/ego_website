@@ -122,6 +122,9 @@
 
                 // Save settings
                 if (Settings::update($data)) {
+                    // Clear settings cache so new values are loaded immediately
+                    SettingsHelper::forgetCache();
+                    
                     return [
                         'status' => 'success',
                         'message' => 'Settings saved successfully!'
@@ -149,10 +152,14 @@
                 $outputDir = $this->uploadDir;
                 
                 // Use ImageService to process and resize the image
-                $saved = ImageService::processUpload($file, $outputDir, [600, 1200], 82);
+                $saved = ImageService::processUploadLegacy($file, $outputDir, [600, 1200], 82);
                 
-                // Use the 1200px version, or fallback to the largest available
-                $filename = $saved[1200] ?? end($saved);
+                // Get largest available size (prefer 1200, then 600, then whatever exists)
+                if (!empty($saved)) {
+                    $filename = $saved[1200] ?? $saved[600] ?? reset($saved);
+                } else {
+                    throw new Exception('No image variants were generated');
+                }
                 
                 // Return relative path from public folder
                 return 'admin/uploads/settings/' . $filename;

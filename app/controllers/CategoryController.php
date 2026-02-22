@@ -42,8 +42,8 @@
                 try {
                     $uploadDir = __DIR__ . '/../../public/admin/uploads/categories/';
                     
-                    $saved = ImageService::processUpload($_FILES['image'], $uploadDir, [600, 1200], 82);
-                    $imageName = $saved[1200] ?? end($saved);
+                    $saved = ImageService::processUploadLegacy($_FILES['image'], $uploadDir, [600, 1200], 82);
+                    $imageName = $saved[1200] ?? $saved[600] ?? reset($saved);
                     $filename = "admin/uploads/categories/" . $imageName;
                 } catch (Exception $e) {
                     error_log("Category image upload error: " . $e->getMessage());
@@ -83,8 +83,8 @@
                 try {
                     $uploadDir = __DIR__ . '/../../public/admin/uploads/categories/';
                     
-                    $saved = ImageService::processUpload($_FILES['image'], $uploadDir, [600, 1200], 82);
-                    $imageName = $saved[1200] ?? end($saved);
+                    $saved = ImageService::processUploadLegacy($_FILES['image'], $uploadDir, [600, 1200], 82);
+                    $imageName = $saved[1200] ?? $saved[600] ?? reset($saved);
                     $imagePath = "admin/uploads/categories/" . $imageName;
                 } catch (Exception $e) {
                     error_log("Category image update error: " . $e->getMessage());

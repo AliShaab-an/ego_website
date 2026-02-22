@@ -43,14 +43,14 @@ const Admins = {
                 <td class= "whitespace-normal break-words">${admin.email}</td>
                 <td>${admin.role}</td>
                 <td class="flex justify-center gap-2 py-4">
-                  <button class="text-blue-500 hover:underline editAdminBtn" 
+                  <button class="admin-icon-btn text-blue-500 hover:text-blue-700 hover:bg-blue-50 p-1.5 rounded transition editAdminBtn" 
                     data-id="${admin.id}" data-name="${admin.name}" 
-                    data-email="${admin.email}" data-role="${admin.role}">
-                    Edit
+                    data-email="${admin.email}" data-role="${admin.role}" title="Edit">
+                    <i class="fa-solid fa-pen text-sm"></i>
                   </button>
-                  <button class="text-red-500 hover:underline deleteAdminBtn" 
-                    data-id="${admin.id}" data-name="${admin.name}">
-                    Delete
+                  <button class="admin-icon-btn text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded transition deleteAdminBtn" 
+                    data-id="${admin.id}" data-name="${admin.name}" title="Delete">
+                    <i class="fa-solid fa-trash text-sm"></i>
                   </button>
                 </td>
               </tr>

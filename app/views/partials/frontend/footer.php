@@ -6,11 +6,41 @@
       
       <!-- Logo + Socials -->
       <div class="flex flex-col items-center  space-y-4 md:w-1/3">
-        <img src="<?= IMG_PATH ?>egologo.png" alt="EGO" class="h-32 w-auto md:h-60">
+        <?php 
+            $footerLogo = getSetting('logo_light') ?: getSetting('logo');
+            $footerLogoSrc = $footerLogo ? url($footerLogo) : IMG_PATH . 'egologo.png';
+        ?>
+        <img src="<?= htmlspecialchars($footerLogoSrc) ?>" alt="<?= htmlspecialchars(getSetting('website_name', 'EGO')) ?>" class="h-32 w-auto md:h-60">
         <div class="flex gap-4 text-brand">
-          <a href="#"><i class="fa-brands fa-square-instagram text-2xl"></i></a>
-          <a href="#"><i class="fa-brands fa-facebook-f text-2xl"></i></a>
-          <a href="#"><i class="fa-brands fa-tiktok text-2xl"></i></a>
+          <?php if ($instagram = getSetting('instagram_url')): ?>
+            <a href="<?= htmlspecialchars($instagram) ?>" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              <i class="fa-brands fa-square-instagram text-2xl text-brand"></i>
+            </a>
+          <?php endif; ?>
+          
+          <?php if ($facebook = getSetting('facebook_url')): ?>
+            <a href="<?= htmlspecialchars($facebook) ?>" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+              <i class="fa-brands fa-facebook-f text-2xl"></i>
+            </a>
+          <?php endif; ?>
+          
+          <?php if ($tiktok = getSetting('tiktok_url')): ?>
+            <a href="<?= htmlspecialchars($tiktok) ?>" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+              <i class="fa-brands fa-tiktok text-2xl"></i>
+            </a>
+          <?php endif; ?>
+          
+          <?php if ($twitter = getSetting('twitter_url')): ?>
+            <a href="<?= htmlspecialchars($twitter) ?>" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+              <i class="fa-brands fa-twitter text-2xl"></i>
+            </a>
+          <?php endif; ?>
+          
+          <?php if ($youtube = getSetting('youtube_url')): ?>
+            <a href="<?= htmlspecialchars($youtube) ?>" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+              <i class="fa-brands fa-youtube text-2xl"></i>
+            </a>
+          <?php endif; ?>
         </div>
       </div>
 
@@ -19,7 +49,6 @@
         <ul class="space-y-2">
           <li><a href="<?= page_url('home') ?>" class="hover:text-brand">Home</a></li>
           <li><a href="<?= page_url('shop') ?>" class="hover:text-brand">Shop</a></li>
-          <li><a href="#" class="hover:text-brand">Categories</a></li>
           <li><a href="<?= page_url('contact') ?>" class="hover:text-brand">Contact Us</a></li>
         </ul>
         <ul class="space-y-2">

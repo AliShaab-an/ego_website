@@ -364,13 +364,12 @@ const ProductDetail = {
       $button.text("Adding...").prop("disabled", true);
 
       // Send AJAX request
-      $.ajax({
+      ajaxRequest({
         url: Config.getApiUrl("add-to-cart.php"),
-        type: "POST",
+        method: "POST",
         data: formData,
         processData: false,
         contentType: false,
-        dataType: "json",
         success: function (response) {
           if (response.success) {
             // Update cart count

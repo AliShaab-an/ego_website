@@ -5,13 +5,13 @@
         public function createProduct(){
             
             // Debug: Log all FILES data
-            file_put_contents(__DIR__ . '/../../logs/files_debug.log', 
-                "=== FILES DEBUG ===\n" . 
-                print_r($_FILES, true) . "\n" .
-                "=== POST DEBUG ===\n" . 
-                print_r($_POST, true) . "\n\n", 
-                FILE_APPEND
-            );
+            // file_put_contents(__DIR__ . '/../../logs/files_debug.log', 
+            //     "=== FILES DEBUG ===\n" . 
+            //     print_r($_FILES, true) . "\n" .
+            //     "=== POST DEBUG ===\n" . 
+            //     print_r($_POST, true) . "\n\n", 
+            //     FILE_APPEND
+            // );
             
             $name = trim($_POST['name'] ?? '');
             $description = trim($_POST['description'] ?? '');
@@ -82,6 +82,9 @@
                 return ['status' => 'error', 'message' => 'Please upload at least one product image.'];
             }
             try{
+                // Start database transaction to ensure atomicity
+                DB::beginTransaction();
+                
                 $productId = Product::create([
                 'name'        => $name,
                 'description' => $description,
@@ -92,11 +95,11 @@
                 'is_active' => 1
                 ]);
 
-                $check = DB::query("SELECT * FROM products WHERE id = ?", [$productId])->fetch(PDO::FETCH_ASSOC);
-                file_put_contents(__DIR__ . '/../../logs/controller.log',
-                    "After insert, fetched product #$productId:\n" . print_r($check, true) . "\n",
-                    FILE_APPEND
-                );
+                // $check = DB::query("SELECT * FROM products WHERE id = ?", [$productId])->fetch(PDO::FETCH_ASSOC);
+                // file_put_contents(__DIR__ . '/../../logs/controller.log',
+                //     "After insert, fetched product #$productId:\n" . print_r($check, true) . "\n",
+                //     FILE_APPEND
+                // );
 
                 $isFirstImage = true;
                 $processedColorBlocks = []; // Track which color blocks we've already processed images for
@@ -144,14 +147,14 @@
                             $error    = $errors[$i];
 
                             // Debug logging for file upload
-                            file_put_contents(__DIR__ . '/../../logs/upload_debug.log',
-                                "File: $fileName\n" .
-                                "Temp Name: $tmpName\n" .
-                                "Error Code: $error\n" .
-                                "Is Uploaded File: " . (is_uploaded_file($tmpName) ? 'YES' : 'NO') . "\n" .
-                                "File Exists: " . (file_exists($tmpName) ? 'YES' : 'NO') . "\n\n",
-                                FILE_APPEND
-                            );
+                            // file_put_contents(__DIR__ . '/../../logs/upload_debug.log',
+                            //     "File: $fileName\n" .
+                            //     "Temp Name: $tmpName\n" .
+                            //     "Error Code: $error\n" .
+                            //     "Is Uploaded File: " . (is_uploaded_file($tmpName) ? 'YES' : 'NO') . "\n" .
+                            //     "File Exists: " . (file_exists($tmpName) ? 'YES' : 'NO') . "\n\n",
+                            //     FILE_APPEND
+                            // );
 
                             if($error === UPLOAD_ERR_OK && is_uploaded_file($tmpName)){
                                 try {
@@ -162,8 +165,8 @@
                                     ];
                                     
                                     // Use ImageService to process and resize
-                                    $saved = ImageService::processUpload($fileArray, $uploadDir, [300, 600, 1200], 82);
-                                    $imageName = $saved[1200] ?? end($saved);
+                                    $saved = ImageService::processUploadLegacy($fileArray, $uploadDir, [300, 600, 1200], 82);
+                                    $imageName = $saved[1200] ?? $saved[600] ?? $saved[300] ?? reset($saved);
                                     $relativePath = "admin/uploads/products/" . $imageName;
                                 } catch (Exception $e) {
                                     error_log("Product image upload error for $fileName: " . $e->getMessage());
@@ -224,6 +227,9 @@
                 // Invalidate cache by bumping versions
                 $this->invalidateProductCache();
                 
+                // Commit transaction - all operations successful
+                DB::commit();
+                
                 return [
                     'status' => 'success',
                     'product_id' => $productId,
@@ -231,6 +237,10 @@
                 ];
 
             }catch(Exception $e){
+                // Rollback transaction on error - prevents partial product creation
+                if (DB::inTransaction()) {
+                    DB::rollback();
+                }
                 Logger::error("ProductController::addProduct", $e->getMessage());
                 return ['status'=> 'error', 'message' => $e->getMessage()];
             }
@@ -320,7 +330,7 @@
                 $id = (int)($_POST['id'] ?? 0);
                 $action = $_POST['action'] ?? 0;
 
-                file_put_contents(__DIR__ . '/../../logs/app.log', print_r($_POST, true), FILE_APPEND);
+                // file_put_contents(__DIR__ . '/../../logs/app.log', print_r($_POST, true), FILE_APPEND);
 
                 if ($id <= 0) {
                     return ['status' => 'error', 'message' => 'Invalid product data'];
@@ -344,6 +354,9 @@
 
         public function updateProduct(){
             try {
+                // Start database transaction to ensure atomicity
+                DB::beginTransaction();
+                
                 $id = (int)($_POST['id'] ?? 0);
                 if ($id <= 0) throw new Exception("Invalid product ID.");
 
@@ -441,11 +454,18 @@
                 // Invalidate cache by bumping versions
                 $this->invalidateProductCache();
 
+                // Commit transaction - all operations successful
+                DB::commit();
+
                 return([
                     'status' => 'success',
                     'message' => 'Product updated successfully.'
                 ]);
             } catch (Exception $e) {
+                // Rollback transaction on error - prevents partial updates
+                if (DB::inTransaction()) {
+                    DB::rollback();
+                }
                 return ['status' => 'error', 'message' => $e->getMessage()];
             }
         }

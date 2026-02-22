@@ -10,18 +10,37 @@
                 throw new Exception('Invalid request method');
             }
             
-            if (!isset($_SESSION['user_id'])) {
-                throw new Exception('Please log in or create an account to complete your order');
-            }
-            
             $input = json_decode(file_get_contents('php://input'), true);
             
-            $userId = $_SESSION['user_id'];
+            // Support both logged-in users and guests
+            $isGuest = !Auth::check();
+            $userId = $isGuest ? null : Auth::id();
+            
+            // Guest information (required for guests)
+            $guestName = $input['name'] ?? '';
+            $guestEmail = $input['email'] ?? '';
+            $guestPhone = $input['phone'] ?? '';
+            
+            // Validate guest information
+            if ($isGuest) {
+                if (empty($guestName) || empty($guestEmail) || empty($guestPhone)) {
+                    throw new Exception('Name, email, and phone are required for guest checkout');
+                }
+                if (!filter_var($guestEmail, FILTER_VALIDATE_EMAIL)) {
+                    throw new Exception('Please provide a valid email address');
+                }
+            }
+            
             $shippingRegionId = $input['shipping_region_id'] ?? null;
-            $paymentMethod = $input['payment_method'] ?? 'COD';
+
+            // Normalise payment method to lowercase; validate against known keys from settings
+            $rawMethod     = strtolower(trim($input['payment_method'] ?? 'cod'));
+            $allowedMethods = ['cod', 'bank', 'omt', 'wishmoney'];
+            $paymentMethod  = in_array($rawMethod, $allowedMethods) ? $rawMethod : 'cod';
+
             $couponCode = $input['coupon_code'] ?? null;
             $notes = $input['notes'] ?? '';
-            $phone = $input['phone'] ?? '';
+            $phone = $isGuest ? $guestPhone : ($input['phone'] ?? '');
             $address = $input['address'] ?? '';
             $city = $input['city'] ?? '';
             $state = $input['state'] ?? '';
@@ -36,28 +55,122 @@
                 }
             }
             
-            // Update user contact information if provided
-            if (!empty($phone)) {
+            // Update user contact information if logged-in and provided
+            if (!$isGuest && !empty($phone)) {
                 User::updateContactInfo($userId, $phone, $address, $city, $state, $zip);
             }
             
-            // For Wish Money, shipping region is not required
-            if ($paymentMethod === 'cash' && !$shippingRegionId) {
-                throw new Exception('Shipping region is required for Cash on Delivery');
+            // Shipping region required for COD, bank transfer, and OMT
+            if (in_array($paymentMethod, ['cod', 'bank', 'omt']) && !$shippingRegionId) {
+                throw new Exception('Shipping region is required for ' . strtoupper($paymentMethod));
             }
-            
-            // Set default shipping region ID for Wish Money if not provided
+
+            // Wishmoney orders are handled via WhatsApp (JS side) and rarely reach here,
+            // but set a sensible default just in case.
             if ($paymentMethod === 'wishmoney' && !$shippingRegionId) {
-                $shippingRegionId = 1; // Default region or you can handle differently
+                $shippingRegionId = 1;
             }
             
-            $orderId = Order::create($userId, $shippingRegionId, $paymentMethod, $couponId, $notes);
+            // Prepare guest info array
+            $guestInfo = $isGuest ? [
+                'name' => $guestName,
+                'email' => $guestEmail,
+                'phone' => $guestPhone,
+                'address' => $address,
+                'city' => $city,
+                'state' => $state,
+                'zip' => $zip
+            ] : null;
+            
+            $orderId = Order::create($userId, $shippingRegionId, $paymentMethod, $couponId, $notes, $guestInfo);
+            
+            // Send order confirmation email
+            try {
+                $orderData = Order::getById($orderId);
+                $customerEmail = $isGuest ? $guestEmail : (Auth::user()['email'] ?? '');
+                $customerName = $isGuest ? $guestName : (Auth::user()['name'] ?? 'Customer');
+                $orderNumber = 'ORD-' . str_pad($orderId, 6, '0', STR_PAD_LEFT);
+                
+                if (!empty($customerEmail) && $orderData) {
+                    $htmlBody = EmailService::renderTemplate('order-confirmation', [
+                        'order' => $orderData,
+                        'items' => $orderData['items'] ?? [],
+                        'customerName' => $customerName,
+                        'orderNumber' => $orderNumber
+                    ]);
+                    EmailService::send($customerEmail, "Order Confirmation #$orderNumber", $htmlBody);
+                }
+            } catch (Exception $emailErr) {
+                // Log but don't fail the order
+                error_log("Order confirmation email failed: " . $emailErr->getMessage());
+            }
+            
+            // For eCheck/Bank Transfer payment, redirect to Secure Acceptance
+            // Accept both 'echeck' and 'bank' as payment method identifiers
+            if ($paymentMethod === 'echeck' || $paymentMethod === 'bank') {
+                return $this->initiateEcheckPayment($orderId, $userId, $guestInfo);
+            }
             
             return [
                 'success' => true,
-                'message' => 'Order placed successfully!',
-                'order_id' => $orderId
+                'message' => $isGuest 
+                    ? 'Order placed successfully! Check your email for order confirmation.' 
+                    : 'Order placed successfully!',
+                'order_id' => $orderId,
+                'order_number' => 'ORD-' . str_pad($orderId, 6, '0', STR_PAD_LEFT)
             ];
+        }
+        
+        /**
+         * Initiate eCheck payment via Cybersource Secure Acceptance
+         * 
+         * @param int $orderId Order ID
+         * @param int|null $userId User ID (null for guest)
+         * @param array|null $guestInfo Guest information
+         * @return array Checkout data with URL and form fields
+         * @throws Exception
+         */
+        private function initiateEcheckPayment(int $orderId, ?int $userId, ?array $guestInfo): array
+        {
+            try {
+                // Get order details
+                $order = Order::getById($orderId);
+                
+                if (!$order) {
+                    throw new Exception('Order not found');
+                }
+                
+                // Get user details if logged in
+                $user = null;
+                if ($userId) {
+                    $user = User::findById($userId);
+                }
+                
+                // Initialize Secure Acceptance service
+                $service = new SecureAcceptanceService();
+                
+                // Build checkout request
+                $checkoutData = $service->buildEcheckCheckoutRequest($order, $user);
+                
+                // Return checkout data (frontend will auto-submit form)
+                return [
+                    'success' => true,
+                    'payment_gateway' => 'cybersource',
+                    'checkout_url' => $checkoutData['url'],
+                    'checkout_fields' => $checkoutData['fields'],
+                    'order_id' => $orderId,
+                    'order_number' => 'ORD-' . str_pad($orderId, 6, '0', STR_PAD_LEFT),
+                    'message' => 'Redirecting to secure payment gateway...'
+                ];
+                
+            } catch (Exception $e) {
+                Logger::error("Failed to initiate eCheck payment", [
+                    'order_id' => $orderId,
+                    'error' => $e->getMessage()
+                ]);
+                
+                throw new Exception('Failed to initiate payment: ' . $e->getMessage());
+            }
         }
         
         /**
@@ -77,9 +190,11 @@
             }
             
             // Check if user is authorized to view this order
-            if (isset($_SESSION['user_id']) && 
-                $_SESSION['user_id'] != $order['user_id'] && 
-                !in_array($_SESSION['role'] ?? '', ['admin', 'super_admin'])) {
+            // Allow admin/super_admin/editor OR customer viewing their own order
+            $isAdmin = Authorization::isAdmin() || Authorization::hasRole('editor');
+            $isOwner = Auth::check() && Auth::id() == $order['user_id'];
+            
+            if (!$isAdmin && !$isOwner) {
                 throw new Exception('Unauthorized access');
             }
             
@@ -93,7 +208,7 @@
          * Get user's orders (Frontend)
          */
         public function getUserOrders() {
-            if (!isset($_SESSION['user_id'])) {
+            if (!Auth::check()) {
                 throw new Exception('Please log in to view your orders');
             }
             
@@ -101,7 +216,7 @@
             $limit = isset($_GET['limit']) ? max(1, min(50, (int)$_GET['limit'])) : 10;
             $offset = ($page - 1) * $limit;
             
-            $userId = $_SESSION['user_id'];
+            $userId = Auth::id();
             
             $orders = Order::getUserOrders($userId, $limit, $offset);
             $totalCount = Order::countAll('all', $userId);
@@ -126,7 +241,7 @@
          */
         public function getAllOrders() {
             $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
-            $limit = isset($_GET['limit']) ? max(1, min(100, (int)$_GET['limit'])) : 20;
+            $limit = isset($_GET['limit']) ? max(1, min(100, (int)$_GET['limit'])) : 5;
             $status = isset($_GET['status']) ? $_GET['status'] : 'all';
             $offset = ($page - 1) * $limit;
             
@@ -225,7 +340,7 @@
             
             // Check authorization
             $isAdmin = in_array($_SESSION['role'] ?? '', ['admin', 'super_admin']);
-            $isOwner = isset($_SESSION['user_id']) && $_SESSION['user_id'] == $order['user_id'];
+            $isOwner = Auth::check() && Auth::id() == $order['user_id'];
             
             if (!$isAdmin && !$isOwner) {
                 throw new Exception('Unauthorized');

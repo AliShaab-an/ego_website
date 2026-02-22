@@ -2,26 +2,63 @@
     class Order {
         
         /**
-         * Create a new order from cart
+         * Create a new order from cart (supports both logged-in and guest users)
          */
-        public static function create($userId, $shippingRegionId, $paymentMethod, $couponId = null, $notes = '') {
+        public static function create($userId, $shippingRegionId, $paymentMethod, $couponId = null, $notes = '', $guestInfo = null) {
             try {
                 DB::getConnection()->beginTransaction();
                 
-                // Insert order
-                $sql = "INSERT INTO orders (user_id, shipping_region_id, payment_method, coupon_id, payment_status, status, created_at) 
-                        VALUES (?, ?, ?, ?, 'pending', 'pending', NOW())";
+                // Determine if this is a guest order
+                $isGuest = ($userId === null);
                 
-                DB::query($sql, [$userId, $shippingRegionId, $paymentMethod, $couponId]);
-                $orderId = DB::getConnection()->lastInsertId();
-                
-                // Get cart items
-                $cartId = self::getCartId($userId);
-                if (!$cartId) {
-                    throw new Exception("Cart not found");
+                // Prepare guest address if provided
+                $guestAddress = '';
+                if ($isGuest && $guestInfo) {
+                    $addressParts = [];
+                    if (!empty($guestInfo['address'])) $addressParts[] = $guestInfo['address'];
+                    if (!empty($guestInfo['city'])) $addressParts[] = $guestInfo['city'];
+                    if (!empty($guestInfo['state'])) $addressParts[] = $guestInfo['state'];
+                    if (!empty($guestInfo['zip'])) $addressParts[] = $guestInfo['zip'];
+                    $guestAddress = implode(', ', $addressParts);
                 }
                 
-                $cartItems = self::getCartItems($cartId);
+                // Determine initial payment status
+                // bank / omt require upfront transfer proof → start as 'unpaid'
+                // COD and other methods start as 'pending'
+                $initialPaymentStatus = in_array(strtolower($paymentMethod), ['bank', 'omt']) ? 'unpaid' : 'pending';
+                
+                // Insert order (with guest fields for guest orders)
+                if ($isGuest) {
+                    $sql = "INSERT INTO orders (user_id, guest_name, guest_email, guest_phone, guest_address, shipping_region_id, payment_method, coupon_id, payment_status, status, created_at) 
+                            VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())";
+                    DB::query($sql, [
+                        $guestInfo['name'] ?? '',
+                        $guestInfo['email'] ?? '',
+                        $guestInfo['phone'] ?? '',
+                        $guestAddress,
+                        $shippingRegionId,
+                        $paymentMethod,
+                        $couponId,
+                        $initialPaymentStatus
+                    ]);
+                } else {
+                    $sql = "INSERT INTO orders (user_id, shipping_region_id, payment_method, coupon_id, payment_status, status, created_at) 
+                            VALUES (?, ?, ?, ?, ?, 'pending', NOW())";
+                    DB::query($sql, [$userId, $shippingRegionId, $paymentMethod, $couponId, $initialPaymentStatus]);
+                }
+                
+                $orderId = DB::getConnection()->lastInsertId();
+                
+                // Get cart items (session for guests, database for logged-in)
+                if ($isGuest) {
+                    $cartItems = self::getSessionCartItems();
+                } else {
+                    $cartId = self::getCartId($userId);
+                    if (!$cartId) {
+                        throw new Exception("Cart not found");
+                    }
+                    $cartItems = self::getCartItems($cartId);
+                }
                 
                 if (empty($cartItems)) {
                     throw new Exception("Cart is empty");
@@ -50,8 +87,15 @@
                     self::updateStock($item['variant_id'], $item['quantity']);
                 }
                 
-                // Clear cart after order
-                self::clearCart($cartId);
+                // Clear cart after order (EXCEPT for eCheck/Bank Transfer - clear after payment confirmed)
+                if (!in_array($paymentMethod, ['echeck', 'bank'])) {
+                    if ($isGuest) {
+                        self::clearSessionCart();
+                    } else {
+                        self::clearCart($cartId);
+                    }
+                }
+                // NOTE: For eCheck/Bank Transfer, cart will be cleared in webhook after payment confirmation
                 
                 DB::getConnection()->commit();
                 
@@ -64,15 +108,18 @@
         }
         
         /**
-         * Get order by ID with full details
+         * Get order by ID with full details (supports guest orders)
          */
         public static function getById($orderId) {
             try {
                 $sql = "SELECT o.*, 
-                            u.name as customer_name, 
-                            u.email as customer_email,
-                            u.phone as customer_phone,
-                            u.address, u.city, u.state, u.country, u.zip_code,
+                            COALESCE(u.name, o.guest_name) as customer_name, 
+                            COALESCE(u.email, o.guest_email) as customer_email,
+                            COALESCE(u.phone, o.guest_phone) as customer_phone,
+                            COALESCE(
+                                CONCAT_WS(', ', u.address, u.city, u.state, u.country, u.zip_code),
+                                o.guest_address
+                            ) as address,
                             s.region_name, s.fee_per_kg as shipping_fee,
                             c.code as coupon_code, c.discount_type, c.discount_value
                         FROM orders o
@@ -150,8 +197,8 @@
                 $offset = (int)$offset;
                 
                 $sql = "SELECT o.*, 
-                            u.name as customer_name, 
-                            u.email as customer_email,
+                            COALESCE(u.name, o.guest_name, 'Guest') as customer_name, 
+                            COALESCE(u.email, o.guest_email) as customer_email,
                             COUNT(oi.id) as items_count
                         FROM orders o
                         LEFT JOIN users u ON o.user_id = u.id
@@ -274,6 +321,24 @@
         }
         
         /**
+         * Delete an order permanently (order_items cascade automatically)
+         */
+        public static function delete($orderId) {
+            try {
+                $stmt = DB::query("SELECT id FROM orders WHERE id = ?", [$orderId]);
+                if (!$stmt->fetch()) {
+                    throw new Exception("Order not found");
+                }
+
+                DB::query("DELETE FROM orders WHERE id = ?", [$orderId]);
+                return true;
+
+            } catch (Exception $e) {
+                throw new Exception("Failed to delete order: " . $e->getMessage());
+            }
+        }
+
+        /**
          * Get user's orders
          */
         public static function getUserOrders($userId, $limit = 20, $offset = 0) {
@@ -321,6 +386,69 @@
         private static function restoreStock($variantId, $quantity) {
             $sql = "UPDATE product_variants SET quantity = quantity + ? WHERE id = ?";
             DB::query($sql, [$quantity, $variantId]);
+        }
+        
+        /**
+         * Get cart items from session (for guest checkout)
+         */
+        private static function getSessionCartItems() {
+            $sessionCart = $_SESSION['cart'] ?? [];
+            $items = [];
+            
+            foreach ($sessionCart as $item) {
+                // Find variant ID based on product_id, size, and color
+                $variantSql = "SELECT pv.id as variant_id 
+                               FROM product_variants pv
+                               INNER JOIN sizes s ON pv.size_id = s.id
+                               INNER JOIN colors c ON pv.color_id = c.id
+                               WHERE pv.product_id = ? AND s.name = ? AND c.name = ?";
+                               
+                $variantStmt = DB::query($variantSql, [$item['product_id'], $item['size'], $item['color']]);
+                $variant = $variantStmt->fetch(PDO::FETCH_ASSOC);
+                
+                if (!$variant) {
+                    continue; // Skip if variant not found
+                }
+                
+                $variantId = $variant['variant_id'];
+                
+                // Get product variant and pricing info
+                $sql = "SELECT 
+                            CASE 
+                                WHEN pv.price IS NOT NULL AND pv.price > 0 THEN pv.price
+                                ELSE p.base_price
+                            END as price,
+                            CASE 
+                                WHEN pd.is_active = 1 AND pd.discount_percentage > 0 
+                                THEN pd.discount_percentage 
+                                ELSE 0 
+                            END as discount
+                        FROM product_variants pv
+                        INNER JOIN products p ON pv.product_id = p.id
+                        LEFT JOIN product_discounts pd ON p.id = pd.product_id
+                        WHERE pv.id = ?";
+                        
+                $stmt = DB::query($sql, [$variantId]);
+                $variantData = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                if ($variantData) {
+                    $items[] = [
+                        'variant_id' => $variantId,
+                        'quantity' => $item['quantity'],
+                        'price' => $variantData['price'],
+                        'discount' => $variantData['discount']
+                    ];
+                }
+            }
+            
+            return $items;
+        }
+        
+        /**
+         * Clear session cart (for guest checkout)
+         */
+        private static function clearSessionCart() {
+            unset($_SESSION['cart']);
         }
         
         private static function calculateOrderTotals($order) {

@@ -67,18 +67,18 @@ if (!isset($product) || empty($product)) {
     </div>
 
     <!-- Thumbnails on mobile (horizontal row under main image) -->
-    <div class="flex w-24 md:hidden gap-4 mt-4 justify-center">
+    <div class="flex flex-wrap w-full md:hidden gap-4 mt-4 justify-start">
       <?php foreach($product['images'] as $img): ?>
           <img 
             loading="lazy"
             src="<?= PUBLIC_URL ?><?= $img ?>" 
-            class="thumbnail-image cursor-pointer hover:ring-2 hover:ring-brand transition-all rounded"/>
+            class="thumbnail-image w-20 h-20 object-cover cursor-pointer hover:ring-2 hover:ring-brand transition-all rounded"/>
         <?php endforeach; ?>
     </div>
 
     <!-- Right: Product Details -->
-    <div class="flex flex-col gap-6">
-      <h1 class="text-3xl font-light font-outfit"><?= htmlspecialchars($product['name']) ?></h1>
+    <div class="flex flex-col gap-6 items-start">
+      <h1 class="text-3xl font-light font-outfit text-left"><?= htmlspecialchars($product['name']) ?></h1>
       
       <!-- Price Section with Discount Display -->
       <div class="price-section">
@@ -110,9 +110,9 @@ if (!isset($product) || empty($product)) {
       </script>
 
       <!-- Sizes -->
-      <div class="flex flex-col gap-2">
-        <h3 class="text-xl">Size:</h3>
-        <div id="sizeContainer" class="flex gap-2">
+      <div class="flex flex-col gap-2 w-full">
+        <h3 class="text-xl text-left">Size:</h3>
+        <div id="sizeContainer" class="flex flex-wrap gap-2 justify-start">
           <?php 
           $uniqueSizes = [];
           foreach($product['variants'] as $variant): 
@@ -131,9 +131,9 @@ if (!isset($product) || empty($product)) {
       </div>
 
       <!-- Colors -->
-      <div class="flex flex-col gap-2">
-        <h3 class="text-xl">Colors:</h3>
-        <div id="colorContainer" class="flex gap-2">
+      <div class="flex flex-col gap-2 w-full">
+        <h3 class="text-xl text-left">Colors:</h3>
+        <div id="colorContainer" class="flex flex-wrap gap-2 justify-start">
           <?php 
           $uniqueColors = [];
           foreach ($product['variants'] as $variant): 
@@ -182,14 +182,20 @@ if (!isset($product) || empty($product)) {
         <div class="accordion-content hidden p-4">
           <?= $product['description'] ?>
         </div>
-        <button class="w-full flex justify-between items-center p-3 text-lg font-medium text-left cursor-pointer">
+        <button class="accordion-btn w-full flex justify-between items-center p-3 text-lg font-medium text-left cursor-pointer">
           Shipping & Returns
           <i class="fi fi-rr-arrow-small-right text-xl"></i>
         </button>
-        <button class="w-full flex justify-between items-center p-3 text-lg font-medium text-left cursor-pointer">
+        <div class="accordion-content hidden p-4">
+          <?= getSetting('shipping_policy', 'Shipping and return information will be available here.') ?>
+        </div>
+        <button class="accordion-btn w-full flex justify-between items-center p-3 text-lg font-medium text-left cursor-pointer">
           Product Care
           <i class="fi fi-rr-arrow-small-right text-xl"></i>
         </button>
+        <div class="accordion-content hidden p-4">
+          <?= getSetting('return_policy', 'Product care instructions will be available here.') ?>
+        </div>
       </div>
     </div>
   </div> <!-- End of productContent -->

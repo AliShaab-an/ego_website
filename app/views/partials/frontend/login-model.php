@@ -54,7 +54,11 @@
 
     <!-- Right: Image -->
     <div class="hidden md:block">
-      <img src="<?= IMG_PATH ?>login-image.png"
+      <?php
+        $loginBgSetting = getSetting('login_bg');
+        $loginBg = $loginBgSetting ? url($loginBgSetting) : IMG_PATH . 'login-image.png';
+      ?>
+      <img src="<?= htmlspecialchars($loginBg) ?>"
            alt="Login Visual"
            class="w-full h-full object-cover">
     </div>

@@ -4,14 +4,21 @@
     class Settings {
 
         public static function getAll() {
-            $stmt = DB::query("SELECT * FROM settings LIMIT 1");
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            
-            if (!$result) {
-                throw new Exception("No settings found in database");
+            try {
+                $stmt = DB::query("SELECT * FROM settings LIMIT 1");
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                if (!$result) {
+                    // Return empty array if no settings found - will use defaults
+                    return [];
+                }
+                
+                return $result;
+            } catch (Exception $e) {
+                // If settings table doesn't exist or query fails, return empty array
+                error_log("Settings::getAll() error: " . $e->getMessage());
+                return [];
             }
-            
-            return $result;
         }
 
         /**

@@ -2,7 +2,7 @@
     
     require_once __DIR__ . '/../../app/bootstrap.php';
 
-    Middleware::requireRoles(['admin', 'super_admin','editor']);
+    Middleware::requireRoles(['admin', 'super_admin']);
 
     $adminController = new AdminController();
     $settings = new SettingsController();

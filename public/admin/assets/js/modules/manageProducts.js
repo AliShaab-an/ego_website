@@ -8,6 +8,7 @@ const ManageProducts = {
   currentPage: 1,
   limit: 5,
   total: 0,
+  variantsCache: {},
 
   init() {
     this.bindEvents();
@@ -31,38 +32,14 @@ const ManageProducts = {
     $(document).on("click", ".editProductBtn", (e) => this.openQuickEdit(e));
     $(document).on("click", ".fullEditBtn", (e) => this.openFullEdit(e));
 
-    $(document).on("click", ".toggleVariantsBtn", function () {
-      const targetId = $(this).data("target");
-      const targetRow = $(targetId);
-      const icon = $(this).find("i");
-      const count = $(this).data("count");
+    $(document).on("click", ".viewVariantsBtn", (e) => {
+      const productId = $(e.currentTarget).data("product-id");
+      this.openVariantsModal(productId);
+    });
 
-      if (targetRow.hasClass("hidden")) {
-        // Show variants
-        targetRow.removeClass("hidden");
-        targetRow.hide().slideDown(300);
-        icon.removeClass("fa-chevron-down").addClass("fa-chevron-up");
-        $(this)
-          .removeClass(
-            "bg-yellow-50 text-yellow-700 border-yellow-200 hover:bg-yellow-100"
-          )
-          .addClass(
-            "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
-          );
-      } else {
-        // Hide variants
-        targetRow.slideUp(300, function () {
-          $(this).addClass("hidden");
-        });
-        icon.removeClass("fa-chevron-up").addClass("fa-chevron-down");
-        $(this)
-          .removeClass(
-            "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
-          )
-          .addClass(
-            "bg-yellow-50 text-yellow-700 border-yellow-200 hover:bg-yellow-100"
-          );
-      }
+    $("#closeVariantsModal").on("click", () => this.closeVariantsModal());
+    $("#variantsModal").on("click", (e) => {
+      if ($(e.target).is("#variantsModal")) this.closeVariantsModal();
     });
 
     $("#filterCategory, #filterStatus, #filterTop").on("change", () =>
@@ -105,7 +82,10 @@ const ManageProducts = {
                   .split(";")
                   .map((v) => {
                     const parts = Object.fromEntries(
-                      v.split("|").map((x) => x.split(":"))
+                      v.trim().split("|").map((x) => {
+                        const idx = x.indexOf(":");
+                        return [x.substring(0, idx).trim(), x.substring(idx + 1)];
+                      })
                     );
 
                     // Safely handle color with fallback values
@@ -181,16 +161,24 @@ const ManageProducts = {
             tbody.append(`
               <tr class="text-center border-b border-gray-300">
                 <td>${(page - 1) * this.limit + (i + 1)}</td>
-                <td class="flex items-center justify-center gap-2 py-2">
-                  <img src="${Config.getAssetUrl(
-                    p.main_image || "admin/assets/no-image.png"
-                  )}" 
-                      alt="${p.name}" 
-                      class="w-12 h-12 object-cover rounded border border-gray-300"/>
-                  <span>${p.name}</span>
+                <td class="py-2 pl-3">
+                  <div class="flex items-center gap-2">
+                    <img src="${Config.getAssetUrl(
+                      p.main_image || "admin/assets/no-image.png"
+                    )}"
+                        alt="${p.name}"
+                        class="w-12 h-12 object-cover rounded border border-gray-300 flex-shrink-0"/>
+                    <span class="block truncate text-left" title="${p.name}">${p.name}</span>
+                  </div>
                 </td>
                 <td>${p.category_name}</td>
                 <td>$${p.base_price}</td>
+                <td class="text-center py-2">
+                  ${parseInt(p.total_stock) > 0
+                    ? `<span class="inline-flex items-center gap-1 text-xs font-semibold text-green-700 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full"><i class="fa-solid fa-check text-green-500 text-[10px]"></i> ${p.total_stock}</span>`
+                    : `<span class="inline-flex items-center gap-1 text-xs font-semibold text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full"><i class="fa-solid fa-xmark text-red-500 text-[10px]"></i> Out of Stock</span>`
+                  }
+                </td>
                 <td class="cursor-pointer font-medium toggleStatusBtn"
                   data-id="${p.id}"
                   data-status="${p.is_active}">
@@ -204,11 +192,11 @@ const ManageProducts = {
                   ${
                     p.variants_info
                       ? `
-                  <button class="toggleVariantsBtn px-2 py-1 bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-lg hover:bg-yellow-100 transition-colors duration-200 flex items-center gap-1 text-sm font-medium" 
-                          data-target="#${variantId}" 
-                          data-count="${p.variants_info.split(";").length}">
-                    <i class="fas fa-chevron-down transition-transform duration-200"></i>
-                    <span class="variant-count bg-yellow-200 text-yellow-800 px-2 py-0.5 rounded-full text-xs">${
+                  <button class="viewVariantsBtn flex items-center gap-1 px-2 py-1 bg-purple-50 text-purple-700 border border-purple-200 rounded-lg hover:bg-purple-100 transition text-sm font-medium"
+                          data-product-id="${p.id}"
+                          title="View Variants">
+                    <i class="fa-solid fa-layer-group text-xs"></i>
+                    <span class="bg-purple-200 text-purple-800 px-2 py-0.5 rounded-full text-xs">${
                       p.variants_info.split(";").length
                     }</span>
                   </button>
@@ -221,38 +209,28 @@ const ManageProducts = {
                   </button>
                   `
                   }
-                  <button class="text-green-500 hover:underline cursor-pointer editProductBtn" data-id="${
+                  <button class="admin-icon-btn text-yellow-600 hover:text-yellow-800 hover:bg-yellow-50 p-1.5 rounded transition cursor-pointer editProductBtn" data-id="${
                     p.id
                   }" data-name="${p.name}" data-price="${
               p.base_price
-            }" data-top="${p.is_top || 0}">QE</button>
-                  <button class="text-blue-500 hover:underline cursor-pointer fullEditBtn" data-id="${
+            }" data-top="${p.is_top || 0}" title="Quick Edit"><i class="fa-solid fa-bolt text-sm"></i></button>
+                  <button class="admin-icon-btn text-blue-500 hover:text-blue-700 hover:bg-blue-50 p-1.5 rounded transition cursor-pointer fullEditBtn" data-id="${
                     p.id
-                  }"><i class="fa-solid fa-pen"></i></button>
-                  <button class="text-red-500 cursor-pointer deleteProductBtn" data-id="${
+                  }" title="Full Edit"><i class="fa-solid fa-pen text-sm"></i></button>
+                  <button class="admin-icon-btn text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded transition cursor-pointer deleteProductBtn" data-id="${
                     p.id
                   }" data-name="${
               p.name
-            }"><i class="fa-solid fa-trash"></i></button>
-                </td>
-              </tr>
-              <tr id="${variantId}" class="hidden bg-gradient-to-r from-gray-50 to-blue-50 border-l-4 border-blue-200">
-                <td colspan="6" class="p-4">
-                  <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-                    <div class="flex items-center gap-2 mb-3">
-                      <i class="fas fa-box text-blue-500"></i>
-                      <h4 class="font-medium text-gray-800">Product Variants</h4>
-                      <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">${
-                        p.variants_info ? p.variants_info.split(";").length : 0
-                      } variants</span>
-                    </div>
-                    <div class="variants-grid grid gap-3">
-                      ${variantsList}
-                    </div>
-                  </div>
+            }" title="Delete"><i class="fa-solid fa-trash text-sm"></i></button>
                 </td>
               </tr>
             `);
+
+            this.variantsCache[p.id] = {
+              name: p.name,
+              count: p.variants_info ? p.variants_info.split(";").length : 0,
+              html: variantsList
+            };
           });
           $("#prevPage").toggle(page > 1);
           $("#nextPage").toggle(res.has_more);
@@ -391,6 +369,21 @@ const ManageProducts = {
 
     // Redirect to add product page with edit parameter
     window.location.href = `index.php?action=addProduct&edit=${productId}`;
+  },
+
+  openVariantsModal(productId) {
+    const data = this.variantsCache[productId];
+    if (!data) return;
+    const count = data.count;
+    $("#variantsModalTitle").text(
+      `${data.name} — ${count} Variant${count !== 1 ? "s" : ""}`
+    );
+    $("#variantsModalContent").html(data.html);
+    openModal("#variantsModal");
+  },
+
+  closeVariantsModal() {
+    closeModal("#variantsModal");
   },
 
   quickEditSubmit(e) {

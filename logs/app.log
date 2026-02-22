@@ -54,3 +54,4 @@
 [2025-10-30 21:33:15] [ProductController::addProduct] INFO: Discount created: 30% (Active: 1)
 [2025-11-01 09:57:09] [ProductController::addProduct] INFO: Discount created: 40% (Active: 1)
 [2025-11-01 10:25:36] [ProductController::addProduct] INFO: Discount created: 30% (Active: 1)
+[2026-02-22 20:00:09] [eCheck payment initiated] INFO: Array

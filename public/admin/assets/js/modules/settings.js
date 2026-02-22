@@ -1,5 +1,6 @@
 import { showToast } from "../utils/messages.js";
 import { Loader } from "../utils/loader.js";
+import { ajaxRequest } from "../utils/ajax.js";
 import Config from "../../../../assets/js/config.js";
 
 const Settings = {
@@ -330,9 +331,9 @@ const Settings = {
 
     Loader.show("#settings-form");
 
-    $.ajax({
+    ajaxRequest({
       url: Config.getAdminApiUrl("settings.php"),
-      type: "POST",
+      method: "POST",
       data: formData,
       processData: false,
       contentType: false,

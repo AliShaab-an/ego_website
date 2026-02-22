@@ -48,11 +48,10 @@ const Cart = {
       const color = $("#selected-color").val();
       const quantity = parseInt($("#qty-value").text());
 
-      $.ajax({
+      ajaxRequest({
         url: "api/add-to-cart.php",
-        type: "POST",
+        method: "POST",
         data: { productId, size, color, quantity },
-        dataType: "json",
         success: function (res) {
           if (res.success) {
             showToast("Added to cart successfully", "success");
@@ -89,13 +88,12 @@ const Cart = {
       formData.append("color", color);
       formData.append("quantity", quantity);
 
-      $.ajax({
+      ajaxRequest({
         url: "api/add-to-cart.php",
-        type: "POST",
+        method: "POST",
         data: formData,
         processData: false,
         contentType: false,
-        dataType: "json",
         success: function (response) {
           if (response.success) {
             Cart.updateCartCount();
@@ -231,13 +229,12 @@ const Cart = {
     formData.append("color", color);
     formData.append("quantity", quantity);
 
-    $.ajax({
+    ajaxRequest({
       url: "api/update-cart.php",
-      type: "POST",
+      method: "POST",
       data: formData,
       processData: false,
       contentType: false,
-      dataType: "json",
       success: function (response) {
         if (response.success) {
           // Update ALL cart items with same product/size/color (both desktop and mobile)
@@ -264,11 +261,6 @@ const Cart = {
 
           // Recalculate totals
           Cart.updateCartTotals();
-
-          Cart.showCartMessage(
-            response.message || "Cart updated successfully!",
-            "success"
-          );
         } else {
           Cart.showCartMessage(
             response.message || "Failed to update cart",
@@ -288,13 +280,12 @@ const Cart = {
     formData.append("size", size);
     formData.append("color", color);
 
-    $.ajax({
+    ajaxRequest({
       url: "api/remove-from-cart.php",
-      type: "POST",
+      method: "POST",
       data: formData,
       processData: false,
       contentType: false,
-      dataType: "json",
       success: function (response) {
         if (response.success) {
           // Remove the item from the DOM

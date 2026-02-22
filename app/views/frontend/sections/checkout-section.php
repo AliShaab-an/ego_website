@@ -6,6 +6,18 @@ $cartCount = $cartCount ?? 0;
 $userName = $userName ?? '';
 $userEmail = $userEmail ?? '';
 $userPhone = $userPhone ?? '';
+
+// Ensure payment methods have a default (COD at minimum)
+if (!isset($paymentMethods) || empty($paymentMethods)) {
+    $paymentMethods = [
+        'cod' => [
+            'enabled' => true,
+            'label' => 'Cash on Delivery',
+            'instructions' => '',
+            'requires_proof' => false
+        ]
+    ];
+}
 ?>
 
 <section class="max-w-7xl mx-auto px-4 py-10">
@@ -27,15 +39,63 @@ $userPhone = $userPhone ?? '';
         <!-- Payment Method Selection -->
         <div class="space-y-4 py-4 border-b">
             <h2 class="text-2xl md:text-3xl">Payment Method</h2>
-            <div class="flex flex-wrap gap-3">
-                <button type="button" class="payment-method-btn flex-1 min-w-[120px] border-2 px-4 py-2 md:px-8 md:py-3 text-lg md:text-xl hover:border-brand hover:text-brand transition-colors rounded" data-method="cash">
-                    Cash on Delivery
-                </button>
-                <button type="button" class="payment-method-btn flex-1 min-w-[120px] border-2 px-4 py-2 md:px-8 md:py-3 text-lg md:text-xl hover:border-brand hover:text-brand transition-colors rounded" data-method="wishmoney">
-                    Wish Money
-                </button>
-            </div>
-            <p id="payment-method-error" class="text-red-500 text-sm hidden">Please select a payment method</p>
+            <?php 
+            $enabledPayments = array_filter($paymentMethods ?? [], function($pm) {
+                return $pm['enabled'] ?? false;
+            });
+            
+            if (empty($enabledPayments)): 
+            ?>
+                <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 p-4 rounded">
+                    <p class="font-semibold">No payment methods available</p>
+                    <p class="text-sm mt-1">Please contact support to complete your order.</p>
+                </div>
+            <?php else: ?>
+                <div class="flex flex-wrap gap-3">
+                    <?php foreach ($paymentMethods as $key => $method): ?>
+                        <?php if ($method['enabled']): ?>
+                            <button type="button" 
+                                    class="payment-method-btn flex-1 min-w-[120px] border-2 px-4 py-2 md:px-8 md:py-3 text-lg md:text-xl hover:border-brand hover:text-brand transition-colors rounded" 
+                                    data-method="<?= htmlspecialchars($key) ?>"
+                                    data-requires-proof="<?= !empty($method['requires_proof']) ? 'true' : 'false' ?>">
+                                <?= htmlspecialchars($method['label']) ?>
+                            </button>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                </div>
+                <p id="payment-method-error" class="text-red-500 text-sm hidden">Please select a payment method</p>
+                
+                <!-- Payment Instructions -->
+                <?php foreach ($paymentMethods as $key => $method): ?>
+                    <?php if ($method['enabled'] && !empty($method['instructions'])): ?>
+                        <div id="payment-instructions-<?= htmlspecialchars($key) ?>" class="payment-instructions hidden bg-blue-50 border border-blue-200 p-4 rounded mt-3">
+                            <p class="text-sm text-gray-700 whitespace-pre-line"><?= htmlspecialchars($method['instructions']) ?></p>
+                            <?php if ($key === 'wishmoney' && !empty($method['number'])): ?>
+                                <p class="text-sm mt-2">
+                                    <strong>Wish Money Number:</strong> <?= htmlspecialchars($method['number']) ?><br>
+                                    <?php if (!empty($method['name'])): ?>
+                                        <strong>Name:</strong> <?= htmlspecialchars($method['name']) ?>
+                                    <?php endif; ?>
+                                </p>
+                            <?php elseif ($key === 'bank' && !empty($method['account'])): ?>
+                                <p class="text-sm mt-2">
+                                    <?php if (!empty($method['bank_name'])): ?>
+                                        <strong>Bank:</strong> <?= htmlspecialchars($method['bank_name']) ?><br>
+                                    <?php endif; ?>
+                                    <strong>Account Number:</strong> <?= htmlspecialchars($method['account']) ?><br>
+                                    <?php if (!empty($method['account_name'])): ?>
+                                        <strong>Account Name:</strong> <?= htmlspecialchars($method['account_name']) ?>
+                                    <?php endif; ?>
+                                </p>
+                            <?php elseif ($key === 'omt' && !empty($method['name'])): ?>
+                                <p class="text-sm mt-2">
+                                    <strong>Recipient Name:</strong> <?= htmlspecialchars($method['name']) ?>
+                                </p>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
 
         <!-- Content -->
@@ -79,6 +139,17 @@ $userPhone = $userPhone ?? '';
 
                     <label class="text-lg" for="order-notes">Order Notes (Optional)</label>
                     <textarea class="border w-full h-20 p-2 outline-none focus:border-brand resize-none" id="order-notes" name="notes" placeholder="Any special instructions?"></textarea>
+                    
+                    <!-- Payment Proof Upload (for non-COD methods that require it) -->
+                    <div id="payment-proof-section" class="hidden space-y-2">
+                        <label class="text-lg" for="payment-proof">Payment Proof <span class="text-red-500">*</span></label>
+                        <input type="file" 
+                               id="payment-proof" 
+                               name="payment_proof" 
+                               accept="image/*,.pdf"
+                               class="border w-full p-2 outline-none focus:border-brand">
+                        <p class="text-sm text-gray-600">Please upload a screenshot or photo of your payment receipt/transfer confirmation</p>
+                    </div>
                 </div>
             </form>
 

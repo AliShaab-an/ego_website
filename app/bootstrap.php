@@ -1,5 +1,11 @@
 <?php
 
+    // Load Composer autoloader (PHPMailer, etc.)
+    $composerAutoload = dirname(__DIR__) . '/vendor/autoload.php';
+    if (file_exists($composerAutoload)) {
+        require_once $composerAutoload;
+    }
+
     require_once __DIR__ . '/config/path.php';
     require_once HELPER . 'SettingsHelper.php';
     require_once HELPER . 'UrlHelper.php';
@@ -50,8 +56,11 @@
     }
 
     if(defined('IS_LOCAL') && IS_LOCAL){
-        ini_set('display_errors', '1');
-        ini_set('display-startup_errors', '1');
+        // Log errors but don't display them (to prevent breaking JSON responses in API requests)
+        ini_set('display_errors', '0');
+        ini_set('display_startup_errors', '0');
+        ini_set('log_errors', '1');
+        ini_set('error_log', ROOT_PATH . 'app/logs/php_errors.log');
         error_reporting(E_ALL);
 
     }else{
@@ -65,6 +74,8 @@
     require_once CORE . 'Response.php';
     require_once CORE . 'ApiRunner.php';
     require_once CORE . 'Authorization.php';
+    require_once CORE . 'CSRF.php';
+    require_once CORE . 'Logger.php';
 
     if (file_exists(CORE . 'Auth.php'))    require_once CORE . 'Auth.php';
 

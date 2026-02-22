@@ -54,14 +54,14 @@ const Colors = {
                   color.hex_code
                 }"></span></td>
                 <td class="flex justify-center gap-2 py-4">
-                  <button class="text-blue-500 hover:underline editColorBtn" data-id="${
+                  <button class="admin-icon-btn text-blue-500 hover:text-blue-700 hover:bg-blue-50 p-1.5 rounded transition editColorBtn" data-id="${
                     color.id
                   }" data-name="${color.name}" data-hex="${
               color.hex_code
-            }">Edit</button>
-                  <button class="text-red-500 hover:underline deleteColorBtn" data-id="${
+            }" title="Edit"><i class="fa-solid fa-pen text-sm"></i></button>
+                  <button class="admin-icon-btn text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded transition deleteColorBtn" data-id="${
                     color.id
-                  }" data-name="${color.name}">Delete</button>
+                  }" data-name="${color.name}" title="Delete"><i class="fa-solid fa-trash text-sm"></i></button>
                 </td>
               </tr>
             `);

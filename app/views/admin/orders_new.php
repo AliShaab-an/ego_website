@@ -38,18 +38,31 @@
     </div>
   </div>
 
-  <table class="table-auto w-full md:table-fixed">
+  <table class="table-fixed w-full">
+    <colgroup>
+      <col style="width:4%">
+      <col style="width:7%">
+      <col style="width:17%">
+      <col style="width:5%">
+      <col style="width:8%">
+      <col style="width:10%">
+      <col style="width:9%">
+      <col style="width:10%">
+      <col style="width:10%">
+      <col style="width:20%">
+    </colgroup>
     <thead class="bg-[rgba(240,215,186,0.2)]">
       <tr>
-        <th class="pt-4 pb-4">#</th>
-        <th>Order ID</th>
-        <th>Customer</th>
-        <th>Items</th>
-        <th>Total</th>
-        <th>Payment</th>
-        <th>Status</th>
-        <th>Date</th>
-        <th>Actions</th>
+        <th class="pt-4 pb-4 text-center">#</th>
+        <th class="text-center">Order ID</th>
+        <th class="text-left pl-3">Customer</th>
+        <th class="text-center">Items</th>
+        <th class="text-center">Total</th>
+        <th class="text-center">Payment</th>
+        <th class="text-center">Pay Type</th>
+        <th class="text-center">Status</th>
+        <th class="text-center">Date</th>
+        <th class="text-center">Actions</th>
       </tr>
     </thead>
     <tbody id="ordersTableBody">
@@ -58,9 +71,9 @@
   </table>
 
   <div class="flex justify-between w-full mt-4 px-4">
-    <button id="prevPage" class="px-3 py-1 bg-white rounded shadow cursor-pointer" disabled>Previous</button>
+    <button id="prevPage" class="px-3 py-1 bg-white border rounded shadow cursor-pointer" disabled>Previous</button>
     <span id="pageInfo" class="text-gray-600">Page 1</span>
-    <button id="nextPage" class="px-3 py-1 bg-white rounded shadow cursor-pointer">Next</button>
+    <button id="nextPage" class="px-3 py-1 bg-white border rounded shadow cursor-pointer">Next</button>
   </div>
 </div>
 
@@ -112,6 +125,20 @@
       <div class="flex justify-end gap-3 mt-6">
         <button id="cancelUpdateBtn" class="px-4 py-2 border rounded hover:bg-gray-100 cursor-pointer">Cancel</button>
         <button id="confirmUpdateBtn" class="px-4 py-2 bg-brand text-white rounded hover:bg-opacity-90 cursor-pointer">Update</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRMATION MODAL -->
+<div id="deleteOrderModal" class="hidden fixed inset-0 bg-white/20 backdrop-blur-md z-50">
+  <div class="flex items-center justify-center h-full">
+    <div class="bg-white p-6 rounded shadow-lg w-[400px]">
+      <h2 class="text-xl font-bold mb-2 text-gray-900">Delete Order</h2>
+      <p class="text-gray-600 mb-6">Are you sure you want to permanently delete order <strong id="deleteOrderId"></strong>? This cannot be undone.</p>
+      <div class="flex justify-end gap-3">
+        <button id="cancelDeleteBtn" class="px-4 py-2 border rounded hover:bg-gray-100 cursor-pointer">Cancel</button>
+        <button id="confirmDeleteBtn" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 cursor-pointer">Delete</button>
       </div>
     </div>
   </div>

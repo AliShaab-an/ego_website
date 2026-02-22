@@ -496,7 +496,7 @@
                         class="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:border-[rgba(183,146,103,1)] focus:ring-2 focus:ring-[rgba(183,146,103,0.2)]"></textarea>
                 </div>
                 <div>
-                    <label class="block text-gray-700 font-semibold mb-2">Return & Exchange Policy</label>
+                    <label class="block text-gray-700 font-semibold mb-2">Product Care</label>
                     <textarea id="return_policy" name="return_policy" rows="4" placeholder="Define your return and exchange terms..." 
                         class="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:border-[rgba(183,146,103,1)] focus:ring-2 focus:ring-[rgba(183,146,103,0.2)]"></textarea>
                 </div>

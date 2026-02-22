@@ -51,14 +51,14 @@
             return [
                 'success' => true,
                 'cart_count' => $cartCount,
-                'message' => 'Added to session cart successfully!'
+                'message' => 'Added to cart successfully!'
             ];
         }
 
         public function getCartItems() {
             // If user is logged in, get from database
-            if(isset($_SESSION['user_id'])){
-                $userId = $_SESSION['user_id'];
+            if(Auth::check()){
+                $userId = Auth::id();
                 $cartId = Cart::getOrCreateCart($userId);
                 $items = Cart::getCartItemsWithDetails($cartId);
                 $total = Cart::getCartTotal($cartId);
@@ -93,7 +93,7 @@
 
             foreach($_SESSION['cart'] as $item) {
                 // Debug: Log the item being processed
-                error_log("Cart Debug - Processing item: " . json_encode($item));
+                // error_log("Cart Debug - Processing item: " . json_encode($item));
                 
                 $productDetails = Product::getProductWithVariant(
                     $item['product_id'], 
@@ -102,7 +102,7 @@
                 );
                 
                 // Debug logging
-                error_log("Cart Debug - Product Details for ID " . $item['product_id'] . ": " . json_encode($productDetails));
+                // error_log("Cart Debug - Product Details for ID " . $item['product_id'] . ": " . json_encode($productDetails));
                 
                 if($productDetails) {
                     $itemTotal = $productDetails['price'] * $item['quantity'];
@@ -120,14 +120,14 @@
                         'image' => $productDetails['image'] ?? null
                     ];
                     
-                    error_log("Cart Debug - Successfully added item to cart items array");
+                    // error_log("Cart Debug - Successfully added item to cart items array");
                 } else {
-                    error_log("Cart Debug - Product NOT FOUND for ID: " . $item['product_id'] . ", Size: " . $item['size'] . ", Color: " . $item['color']);
+                    // error_log("Cart Debug - Product NOT FOUND for ID: " . $item['product_id'] . ", Size: " . $item['size'] . ", Color: " . $item['color']);
                     
                     // Try to get product without variant matching as fallback
                     $basicProduct = Product::findById($item['product_id']);
                     if ($basicProduct) {
-                        error_log("Cart Debug - Basic product found: " . json_encode($basicProduct));
+                        // error_log("Cart Debug - Basic product found: " . json_encode($basicProduct));
                         
                         // Add item with basic product info
                         $itemTotal = $basicProduct['base_price'] * $item['quantity'];
@@ -145,7 +145,7 @@
                             'image' => null // We'll add this later
                         ];
                     } else {
-                        error_log("Cart Debug - Basic product also NOT FOUND for ID: " . $item['product_id']);
+                        // error_log("Cart Debug - Basic product also NOT FOUND for ID: " . $item['product_id']);
                     }
                 }
             }
@@ -169,21 +169,21 @@
             }
 
             // If user is logged in, update in database
-            if(isset($_SESSION['user_id'])){
-                $userId = $_SESSION['user_id'];
-                $success = Cart::updateItemQuantityForUser($userId, $productId, $size, $color, $quantity);
-                
-                if($success) {
-                    $cartCount = Cart::getCartCount($userId);
-                    return [
-                        'success' => true,
-                        'cart_count' => $cartCount,
-                        'message' => 'Cart updated successfully!'
-                    ];
-                } else {
-                    return ['success' => false, 'message' => 'Failed to update cart item'];
-                }
+        if(Auth::check()){
+            $userId = Auth::id();
+            $success = Cart::updateItemQuantityForUser($userId, $productId, $size, $color, $quantity);
+            
+            if($success) {
+                $cartCount = Cart::getCartCount($userId);
+                return [
+                    'success' => true,
+                    'cart_count' => $cartCount,
+                    'message' => 'Cart updated successfully!'
+                ];
+            } else {
+                return ['success' => false, 'message' => 'Failed to update cart item'];
             }
+        }
 
             // For guest users, update session
             if(!isset($_SESSION['cart'])){
@@ -219,8 +219,8 @@
             }
 
             // If user is logged in, remove from database
-            if(isset($_SESSION['user_id'])){
-                $userId = $_SESSION['user_id'];
+            if(Auth::check()){
+                $userId = Auth::id();
                 $success = Cart::removeItemForUser($userId, $productId, $size, $color);
                 
                 if($success) {
@@ -256,8 +256,8 @@
 
         public function clearCart() {
             // If user is logged in, clear database cart
-            if(isset($_SESSION['user_id'])){
-                $userId = $_SESSION['user_id'];
+            if(Auth::check()){
+                $userId = Auth::id();
                 $cartId = Cart::getOrCreateCart($userId);
                 Cart::clearCart($cartId);
                 
@@ -279,8 +279,8 @@
 
         public function getCartCount() {
             // If user is logged in, get count from displayable items
-            if(isset($_SESSION['user_id'])){
-                $userId = $_SESSION['user_id'];
+            if(Auth::check()){
+                $userId = Auth::id();
                 $cartId = Cart::getOrCreateCart($userId);
                 $items = Cart::getCartItemsWithDetails($cartId);
                 

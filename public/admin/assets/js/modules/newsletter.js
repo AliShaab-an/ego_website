@@ -127,8 +127,8 @@ const Newsletter = {
 
       const actionButtons =
         subscriber.is_active == 1
-          ? `<button class="action-btn deactivate-btn bg-orange-500 text-white px-2 py-1 rounded text-xs hover:bg-orange-600" data-id="${subscriber.id}" data-action="deactivate">Deactivate</button>`
-          : `<button class="action-btn activate-btn bg-green-500 text-white px-2 py-1 rounded text-xs hover:bg-green-600" data-id="${subscriber.id}" data-action="activate">Activate</button>`;
+          ? `<button class="admin-icon-btn action-btn deactivate-btn text-orange-500 hover:text-orange-700 hover:bg-orange-50 p-1.5 rounded transition" data-id="${subscriber.id}" data-action="deactivate" title="Deactivate"><i class="fa-solid fa-ban text-sm"></i></button>`
+          : `<button class="admin-icon-btn action-btn activate-btn text-green-600 hover:text-green-800 hover:bg-green-50 p-1.5 rounded transition" data-id="${subscriber.id}" data-action="activate" title="Activate"><i class="fa-solid fa-check text-sm"></i></button>`;
 
       tbody.append(`
         <tr class="border-b hover:bg-gray-50">
@@ -143,9 +143,9 @@ const Newsletter = {
           <td class="py-3 text-center">
             <div class="flex gap-1 justify-center">
               ${actionButtons}
-              <button class="action-btn delete-btn bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600" data-id="${
+              <button class="admin-icon-btn action-btn delete-btn text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded transition" data-id="${
                 subscriber.id
-              }" data-action="delete">Delete</button>
+              }" data-action="delete" title="Delete"><i class="fa-solid fa-trash text-sm"></i></button>
             </div>
           </td>
         </tr>
@@ -154,7 +154,7 @@ const Newsletter = {
 
     // Attach event listeners to action buttons
     $(".action-btn").on("click", (e) => {
-      const button = $(e.target);
+      const button = $(e.currentTarget);
       const id = button.data("id");
       const action = button.data("action");
       this.showActionModal(id, action);

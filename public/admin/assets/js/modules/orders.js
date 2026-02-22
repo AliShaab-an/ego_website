@@ -2,11 +2,12 @@ import { Loader } from "../utils/loader.js";
 import { ajaxRequest } from "../utils/ajax.js";
 import { showToast } from "../utils/messages.js";
 import { openModal, closeModal } from "../utils/modal.js";
+import Config from "../../../../assets/js/config.js";
 
 const Orders = {
   currentPage: 1,
   currentStatus: "all",
-  limit: 20,
+  limit: 5,
   currentOrderId: null,
 
   init() {
@@ -50,6 +51,10 @@ const Orders = {
     $("#cancelUpdateBtn").on("click", () => this.hideUpdateModal());
     $("#confirmUpdateBtn").on("click", () => this.updateOrderStatus());
 
+    // Delete modal
+    $("#cancelDeleteBtn").on("click", () => this.hideDeleteModal());
+    $("#confirmDeleteBtn").on("click", () => this.deleteOrder());
+
     // Close modals on outside click
     $("#viewOrderModal").on("click", (e) => {
       if (e.target === e.currentTarget) {
@@ -60,6 +65,12 @@ const Orders = {
     $("#updateStatusModal").on("click", (e) => {
       if (e.target === e.currentTarget) {
         this.hideUpdateModal();
+      }
+    });
+
+    $("#deleteOrderModal").on("click", (e) => {
+      if (e.target === e.currentTarget) {
+        this.hideDeleteModal();
       }
     });
   },
@@ -95,7 +106,7 @@ const Orders = {
     if (orders.length === 0) {
       tbody.append(`
         <tr>
-          <td colspan="9" class="text-center py-8">
+          <td colspan="10" class="text-center py-8">
             <div class="flex flex-col items-center justify-center text-gray-500">
               <i class="fas fa-shopping-bag text-4xl mb-4 text-gray-300"></i>
               <h3 class="text-lg font-semibold mb-2">No orders found</h3>
@@ -116,41 +127,40 @@ const Orders = {
 
       const statusBadge = this.getStatusBadge(order.status);
       const paymentBadge = this.getPaymentBadge(order.payment_status);
+      const paymentMethodBadge = this.getPaymentMethodBadge(order.payment_method);
 
       tbody.append(`
         <tr class="border-b hover:bg-gray-50">
           <td class="text-center py-3">${rowNum}</td>
-          <td class="py-3 text-center">#${order.id}</td>
-          <td class="py-3">
+          <td class="py-3 text-center font-medium">#${order.id}</td>
+          <td class="py-3 pl-3">
             <div>
-              <p class="font-semibold">${this.escapeHtml(
-                order.customer_name
-              )}</p>
-              <p class="text-xs text-gray-500">${this.escapeHtml(
-                order.customer_email
-              )}</p>
+              <p class="font-semibold truncate" title="${this.escapeHtml(order.customer_name)}">${this.escapeHtml(order.customer_name)}</p>
+              <p class="text-xs text-gray-500 truncate" title="${this.escapeHtml(order.customer_email)}">${this.escapeHtml(order.customer_email)}</p>
             </div>
           </td>
           <td class="py-3 text-center">${order.items_count}</td>
-          <td class="py-3 text-center font-semibold">$${parseFloat(
-            order.total
-          ).toFixed(2)}</td>
+          <td class="py-3 text-center font-semibold">$${parseFloat(order.total).toFixed(2)}</td>
           <td class="py-3 text-center">${paymentBadge}</td>
+          <td class="py-3 text-center">${paymentMethodBadge}</td>
           <td class="py-3 text-center">${statusBadge}</td>
-          <td class="py-3 text-center">${new Date(
-            order.created_at
-          ).toLocaleDateString()}</td>
+          <td class="py-3 text-center text-sm">${new Date(order.created_at).toLocaleDateString()}</td>
           <td class="py-3 text-center">
             <div class="flex gap-1 justify-center">
-              <button class="view-btn bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600" data-id="${
+              <button class="admin-icon-btn text-blue-500 hover:text-blue-700 hover:bg-blue-50 p-1.5 rounded transition view-btn" data-id="${
                 order.id
-              }">
-                View
+              }" title="View">
+                <i class="fa-solid fa-eye text-sm"></i>
               </button>
-              <button class="update-btn bg-green-500 text-white px-2 py-1 rounded text-xs hover:bg-green-600" data-id="${
+              <button class="admin-icon-btn text-green-600 hover:text-green-800 hover:bg-green-50 p-1.5 rounded transition update-btn" data-id="${
                 order.id
-              }">
-                Update
+              }" title="Update Status">
+                <i class="fa-solid fa-pen-to-square text-sm"></i>
+              </button>
+              <button class="admin-icon-btn text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded transition delete-order-btn" data-id="${
+                order.id
+              }" title="Delete">
+                <i class="fa-solid fa-trash text-sm"></i>
               </button>
             </div>
           </td>
@@ -160,13 +170,18 @@ const Orders = {
 
     // Attach event listeners
     $(".view-btn").on("click", (e) => {
-      const orderId = $(e.target).data("id");
+      const orderId = $(e.currentTarget).data("id");
       this.viewOrder(orderId);
     });
 
     $(".update-btn").on("click", (e) => {
-      const orderId = $(e.target).data("id");
+      const orderId = $(e.currentTarget).data("id");
       this.showUpdateModal(orderId);
+    });
+
+    $(".delete-order-btn").on("click", (e) => {
+      const orderId = $(e.currentTarget).data("id");
+      this.showDeleteModal(orderId);
     });
   },
 
@@ -187,12 +202,26 @@ const Orders = {
   getPaymentBadge(status) {
     const badges = {
       pending:
-        '<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-yellow-500"></span>Pending</span>',
-      paid: '<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500"></span>Paid</span>',
+        '<span class="inline-flex items-center justify-center gap-1"><span class="w-2 h-2 rounded-full bg-yellow-500"></span>Pending</span>',
+      paid: '<span class="inline-flex items-center justify-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500"></span>Paid</span>',
       failed:
-        '<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500"></span>Failed</span>',
+        '<span class="inline-flex items-center justify-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500"></span>Failed</span>',
     };
     return badges[status] || status;
+  },
+
+  getPaymentMethodBadge(method) {
+    const key = (method || '').toLowerCase();
+    const badges = {
+      cod:       '<span class="inline-block bg-orange-100 text-orange-700 border border-orange-200 text-xs font-semibold px-2 py-0.5 rounded-full">COD</span>',
+      bank:      '<span class="inline-block bg-blue-100 text-blue-700 border border-blue-200 text-xs font-semibold px-2 py-0.5 rounded-full"><i class="fa-solid fa-building-columns mr-1 text-[10px]"></i>Bank</span>',
+      omt:       '<span class="inline-block bg-purple-100 text-purple-700 border border-purple-200 text-xs font-semibold px-2 py-0.5 rounded-full"><i class="fa-solid fa-money-bill-transfer mr-1 text-[10px]"></i>OMT</span>',
+      wishmoney: '<span class="inline-block bg-green-100 text-green-700 border border-green-200 text-xs font-semibold px-2 py-0.5 rounded-full"><i class="fa-brands fa-whatsapp mr-1"></i>Wish Money</span>',
+      // legacy values already in DB
+      card:      '<span class="inline-block bg-blue-100 text-blue-700 border border-blue-200 text-xs font-semibold px-2 py-0.5 rounded-full"><i class="fa-solid fa-credit-card mr-1 text-[10px]"></i>Card</span>',
+      whatsapp:  '<span class="inline-block bg-green-100 text-green-700 border border-green-200 text-xs font-semibold px-2 py-0.5 rounded-full"><i class="fa-brands fa-whatsapp mr-1"></i>WhatsApp</span>',
+    };
+    return badges[key] || `<span class="text-xs text-gray-500">${method || 'N/A'}</span>`;
   },
 
   updateStatistics(stats) {
@@ -257,11 +286,14 @@ const Orders = {
 
     let itemsHtml = "";
     order.items.forEach((item) => {
+      const imgSrc = item.image_path
+        ? Config.getAssetUrl(item.image_path)
+        : Config.getAssetUrl("admin/assets/no-image.png");
       itemsHtml += `
         <div class="flex items-center gap-4 border-b py-3">
-          <img src="../${item.image_url || "assets/images/placeholder.jpg"}" 
+          <img src="${imgSrc}"
                alt="${this.escapeHtml(item.product_name)}"
-               class="w-16 h-16 object-cover rounded">
+               class="w-16 h-16 object-cover rounded flex-shrink-0">
           <div class="flex-1">
             <p class="font-semibold">${this.escapeHtml(item.product_name)}</p>
             <p class="text-sm text-gray-600">
@@ -441,6 +473,43 @@ const Orders = {
   hideUpdateModal() {
     closeModal("#updateStatusModal");
     this.currentOrderId = null;
+  },
+
+  showDeleteModal(orderId) {
+    this.currentOrderId = orderId;
+    $("#deleteOrderId").text(`#${orderId}`);
+    openModal("#deleteOrderModal");
+  },
+
+  hideDeleteModal() {
+    closeModal("#deleteOrderModal");
+    this.currentOrderId = null;
+  },
+
+  deleteOrder() {
+    const confirmBtn = $("#confirmDeleteBtn");
+    Loader.showButton(confirmBtn, "Deleting...");
+
+    ajaxRequest({
+      url: "api/delete-order.php",
+      type: "POST",
+      contentType: "application/json",
+      data: JSON.stringify({ order_id: this.currentOrderId }),
+      success: (data) => {
+        if (data.success) {
+          showToast("Order deleted successfully", "success");
+          this.hideDeleteModal();
+          this.loadOrders();
+        } else {
+          showToast("Error: " + data.message, "error");
+        }
+        Loader.hideButton(confirmBtn);
+      },
+      error: () => {
+        showToast("Failed to delete order", "error");
+        Loader.hideButton(confirmBtn);
+      },
+    });
   },
 
   escapeHtml(text) {

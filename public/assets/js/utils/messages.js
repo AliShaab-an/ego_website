@@ -1,11 +1,16 @@
 export function showToast(message, type = "success") {
-  const bg =
-    type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white";
+  const bgMap = {
+    success: "bg-green-500 text-white",
+    error: "bg-red-500 text-white",
+    info: "bg-blue-500 text-white",
+    warning: "bg-yellow-500 text-white",
+  };
+  const bg = bgMap[type] || bgMap.success;
   const toast = $(
-    `<div class="fixed top-4 right-4 ${bg} p-3 rounded shadow text-sm z-[9999]">${message}</div>`
+    `<div class="fixed top-4 right-4 ${bg} px-4 py-3 rounded-lg shadow-lg text-sm z-[9999] max-w-sm">${message}</div>`
   );
   $("body").append(toast);
-  setTimeout(() => toast.fadeOut(500, () => toast.remove()), 2500);
+  setTimeout(() => toast.fadeOut(500, () => toast.remove()), 3000);
 }
 
 export function fadeOutMessages(selector = ".message") {

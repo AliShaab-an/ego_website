@@ -49,14 +49,14 @@ const Shipping = {
                   </span>
                 </td>
                 <td class="flex justify-center gap-2 py-4">
-                  <button class="text-blue-500 hover:underline editRegionBtn" data-id="${
+                  <button class="admin-icon-btn text-blue-500 hover:text-blue-700 hover:bg-blue-50 p-1.5 rounded transition editRegionBtn" data-id="${
                     region.id
                   }" data-name="${region.region_name}" data-fee="${
               region.fee_per_kg
-            }">Edit</button>
-                  <button class="text-red-500 hover:underline deleteRegionBtn" data-id="${
+            }" title="Edit"><i class="fa-solid fa-pen text-sm"></i></button>
+                  <button class="admin-icon-btn text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded transition deleteRegionBtn" data-id="${
                     region.id
-                  }" data-name="${region.region_name}">Delete</button>
+                  }" data-name="${region.region_name}" title="Delete"><i class="fa-solid fa-trash text-sm"></i></button>
                 </td>
               </tr>
             `);

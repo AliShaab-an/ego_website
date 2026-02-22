@@ -208,6 +208,40 @@ class FrontendController
             }
         }
 
+        // Get enabled payment methods from settings
+        $paymentMethods = [
+            'cod' => [
+                'enabled' => (bool)getSetting('enable_cod', 1),
+                'label' => 'Cash on Delivery',
+                'instructions' => getSetting('cod_instructions', ''),
+                'requires_proof' => false // COD doesn't need payment proof
+            ],
+            'wishmoney' => [
+                'enabled' => (bool)getSetting('enable_wish_money', 0),
+                'label' => 'Wish Money',
+                'number' => getSetting('wish_money_number', ''),
+                'name' => getSetting('wish_money_name', ''),
+                'instructions' => getSetting('wish_money_instructions', ''),
+                'requires_proof' => (bool)getSetting('require_payment_proof', 0)
+            ],
+            'bank' => [
+                'enabled' => (bool)getSetting('enable_bank_transfer', 0),
+                'label' => 'Bank Transfer',
+                'bank_name' => getSetting('bank_name', ''),
+                'account' => getSetting('bank_account', ''),
+                'account_name' => getSetting('bank_account_name', ''),
+                'instructions' => getSetting('bank_instructions', ''),
+                'requires_proof' => (bool)getSetting('require_payment_proof', 0)
+            ],
+            'omt' => [
+                'enabled' => (bool)getSetting('enable_omt', 0),
+                'label' => 'OMT Transfer',
+                'name' => getSetting('omt_name', ''),
+                'instructions' => getSetting('omt_instructions', ''),
+                'requires_proof' => (bool)getSetting('require_payment_proof', 0)
+            ]
+        ];
+
         $this->render('checkout', [
             // No hero for checkout page
             'hasHero' => false,
@@ -225,6 +259,9 @@ class FrontendController
             'userName' => $userName,
             'userEmail' => $userEmail,
             'userPhone' => $userPhone,
+            
+            // Payment methods
+            'paymentMethods' => $paymentMethods,
         ]);
     }
 
@@ -271,6 +308,60 @@ class FrontendController
             'metaTitle' => $title . ' | Ego Clothing',
             'termsTitle' => $title,
             'termsContent' => $content,
+        ]);
+    }
+
+    public function account(): void
+    {
+        $user = User::findById(Auth::id());
+        $this->render('account', [
+            'pageKey' => 'account',
+            'hasHero' => false,
+            'headerVariant' => 'solid',
+            'headerTheme' => 'light',
+            'nav_logo' => asset('images/egologo2.png'),
+            'metaTitle' => 'My Account | Ego Clothing',
+            'user' => $user,
+        ]);
+    }
+
+    public function orderHistory(): void
+    {
+        $controller = new CustomerAccountController();
+        $data = $controller->getOrderHistory();
+        $data['pageKey'] = 'order-history';
+        $data['hasHero'] = false;
+        $data['headerVariant'] = 'solid';
+        $data['headerTheme'] = 'light';
+        $data['nav_logo'] = asset('images/egologo2.png');
+        $data['metaTitle'] = 'My Orders | Ego Clothing';
+        $this->render('order-history', $data);
+    }
+
+    public function orderDetails(): void
+    {
+        $orderId = (int)($_GET['id'] ?? 0);
+        if ($orderId <= 0) {
+            View::render('errors/404', ['pageKey' => '404'], 'layouts/frontend');
+            return;
+        }
+
+        $controller = new CustomerAccountController();
+        try {
+            $order = $controller->getOrderDetails($orderId);
+        } catch (Exception $e) {
+            View::render('errors/404', ['pageKey' => '404'], 'layouts/frontend');
+            return;
+        }
+
+        $this->render('order-details', [
+            'pageKey' => 'order-details',
+            'hasHero' => false,
+            'headerVariant' => 'solid',
+            'headerTheme' => 'light',
+            'nav_logo' => asset('images/egologo2.png'),
+            'metaTitle' => 'Order Details | Ego Clothing',
+            'order' => $order,
         ]);
     }
 }

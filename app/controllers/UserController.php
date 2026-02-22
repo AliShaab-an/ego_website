@@ -77,10 +77,24 @@ class UserController
             return ['status' => 'error', 'message' => 'Invalid email address'];
         }
 
+        // Rate limiting: 5 attempts per 15 minutes per IP
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $rateLimitKey = "login_user_{$ip}";
+        
+        if (!RateLimit::check($rateLimitKey, 5, 900)) {
+            $timeRemaining = RateLimit::getTimeRemaining($rateLimitKey, 900);
+            $minutes = ceil($timeRemaining / 60);
+            return ['status' => 'error', 'message' => "Too many login attempts. Please try again in {$minutes} minute(s)."];
+        }
+
         // Attempt customer login (only customers allowed on frontend)
         if (!Auth::attemptCustomer($email, $password)) {
+            RateLimit::recordAttempt($rateLimitKey);
             return ['status' => 'error', 'message' => 'Invalid email or password'];
         }
+
+        // Successful login - reset rate limit
+        RateLimit::reset($rateLimitKey);
 
         $user = Auth::user();
         
@@ -167,10 +181,24 @@ class UserController
             return ['status' => 'error', 'message' => 'Invalid email address'];
         }
 
+        // Rate limiting: 5 attempts per 15 minutes per IP
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $rateLimitKey = "login_admin_{$ip}";
+        
+        if (!RateLimit::check($rateLimitKey, 5, 900)) {
+            $timeRemaining = RateLimit::getTimeRemaining($rateLimitKey, 900);
+            $minutes = ceil($timeRemaining / 60);
+            return ['status' => 'error', 'message' => "Too many login attempts. Please try again in {$minutes} minute(s)."];
+        }
+
         // Attempt admin login (only admin/super_admin allowed)
         if (!Auth::attemptAdmin($email, $password)) {
+            RateLimit::recordAttempt($rateLimitKey);
             return ['status' => 'error', 'message' => 'Invalid credentials or insufficient permissions'];
         }
+
+        // Successful login - reset rate limit
+        RateLimit::reset($rateLimitKey);
 
         return ['status' => 'success', 'message' => 'Login successful', 'redirect' => 'index.php?action=dashboard'];
     }

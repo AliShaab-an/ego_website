@@ -6,4 +6,5 @@
         'userName' => $userName ?? '',
         'userEmail' => $userEmail ?? '',
         'userPhone' => $userPhone ?? '',
+        'paymentMethods' => $paymentMethods ?? [],
     ]);
