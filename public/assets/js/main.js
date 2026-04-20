@@ -3,6 +3,7 @@ import Product from "./modules/products.js";
 import ProductDetail from "./modules/productDetail.js";
 import Cart from "./modules/cart.js";
 import Auth from "./modules/auth.js";
+import Account from "./modules/account.js";
 import Categories from "./modules/categories.js";
 import Home from "./modules/home.js";
 import Contact from "./modules/contact.js";
@@ -41,6 +42,9 @@ $(document).ready(() => {
       break;
     case "checkout":
       Checkout.init();
+      break;
+    case "account":
+      Account.init();
       break;
     case "contact":
       Contact.init();

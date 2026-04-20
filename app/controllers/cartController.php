@@ -13,8 +13,8 @@
             }
             
             // If user is logged in, save to database
-            if(isset($_SESSION['user_id'])){
-                $userId = $_SESSION['user_id'];
+            if(Auth::check()){
+                $userId = Auth::id();
                 $success = Cart::addItemForUser($userId, $productId, $size, $color, $quantity);
                 $cartCount = Cart::getCartCount($userId);
                 if($success){

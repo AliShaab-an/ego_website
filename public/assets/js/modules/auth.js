@@ -16,6 +16,17 @@ const Auth = {
       let $form = $(this);
       let $messageBox = $("#registerMessage");
 
+      // Client-side confirm password check
+      const password = $form.find("[name='password']").val();
+      const confirm  = $form.find("[name='confirm_password']").val();
+      if (password !== confirm) {
+        $messageBox
+          .removeClass("hidden text-green-600 bg-green-100 border-green-300")
+          .addClass("text-red-600 bg-red-100 border border-red-300 p-3 rounded")
+          .text("❌ Passwords do not match.");
+        return;
+      }
+
       showLoader();
       ajaxRequest({
         url: Config.getApiUrl("register-user.php"),

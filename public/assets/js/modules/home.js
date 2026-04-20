@@ -1,7 +1,6 @@
 const Home = {
   init() {
     this.initCollectionsSwiper();
-    this.initShopTheLookSwiper();
     this.initTopProductsSwiper();
   },
 
@@ -26,46 +25,6 @@ const Home = {
       },
       effect: "slide",
       speed: 600,
-    });
-  },
-
-  initShopTheLookSwiper() {
-    new Swiper(".shopTheLookSwiper", {
-      slidesPerView: 1,
-      spaceBetween: 20,
-      loop: true,
-      autoplay: {
-        delay: 4000,
-        disableOnInteraction: false,
-      },
-      navigation: {
-        nextEl: ".shopTheLook-next",
-        prevEl: ".shopTheLook-prev",
-      },
-      pagination: {
-        el: ".swiper-pagination",
-        clickable: true,
-        bulletClass: "swiper-pagination-bullet",
-        bulletActiveClass: "swiper-pagination-bullet-active",
-      },
-      breakpoints: {
-        640: {
-          slidesPerView: 2,
-          spaceBetween: 20,
-        },
-        768: {
-          slidesPerView: 3,
-          spaceBetween: 30,
-        },
-        1024: {
-          slidesPerView: 4,
-          spaceBetween: 30,
-        },
-        1280: {
-          slidesPerView: 5,
-          spaceBetween: 30,
-        },
-      },
     });
   },
 

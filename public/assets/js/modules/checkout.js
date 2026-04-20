@@ -1,5 +1,6 @@
 ﻿import { ajaxRequest } from "../utils/ajax.js";
 import Config from "../config.js";
+import { showLoader, hideLoader } from "../utils/loader.js";
 
 const Checkout = {
   selectedPaymentMethod: "cash",
@@ -67,6 +68,11 @@ const Checkout = {
 
   initPaymentMethods() {
     const self = this;
+
+    // Clear field error state on input
+    $(document).on("input change", "#checkout-form input, #checkout-form textarea, #checkout-shipping-region", function() {
+      $(this).removeClass("border-red-500");
+    });
 
     // Handle payment method button clicks
     $(".payment-method-btn").on("click", function () {
@@ -165,12 +171,12 @@ const Checkout = {
     const items = this.cartData.items;
     let html = "";
     items.forEach((item) => {
-      const productName = item.product_name || 'Product';
-      const imageUrl = item.image_url || 'assets/images/placeholder.jpg';
+      const productName = item.name || 'Product';
+      const imageUrl = item.image || 'assets/images/placeholder.jpg';
       const price = parseFloat(item.price) || 0;
       const quantity = parseInt(item.quantity) || 0;
-      const colorName = item.color_name || '';
-      const sizeName = item.size_name || '';
+      const colorName = item.color || '';
+      const sizeName = item.size || '';
       
       html += `
         <div class="flex items-center justify-between py-2 border-b">
@@ -193,7 +199,7 @@ const Checkout = {
         </div>
       `;
     });
-    $("#cart-items-summary").html(html);
+    $("#checkout-cart-items").html(html);
   },
 
   loadShippingRegions() {
@@ -382,6 +388,7 @@ const Checkout = {
 
     const btn = $("#place-order-btn");
     btn.prop("disabled", true).text("Processing...");
+    showLoader();
 
     // Collect all form data (using backend expected field names)
     const customerData = {
@@ -403,14 +410,7 @@ const Checkout = {
       customerData.coupon_id = this.appliedCoupon.id;
     }
 
-    // Handle Wish Money - open WhatsApp to seller
-    if (this.selectedPaymentMethod === "wishmoney") {
-      this.sendOrderToWhatsApp(customerData);
-      btn.prop("disabled", false).text("Place Order");
-      return;
-    }
-
-    // Handle Cash on Delivery and Bank Transfer (eCheck) - create order in database
+    // Create order in the database for ALL payment methods (including Wish Money)
     ajaxRequest({
       url: Config.getApiUrl("create-order.php"),
       method: "POST",
@@ -420,7 +420,14 @@ const Checkout = {
         if (response.success) {
           // Reset retry count on success
           self.retryCount = 0;
-          
+          hideLoader();
+
+          // Wish Money: order saved — now open WhatsApp with the order details
+          if (self.selectedPaymentMethod === "wishmoney") {
+            self.sendOrderToWhatsApp(customerData, response.order_number);
+            return;
+          }
+
           // Check if this is a payment gateway redirect (eCheck/Bank Transfer)
           if (response.payment_gateway && response.checkout_url && response.checkout_fields) {
             // Show redirecting message
@@ -438,6 +445,7 @@ const Checkout = {
             // Don't auto-redirect - let user click "Continue Shopping"
           }
         } else {
+          hideLoader();
           self.showToast(response.message || "Failed to place order", "error");
           btn.prop("disabled", false).text("Place Order");
         }
@@ -502,47 +510,52 @@ const Checkout = {
           }
           
           self.showToast(errorMsg, "error");
+          hideLoader();
           btn.prop("disabled", false).text("Place Order");
         }
       },
     });
   },
 
-  sendOrderToWhatsApp(orderData) {
-    const sellerPhone = "96171309445";
+  sendOrderToWhatsApp(orderData, orderNumber) {
+    // Get seller phone from settings (injected via PHP into #checkout-config)
+    const sellerPhone = String($("#checkout-config").attr("data-wishmoney-number") || "").replace(/\D/g, "");
+    if (!sellerPhone) {
+      this.showToast("Wish Money number is not configured. Please contact support.", "error");
+      return;
+    }
 
-    // Get cart summary with correct IDs
-    const subtotal = $("#checkout-subtotal").text();
-    const shippingFee = $("#checkout-shipping").text();
-    const discount = $("#checkout-discount").text();
-    const total = $("#checkout-total").text();
-    const shippingRegion = $(
-      "#checkout-shipping-region option:selected"
-    ).text();
+    const storeName = String($("#checkout-config").attr("data-store-name") || "Ego Clothing");
+
+    // Get totals from the live UI values
+    const subtotal    = $("#checkout-subtotal").text().trim();
+    const shippingFee = $("#checkout-shipping").text().trim();
+    const total       = $("#checkout-total").text().trim();
+    const shippingRegion = $("#checkout-shipping-region option:selected").text().trim();
 
     // Build order message
-    let message = `*New Order - Wish Money Payment*\n\n`;
+    let message = `🛍️ *${storeName}*\n`;
+    if (orderNumber) message += `Order: ${orderNumber}\n`;
+    message += `\n*New Order - Wish Money Payment*\n\n`;
+
     message += `*Customer Details:*\n`;
-    message += `Name: ${orderData.customer_name}\n`;
-    message += `Phone: ${orderData.customer_phone}\n`;
-    message += `Email: ${orderData.customer_email}\n`;
-    message += `Address: ${orderData.customer_address}\n`;
-    message += `City: ${orderData.customer_city}\n`;
-    if (orderData.customer_state)
-      message += `State: ${orderData.customer_state}\n`;
-    if (orderData.customer_zip) message += `Zip: ${orderData.customer_zip}\n`;
+    message += `Name: ${orderData.name || ""}\n`;
+    message += `Phone: ${orderData.phone || ""}\n`;
+    message += `Email: ${orderData.email || ""}\n`;
+    message += `Address: ${orderData.address || ""}\n`;
+    message += `City: ${orderData.city || ""}\n`;
+    if (orderData.state) message += `State: ${orderData.state}\n`;
+    if (orderData.zip)   message += `Zip: ${orderData.zip}\n`;
     message += `Shipping Region: ${shippingRegion}\n\n`;
 
     // Add cart items
     message += `*Order Items:*\n`;
     if (this.cartData && this.cartData.items) {
       this.cartData.items.forEach((item, index) => {
-        message += `${index + 1}. ${item.product_name}`;
-        if (item.color_name) message += ` - ${item.color_name}`;
-        if (item.size_name) message += ` - ${item.size_name}`;
-        message += ` (Qty: ${item.quantity}) - $${(
-          item.price * item.quantity
-        ).toFixed(2)}\n`;
+        message += `${index + 1}. ${item.name || "Product"}`;
+        if (item.color) message += ` - ${item.color}`;
+        if (item.size)  message += ` - ${item.size}`;
+        message += ` (Qty: ${item.quantity}) - $${(parseFloat(item.price) * parseInt(item.quantity)).toFixed(2)}\n`;
       });
     }
 
@@ -550,9 +563,17 @@ const Checkout = {
     message += `\n*Order Summary:*\n`;
     message += `Subtotal: ${subtotal}\n`;
     message += `Shipping Fee: ${shippingFee}\n`;
-    if (discount && discount !== "$0.00") {
-      message += `Discount: ${discount}\n`;
+
+    // Only show discount line when a coupon is actually applied
+    if (this.appliedCoupon) {
+      const discountAmt = this.appliedCoupon.discount_percentage
+        ? (parseFloat(this.cartData.total || 0) * parseFloat(this.appliedCoupon.discount_percentage)) / 100
+        : 0;
+      if (discountAmt > 0) {
+        message += `Discount: -$${discountAmt.toFixed(2)}\n`;
+      }
     }
+
     message += `*Total: ${total}*\n`;
 
     if (orderData.notes) {
@@ -568,22 +589,8 @@ const Checkout = {
     // Open WhatsApp
     window.open(whatsappUrl, "_blank");
 
-    // Show success message and ask user to continue shopping manually
-    this.showToast(
-      "WhatsApp opened! Click 'Continue Shopping' when done.",
-      "success"
-    );
-
-    // Show a simple success modal for Wish Money orders
-    $("#order-number").text("Wish Money Order");
-    $("#success-modal").css("display", "flex").hide().fadeIn();
-
-    // Handle continue shopping button
-    $("#continue-shopping-btn")
-      .off("click")
-      .on("click", function () {
-        window.location.href = "shop.php";
-      });
+    // Show success modal
+    this.showSuccessModal(orderNumber || "Wish Money Order", null);
   },
 
   validatePaymentFields() {
@@ -594,39 +601,28 @@ const Checkout = {
     const city = $("#customer-city").val().trim();
     const shippingRegion = $("#checkout-shipping-region").val();
 
-    if (!name) {
-      this.showToast("Please enter your name", "error");
-      $("#customer-name").focus();
-      return false;
-    }
-    if (!phone) {
-      this.showToast("Please enter your phone number", "error");
-      $("#customer-phone").focus();
-      return false;
-    }
-    if (!email) {
-      this.showToast("Please enter your email", "error");
-      $("#customer-email").focus();
-      return false;
-    }
-    if (!this.isValidEmail(email)) {
-      this.showToast("Please enter a valid email address", "error");
-      $("#customer-email").focus();
-      return false;
-    }
-    if (!address) {
-      this.showToast("Please enter your address", "error");
-      $("#customer-address").focus();
-      return false;
-    }
-    if (!city) {
-      this.showToast("Please enter your city", "error");
-      $("#customer-city").focus();
-      return false;
-    }
-    if (!shippingRegion) {
-      this.showToast("Please select a shipping region", "error");
-      $("#checkout-shipping-region").focus();
+    // Reset all field error states
+    $("#customer-name, #customer-phone, #customer-email, #customer-address, #customer-city, #checkout-shipping-region")
+      .removeClass("border-red-500");
+
+    let firstError = null;
+
+    const markError = ($field, msg) => {
+      $field.addClass("border-red-500");
+      if (!firstError) firstError = { $field, msg };
+    };
+
+    if (!name)  markError($("#customer-name"), "Please enter your name");
+    if (!phone) markError($("#customer-phone"), "Please enter your phone number");
+    if (!email) markError($("#customer-email"), "Please enter your email");
+    else if (!this.isValidEmail(email)) markError($("#customer-email"), "Please enter a valid email address");
+    if (!address) markError($("#customer-address"), "Please enter your address");
+    if (!city)    markError($("#customer-city"), "Please enter your city");
+    if (!shippingRegion) markError($("#checkout-shipping-region"), "Please select a shipping region");
+
+    if (firstError) {
+      this.showToast(firstError.msg, "error");
+      firstError.$field.focus();
       return false;
     }
     return true;

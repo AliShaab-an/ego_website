@@ -1,0 +1,20 @@
+[2026-04-20 14:51:29] [Email failed] ERROR: To: user2@gmail.com | Subject: Order Confirmation #ORD-000015 | Error: Invalid address:  (From): 
+[2026-04-20 14:56:09] [Email failed] ERROR: To: user1@gmail.com | Subject: Order Confirmation #ORD-000016 | Error: Invalid address:  (From): 
+[2026-04-20 16:50:50] [Email failed] ERROR: To: user1@gmail.com | Subject: Order Confirmation #ORD-000017 | Error: Invalid address:  (From): 
+[2026-04-20 16:52:55] [Email failed] ERROR: To: user1@gmail.com | Subject: Order Confirmation #ORD-000018 | Error: Invalid address:  (From): 
+[2026-04-20 19:20:22] [Email failed] ERROR: To: user1@gmail.com | Subject: Password Reset Request | Error: Invalid address:  (From): 
+[2026-04-20 19:20:22] [Password reset email failed] ERROR: Failed to send email: Invalid address:  (From): 
+[2026-04-20 19:25:10] [Email failed] ERROR: To: user@gmail.com | Subject: Password Reset Request | Error: Invalid address:  (From): 
+[2026-04-20 19:25:10] [Password reset email failed] ERROR: Failed to send email: Invalid address:  (From): 
+[2026-04-20 19:27:31] [Email failed] ERROR: To: user1@gmail.com | Subject: Password Reset Request | Error: Invalid address:  (From): 
+[2026-04-20 19:27:31] [Password reset email failed] ERROR: Failed to send email: Invalid address:  (From): 
+[2026-04-20 19:31:53] [Email failed] ERROR: To: user1@gmail.com | Subject: Password Reset Request | Error: Invalid address:  (From): 
+[2026-04-20 19:31:53] [Password reset email failed] ERROR: Failed to send email: Invalid address:  (From): 
+[2026-04-20 19:33:36] [Email failed] ERROR: To: user1@gmail.com | Subject: Password Reset Request | Error: Invalid address:  (From): 
+[2026-04-20 19:33:36] [Password reset email failed] ERROR: Failed to send email: Invalid address:  (From): 
+[2026-04-20 19:34:45] [Email failed] ERROR: To: user2@gmail.com | Subject: Password Reset Request | Error: Invalid address:  (From): 
+[2026-04-20 19:34:45] [Password reset email failed] ERROR: Failed to send email: Invalid address:  (From): 
+[2026-04-20 19:38:10] [Email failed] ERROR: To: user2@gmail.com | Subject: Password Reset Request | Error: Invalid address:  (From): 
+[2026-04-20 19:38:10] [Password reset email failed] ERROR: Failed to send email: Invalid address:  (From): 
+[2026-04-20 20:02:31] [Email failed] ERROR: To: Eclothingleb@gmail.com | Subject: New Order #ORD-000019 | Error: SMTP Error: data not accepted. SMTP server error: DATA command failed Detail: Too many emails per second. Please upgrade your plan https://mailtrap.io/billing/plans/testing
+ SMTP code: 550 Additional SMTP info: 5.7.0

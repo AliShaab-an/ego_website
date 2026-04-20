@@ -42,7 +42,14 @@
 
         <div class="text-left">
           <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-          <input type="password" name="password" placeholder="Enter your password"
+          <input type="password" name="password" id="registerPassword" placeholder="Enter your password"
+                 class="w-full border border-gray-300 px-3 py-2 text-sm rounded-md outline-none
+                        focus:border-[#b38b5e] focus:ring-1 focus:ring-[#b38b5e] transition">
+        </div>
+
+        <div class="text-left">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+          <input type="password" name="confirm_password" id="registerConfirmPassword" placeholder="Confirm your password"
                  class="w-full border border-gray-300 px-3 py-2 text-sm rounded-md outline-none
                         focus:border-[#b38b5e] focus:ring-1 focus:ring-[#b38b5e] transition">
         </div>

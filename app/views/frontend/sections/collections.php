@@ -19,51 +19,69 @@ if (!isset($categoriesWithProducts) || !is_array($categoriesWithProducts)) {
         <div class="swiper-wrapper">
           <?php if (!empty($categoriesWithProducts)): ?>
             <?php foreach($categoriesWithProducts as $category): ?>
-              <!-- Collection Slide - One category per slide -->
+              <?php 
+              if (empty($category['products'])) continue;
+
+              $categoryImage = !empty($category['image'])
+                ? PUBLIC_URL . $category['image']
+                : PUBLIC_URL . 'assets/images/placeholder.jpg';
+              $products = array_slice($category['products'], 0, 4);
+              $productCount = count($products);
+
+              // Columns for the product grid
+              $cols = match($productCount) {
+                1 => 'grid-cols-1',
+                2 => 'grid-cols-2',
+                3 => 'grid-cols-3',
+                default => 'grid-cols-2',
+              };
+              // 4 products: 2 rows; 1-3 products: 1 row
+              $rows = $productCount === 4 ? 'grid-rows-2' : 'grid-rows-1';
+              ?>
               <div class="swiper-slide">
-                <div class="flex flex-col lg:flex-row gap-8 lg:gap-12 items-stretch lg:h-[540px]">
-                  <?php 
-                  $categoryImage = !empty($category['image'])
-                    ? PUBLIC_URL . $category['image']
-                    : PUBLIC_URL . 'assets/images/placeholder.jpg';
-                  $products = !empty($category['products']) ? array_slice($category['products'], 0, 4) : [];
-                  ?>
-                  <!-- Left: Category image -->
-                  <div class="w-full lg:w-1/2 max-w-md mx-auto lg:mx-0 flex flex-col">
-                    <a href="<?= page_url('category', ['id' => $category['id']]) ?>" class="relative overflow-hidden bg-gray-100 group h-[320px] sm:h-[420px] lg:h-full block">
-                      <img src="<?= $categoryImage ?>" 
+                <!-- Fixed height on desktop so both sides are always equal -->
+                <div class="flex flex-col lg:flex-row gap-6 lg:gap-8 lg:h-[520px]">
+
+                  <!-- Left: Category image — fills full desktop height -->
+                  <div class="lg:w-5/12 flex-shrink-0 flex flex-col">
+                    <a href="<?= page_url('category', ['id' => $category['id']]) ?>"
+                       class="block overflow-hidden bg-gray-100 group h-[300px] lg:h-auto lg:flex-1">
+                      <img src="<?= $categoryImage ?>"
                            alt="<?= htmlspecialchars($category['name']) ?>"
                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]">
                     </a>
-                    <a href="<?= page_url('category', ['id' => $category['id']]) ?>" class="mt-4 text-xl lg:text-3xl text-gray-900 tracking-wide text-start hover:text-brand transition-colors">
+                    <a href="<?= page_url('category', ['id' => $category['id']]) ?>"
+                       class="mt-3 text-xl lg:text-2xl text-gray-900 tracking-wide hover:text-brand transition-colors font-light flex-shrink-0">
                       <?= htmlspecialchars($category['name']) ?>
                     </a>
                   </div>
 
-                  <!-- Right: Product grid -->
-                  <div class="w-full lg:w-1/2 flex">
-                    <?php if (!empty($products)): ?>
-                      <div class="grid grid-cols-2 grid-rows-2 gap-4 lg:gap-4 w-full">
-                        <?php foreach ($products as $product): ?>
-                          <a href="<?= page_url('product', ['id' => $product['id']]) ?>" class="group flex flex-col h-full">
-                            <div class="relative overflow-hidden bg-gray-100 w-full h-72 sm:h-72 md:h-80">
-                              <img src="<?= PUBLIC_URL ?><?= $product['image_path'] ?>" 
-                                   alt="<?= htmlspecialchars($product['name']) ?>"
-                                   class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]">
-                            </div>
-                            <h4 class="mt-3 text-xl lg:text-xl text-gray-900 font-medium leading-snug text-start">
-                              <?= htmlspecialchars($product['name']) ?>
-                            </h4>
-                            <p class="mt-1 text-xl lg:text-xl font-semibold text-brand text-start">
-                              $<?= number_format($product['base_price'], 0) ?>
-                            </p>
-                          </a>
-                        <?php endforeach; ?>
-                      </div>
-                    <?php else: ?>
-                      <p class="text-gray-400">No products available in this category right now.</p>
-                    <?php endif; ?>
+                  <!-- Right: Product grid — same height as left on desktop -->
+                  <div class="lg:w-7/12 grid <?= $cols ?> <?= $rows ?> gap-3
+                              <?= $productCount === 4 ? 'h-[440px] lg:h-full' : '' ?>">
+                    <?php foreach ($products as $product): ?>
+                      <a href="<?= page_url('product', ['id' => $product['id']]) ?>"
+                         class="group flex flex-col min-h-0 overflow-hidden">
+                        <!-- Image fills all available cell space -->
+                        <div class="flex-1 min-h-0 overflow-hidden bg-gray-100
+                                    <?= $productCount !== 4 ? 'aspect-[3/4] lg:aspect-auto' : '' ?>">
+                          <img src="<?= PUBLIC_URL ?><?= $product['image_path'] ?>"
+                               alt="<?= htmlspecialchars($product['name']) ?>"
+                               class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]">
+                        </div>
+                        <!-- Text strip — always visible, never clipped -->
+                        <div class="flex-shrink-0 pt-2 pb-1">
+                          <h4 class="text-sm font-medium text-gray-900 truncate leading-snug">
+                            <?= htmlspecialchars($product['name']) ?>
+                          </h4>
+                          <p class="text-sm font-semibold text-brand">
+                            $<?= number_format($product['base_price'], 0) ?>
+                          </p>
+                        </div>
+                      </a>
+                    <?php endforeach; ?>
                   </div>
+
                 </div>
               </div>
             <?php endforeach; ?>

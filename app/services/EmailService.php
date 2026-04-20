@@ -39,7 +39,8 @@ class EmailService
             $smtpUser       = getSetting('smtp_username',   $_ENV['SMTP_USER'] ?? '');
             $smtpPass       = getSetting('smtp_password',   $_ENV['SMTP_PASS'] ?? '');
             $smtpEncryption = getSetting('smtp_encryption', 'tls');
-            $fromEmail      = getSetting('smtp_from_email', getSetting('smtp_username', $_ENV['SMTP_FROM'] ?? $_ENV['SMTP_USER'] ?? 'noreply@example.com'));
+            $smtpFromEmail  = getSetting('smtp_from_email', '');
+            $fromEmail      = filter_var($smtpFromEmail, FILTER_VALIDATE_EMAIL) ? $smtpFromEmail : ($_ENV['SMTP_FROM'] ?? 'noreply@example.com');
             $fromName       = getSetting('smtp_from_name',  getSetting('website_name', 'EGO'));
 
             $mail->isSMTP();

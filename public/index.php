@@ -45,6 +45,12 @@
             'run' => fn() => $frontend->forgotPassword(),
         ],
 
+        // Reset Password - public page (token from email link)
+        'resetPassword' => [
+            'guard' => null,
+            'run' => fn() => $frontend->resetPassword(),
+        ],
+
         // Privacy Policy - public page
         'privacy-policy' => [
             'guard' => null,

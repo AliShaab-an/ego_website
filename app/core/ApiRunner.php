@@ -11,6 +11,7 @@
                         '/api/login-user.php',
                         '/api/register-user.php',
                         '/api/forgot-password.php',
+                        '/api/reset-password.php',
                         '/admin/api/login-admin.php'
                     ];
                     

@@ -6,11 +6,13 @@ export function showToast(message, type = "success") {
     warning: "bg-yellow-500 text-white",
   };
   const bg = bgMap[type] || bgMap.success;
+  // Remove any existing toasts to avoid stacking
+  $(".toast-notification").remove();
   const toast = $(
-    `<div class="fixed top-4 right-4 ${bg} px-4 py-3 rounded-lg shadow-lg text-sm z-[9999] max-w-sm">${message}</div>`
+    `<div class="toast-notification fixed top-4 right-4 ${bg} px-4 py-3 rounded-lg shadow-lg text-sm z-[9999] max-w-sm">${message}</div>`
   );
   $("body").append(toast);
-  setTimeout(() => toast.fadeOut(500, () => toast.remove()), 3000);
+  setTimeout(() => toast.fadeOut(400, () => toast.remove()), 3000);
 }
 
 export function fadeOutMessages(selector = ".message") {

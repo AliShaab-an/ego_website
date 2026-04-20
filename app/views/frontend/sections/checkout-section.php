@@ -6,6 +6,10 @@ $cartCount = $cartCount ?? 0;
 $userName = $userName ?? '';
 $userEmail = $userEmail ?? '';
 $userPhone = $userPhone ?? '';
+$userAddress = $userAddress ?? '';
+$userCity = $userCity ?? '';
+$userState = $userState ?? '';
+$userZip = $userZip ?? '';
 
 // Ensure payment methods have a default (COD at minimum)
 if (!isset($paymentMethods) || empty($paymentMethods)) {
@@ -20,8 +24,37 @@ if (!isset($paymentMethods) || empty($paymentMethods)) {
 }
 ?>
 
+<!-- Checkout configuration data for JavaScript (hidden) -->
+<div id="checkout-config" class="hidden"
+     data-wishmoney-number="<?= htmlspecialchars($paymentMethods['wishmoney']['number'] ?? '') ?>"
+     data-store-name="<?= htmlspecialchars(getSetting('website_name', 'Ego Clothing')) ?>"
+     data-logo-url="<?php
+         $logoSetting = getSetting('logo');
+         echo htmlspecialchars($logoSetting ? url($logoSetting) : asset('images/egologo3.png'));
+     ?>"></div>
+
 <section class="max-w-7xl mx-auto px-4 py-10">
-    <h1 class="text-4xl md:text-5xl font-bold mb-8 text-center font-cor">Checkout</h1>
+    <h1 class="text-4xl md:text-5xl font-bold mb-4 text-center font-cor">Checkout</h1>
+
+    <!-- Checkout Progress Steps -->
+    <?php if (!empty($cartItems)): ?>
+    <div class="flex items-center justify-center gap-0 mb-8 max-w-sm mx-auto">
+        <div class="flex flex-col items-center">
+            <div class="w-8 h-8 rounded-full bg-brand text-white flex items-center justify-center text-sm font-bold">1</div>
+            <span class="text-xs mt-1 text-brand font-medium">Payment</span>
+        </div>
+        <div class="flex-1 h-0.5 bg-brand mx-1 mb-4"></div>
+        <div class="flex flex-col items-center">
+            <div class="w-8 h-8 rounded-full bg-brand text-white flex items-center justify-center text-sm font-bold">2</div>
+            <span class="text-xs mt-1 text-brand font-medium">Shipping</span>
+        </div>
+        <div class="flex-1 h-0.5 bg-brand mx-1 mb-4"></div>
+        <div class="flex flex-col items-center">
+            <div class="w-8 h-8 rounded-full bg-brand text-white flex items-center justify-center text-sm font-bold">3</div>
+            <span class="text-xs mt-1 text-brand font-medium">Review</span>
+        </div>
+    </div>
+    <?php endif; ?>
 
     <?php if (empty($cartItems)): ?>
     <!-- Empty Cart -->
@@ -119,21 +152,21 @@ if (!isset($paymentMethods) || empty($paymentMethods)) {
                     <input class="border w-full h-12 p-2 outline-none focus:border-brand" type="email" id="customer-email" name="email" placeholder="Enter your email" value="<?= htmlspecialchars($userEmail) ?>">
 
                     <label class="text-lg" for="customer-address">Address <span class="text-red-500">*</span></label>
-                    <textarea class="border w-full h-24 p-2 outline-none focus:border-brand resize-none" id="customer-address" name="address" placeholder="Enter your full address"></textarea>
+                    <textarea class="border w-full h-24 p-2 outline-none focus:border-brand resize-none" id="customer-address" name="address" placeholder="Enter your full address"><?= htmlspecialchars($userAddress) ?></textarea>
 
                     <!-- City, State, Zip -->
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div class="flex flex-col">
                             <label class="text-lg" for="customer-city">City <span class="text-red-500">*</span></label>
-                            <input class="border h-10 p-2 outline-none focus:border-brand" type="text" id="customer-city" name="city" placeholder="Enter City">
+                            <input class="border h-10 p-2 outline-none focus:border-brand" type="text" id="customer-city" name="city" placeholder="Enter City" value="<?= htmlspecialchars($userCity) ?>">
                         </div>
                         <div class="flex flex-col">
                             <label class="text-lg" for="customer-state">State</label>
-                            <input class="border h-10 p-2 outline-none focus:border-brand" type="text" id="customer-state" name="state" placeholder="Enter State">
+                            <input class="border h-10 p-2 outline-none focus:border-brand" type="text" id="customer-state" name="state" placeholder="Enter State" value="<?= htmlspecialchars($userState) ?>">
                         </div>
                         <div class="flex flex-col">
                             <label class="text-lg" for="customer-zip">Zip Code</label>
-                            <input class="border h-10 p-2 outline-none focus:border-brand" type="text" id="customer-zip" name="zip" placeholder="Enter Code">
+                            <input class="border h-10 p-2 outline-none focus:border-brand" type="text" id="customer-zip" name="zip" placeholder="Enter Code" value="<?= htmlspecialchars($userZip) ?>">
                         </div>
                     </div>
 

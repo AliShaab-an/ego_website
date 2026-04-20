@@ -48,11 +48,13 @@ const Cart = {
       const color = $("#selected-color").val();
       const quantity = parseInt($("#qty-value").text());
 
+      showLoader();
       ajaxRequest({
         url: "api/add-to-cart.php",
         method: "POST",
         data: { productId, size, color, quantity },
         success: function (res) {
+          hideLoader();
           if (res.success) {
             showToast("Added to cart successfully", "success");
             $("#cart-count").text(res.cart_count);
@@ -62,6 +64,7 @@ const Cart = {
           }
         },
         error: function (xhr) {
+          hideLoader();
           showToast("Server error. Try again.", "error");
         },
       });
@@ -229,6 +232,7 @@ const Cart = {
     formData.append("color", color);
     formData.append("quantity", quantity);
 
+    showLoader();
     ajaxRequest({
       url: "api/update-cart.php",
       method: "POST",
@@ -236,6 +240,7 @@ const Cart = {
       processData: false,
       contentType: false,
       success: function (response) {
+        hideLoader();
         if (response.success) {
           // Update ALL cart items with same product/size/color (both desktop and mobile)
           const allMatchingItems = $(
@@ -269,6 +274,7 @@ const Cart = {
         }
       },
       error: function () {
+        hideLoader();
         Cart.showCartMessage("Server error. Please try again.", "error");
       },
     });
@@ -280,6 +286,7 @@ const Cart = {
     formData.append("size", size);
     formData.append("color", color);
 
+    showLoader();
     ajaxRequest({
       url: "api/remove-from-cart.php",
       method: "POST",
@@ -287,8 +294,8 @@ const Cart = {
       processData: false,
       contentType: false,
       success: function (response) {
+        hideLoader();
         if (response.success) {
-          // Remove the item from the DOM
           cartItemElement.fadeOut(300, function () {
             $(this).remove();
 
@@ -332,6 +339,7 @@ const Cart = {
         }
       },
       error: function () {
+        hideLoader();
         Cart.showCartMessage("Server error. Please try again.", "error");
       },
     });

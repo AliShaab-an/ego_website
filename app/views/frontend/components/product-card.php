@@ -163,7 +163,7 @@ if (!isset($product) || empty($product)) {
           <button class="cursor-pointer" type="button" id="qty-plus">+</button>
         </div>
         <button 
-        class="bg-brand text-white px-8 py-2 rounded cursor-pointer"
+        class="bg-brand text-white px-8 py-2 rounded cursor-pointer hover:opacity-80 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
         id="add-to-cart"
         data-product-id="<?= $product['id'] ?>">
         Add to Cart
@@ -186,14 +186,14 @@ if (!isset($product) || empty($product)) {
           Shipping & Returns
           <i class="fi fi-rr-arrow-small-right text-xl"></i>
         </button>
-        <div class="accordion-content hidden p-4">
+        <div class="accordion-content hidden p-4 text-left">
           <?= getSetting('shipping_policy', 'Shipping and return information will be available here.') ?>
         </div>
         <button class="accordion-btn w-full flex justify-between items-center p-3 text-lg font-medium text-left cursor-pointer">
           Product Care
           <i class="fi fi-rr-arrow-small-right text-xl"></i>
         </button>
-        <div class="accordion-content hidden p-4">
+        <div class="accordion-content hidden p-4 text-left">
           <?= getSetting('return_policy', 'Product care instructions will be available here.') ?>
         </div>
       </div>

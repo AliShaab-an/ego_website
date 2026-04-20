@@ -23,13 +23,12 @@ ApiRunner::run(function () {
         return;
     }
 
-    // Generate reset token
-    $token  = bin2hex(random_bytes(32));
-    $expiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
+    // Generate reset token — use MySQL NOW() so expiry is in the same timezone
+    $token = bin2hex(random_bytes(32));
 
     DB::query(
-        "UPDATE users SET reset_token = ?, reset_token_expiry = ? WHERE id = ?",
-        [$token, $expiry, $user['id']]
+        "UPDATE users SET reset_token = ?, reset_token_expiry = NOW() + INTERVAL 1 HOUR WHERE id = ?",
+        [$token, $user['id']]
     );
 
     // Send password reset email (silently fails if SMTP is disabled)

@@ -4,10 +4,6 @@ View::partial('frontend/sections/collections', [
     'categoriesWithProducts' => $categoriesWithProducts ?? [],
 ]);
 
-View::partial('frontend/sections/shop-the-look', [
-    'shopTheLookProducts' => $shopTheLookProducts ?? [],
-]);
-
 View::partial('frontend/sections/top-products', [
     'topProducts' => $topProducts ?? [],
 ]);

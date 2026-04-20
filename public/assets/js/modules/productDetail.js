@@ -51,15 +51,18 @@ const ProductDetail = {
   },
 
   initImageGallery() {
+    // Set first thumbnail as active
+    $(".thumbnail-image").first().addClass("ring-2 ring-brand");
+
     // Handle thumbnail clicks for image switching
     $(".thumbnail-image").on("click", function () {
       const newSrc = $(this).attr("src");
-      $("#mainImage").attr("src", newSrc);
+      $("#mainImage").fadeOut(150, function() {
+        $(this).attr("src", newSrc).fadeIn(150);
+      });
 
-      // Update active thumbnail - remove active state from all thumbnails
+      // Update active thumbnail
       $(".thumbnail-image").removeClass("ring-2 ring-brand");
-
-      // Add active state to clicked thumbnail
       $(this).addClass("ring-2 ring-brand");
     });
   },

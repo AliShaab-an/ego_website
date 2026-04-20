@@ -60,15 +60,9 @@
                 User::updateContactInfo($userId, $phone, $address, $city, $state, $zip);
             }
             
-            // Shipping region required for COD, bank transfer, and OMT
-            if (in_array($paymentMethod, ['cod', 'bank', 'omt']) && !$shippingRegionId) {
-                throw new Exception('Shipping region is required for ' . strtoupper($paymentMethod));
-            }
-
-            // Wishmoney orders are handled via WhatsApp (JS side) and rarely reach here,
-            // but set a sensible default just in case.
-            if ($paymentMethod === 'wishmoney' && !$shippingRegionId) {
-                $shippingRegionId = 1;
+            // Shipping region required for all delivery methods
+            if (in_array($paymentMethod, ['cod', 'bank', 'omt', 'wishmoney']) && !$shippingRegionId) {
+                throw new Exception('Shipping region is required');
             }
             
             // Prepare guest info array
@@ -88,21 +82,37 @@
             try {
                 $orderData = Order::getById($orderId);
                 $customerEmail = $isGuest ? $guestEmail : (Auth::user()['email'] ?? '');
-                $customerName = $isGuest ? $guestName : (Auth::user()['name'] ?? 'Customer');
-                $orderNumber = 'ORD-' . str_pad($orderId, 6, '0', STR_PAD_LEFT);
-                
+                $customerName  = $isGuest ? $guestName  : (Auth::user()['name'] ?? 'Customer');
+                $customerPhone = $isGuest ? $guestPhone  : ($input['phone'] ?? '');
+                $orderNumber   = 'ORD-' . str_pad($orderId, 6, '0', STR_PAD_LEFT);
+
                 if (!empty($customerEmail) && $orderData) {
-                    $htmlBody = EmailService::renderTemplate('order-confirmation', [
-                        'order' => $orderData,
-                        'items' => $orderData['items'] ?? [],
+                    // Email to customer
+                    $customerHtml = EmailService::renderTemplate('order-confirmation', [
+                        'order'        => $orderData,
+                        'items'        => $orderData['items'] ?? [],
                         'customerName' => $customerName,
-                        'orderNumber' => $orderNumber
+                        'orderNumber'  => $orderNumber,
                     ]);
-                    EmailService::send($customerEmail, "Order Confirmation #$orderNumber", $htmlBody);
+                    EmailService::send($customerEmail, "Order Confirmation #$orderNumber", $customerHtml);
+                }
+
+                // Email to admin/store owner
+                $adminEmail = getSetting('contact_email', '');
+                if (!empty($adminEmail) && $orderData) {
+                    $adminHtml = EmailService::renderTemplate('order-new-admin', [
+                        'order'         => $orderData,
+                        'items'         => $orderData['items'] ?? [],
+                        'customerName'  => $customerName,
+                        'customerEmail' => $customerEmail,
+                        'customerPhone' => $customerPhone,
+                        'orderNumber'   => $orderNumber,
+                    ]);
+                    EmailService::send($adminEmail, "New Order #$orderNumber", $adminHtml);
                 }
             } catch (Exception $emailErr) {
                 // Log but don't fail the order
-                error_log("Order confirmation email failed: " . $emailErr->getMessage());
+                error_log("Order email failed: " . $emailErr->getMessage());
             }
             
             // For eCheck/Bank Transfer payment, redirect to Secure Acceptance

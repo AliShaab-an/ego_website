@@ -42,9 +42,6 @@ class FrontendController
             'newProducts' => Cache::remember("home:v{$homeVersion}:new_products", 300, 
                 fn() => $this->productController->getNewProducts()
             ),
-            'shopTheLookProducts' => Cache::remember("home:v{$homeVersion}:shop_look", 300, 
-                fn() => $this->productController->getProductsByCategoryName('Shop the Look', 8)
-            ),
             'categoriesWithProducts' => Cache::remember("home:v{$homeVersion}:categories", 3600, 
                 fn() => $this->categories->listCategoriesWithProducts()
             ),
@@ -202,9 +199,13 @@ class FrontendController
             if ($user) {
                 $userName = $user['name'] ?? '';
                 $userEmail = $user['email'] ?? '';
-                // Fetch full user data for phone if needed
+                // Fetch full user data for phone and address
                 $fullUser = User::findById($user['id']);
                 $userPhone = $fullUser['phone'] ?? '';
+                $userAddress = $fullUser['address'] ?? '';
+                $userCity = $fullUser['city'] ?? '';
+                $userState = $fullUser['state'] ?? '';
+                $userZip = $fullUser['zip_code'] ?? '';
             }
         }
 
@@ -259,6 +260,10 @@ class FrontendController
             'userName' => $userName,
             'userEmail' => $userEmail,
             'userPhone' => $userPhone,
+            'userAddress' => $userAddress ?? '',
+            'userCity' => $userCity ?? '',
+            'userState' => $userState ?? '',
+            'userZip' => $userZip ?? '',
             
             // Payment methods
             'paymentMethods' => $paymentMethods,
@@ -274,6 +279,19 @@ class FrontendController
             'headerTheme' => 'light',
             'nav_logo' => asset('images/egologo2.png'),
             'metaTitle' => 'Forgot Password | Ego Clothing',
+        ]);
+    }
+
+    public function resetPassword(): void
+    {
+        $token = trim($_GET['token'] ?? '');
+        $this->render('reset-password', [
+            'hasHero' => false,
+            'headerVariant' => 'solid',
+            'headerTheme' => 'light',
+            'nav_logo' => asset('images/egologo2.png'),
+            'metaTitle' => 'Reset Password | Ego Clothing',
+            'token' => $token,
         ]);
     }
 

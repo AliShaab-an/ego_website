@@ -14,3 +14,5 @@ Array
     [action] => inactive
 )
 [2026-02-22 20:13:51] [eCheck payment initiated] INFO: Array
+[2026-04-20 19:47:13] [Email sent] INFO: To: user2@gmail.com | Subject: Password Reset Request
+[2026-04-20 20:02:28] [Email sent] INFO: To: user2@gmail.com | Subject: Order Confirmation #ORD-000019

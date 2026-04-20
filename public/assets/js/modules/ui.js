@@ -1,6 +1,7 @@
 const UI = {
   init() {
     this.initLoginPopup();
+    this.initAccountMenu();
     this.initSidebar();
     this.initFilterSidebar();
     this.initAccordions();
@@ -26,6 +27,14 @@ const UI = {
     closeLogin?.addEventListener("click", () => {
       overlay?.classList.add("hidden");
       document.body.style.overflow = "";
+    });
+
+    // Close modal when clicking the backdrop
+    overlay?.addEventListener("click", (e) => {
+      if (e.target === overlay) {
+        overlay.classList.add("hidden");
+        document.body.style.overflow = "";
+      }
     });
 
     signInRedirect?.addEventListener("click", (e) => {
@@ -77,6 +86,38 @@ const UI = {
         document.body.classList.remove("overflow-hidden");
       });
     }
+  },
+
+  initAccountMenu() {
+    const logoutBtn = document.getElementById("logoutBtn");
+    const mobileLogoutBtn = document.getElementById("mobileLogoutBtn");
+
+    const handleLogout = (e) => {
+      e.preventDefault();
+      const el = e.currentTarget;
+      const logoutUrl = el.dataset.logoutUrl;
+      const homeUrl = el.dataset.homeUrl;
+      const csrfToken =
+        document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || "";
+
+      fetch(logoutUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "X-CSRF-TOKEN": csrfToken,
+        },
+        body: "csrf_token=" + encodeURIComponent(csrfToken),
+      })
+        .then(() => {
+          window.location.href = homeUrl;
+        })
+        .catch(() => {
+          window.location.href = homeUrl;
+        });
+    };
+
+    logoutBtn?.addEventListener("click", handleLogout);
+    mobileLogoutBtn?.addEventListener("click", handleLogout);
   },
 
   initFilterSidebar() {
